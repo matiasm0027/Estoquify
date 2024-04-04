@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('name', 50);
             $table->boolean('its_central')->default(false);
             $table->timestamps();
-        // Conditional unique constraint for its central only one to be valid
        });
     }
 

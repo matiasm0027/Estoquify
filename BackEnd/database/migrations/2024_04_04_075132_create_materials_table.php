@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('materials', function (Blueprint $table) {
             $table->id();
+            $table->string('prefix', 5);
+            $table->date('low_date')->nullable();
+            $table->date('high_date');
+            $table->string('state');
+            $table->foreignId('branch_office_id')->constrained('branch_offices')->onDelete('cascade');
             $table->timestamps();
         });
     }
