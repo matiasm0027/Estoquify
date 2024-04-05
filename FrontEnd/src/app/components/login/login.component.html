@@ -4,7 +4,8 @@
             <img src="../../../assets/img/logo_png.png" alt="Logo" style="width: 100px; height: 100px;">
         </p>
         <p class="text-center text-condensedLight">Sign in with your Account</p>
-        <form [formGroup]="login" (ngSubmit)="enviarLogin()">
+        <form [formGroup]="login" >
+            <!-- <form [formGroup]="login" (ngSubmit)="enviarLogin()"> Oriol la concha de tu madre haz funciones -->
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                 <input class="mdl-textfield__input" type="text" id="email" formControlName="email">
                 <label class="mdl-textfield__label" for="email">Email</label>
