@@ -25,14 +25,10 @@ class EmployeesController extends Controller
                 return response()->json([
                     'token' => $token,
                     'empleado' => [
-                        'id' => $empleado->id,
                         'nombre' => $empleado->name,
                         'apellido' => $empleado->last_name,
                         'email' => $empleado->email,
-                        'telefono' => $empleado->phone_number,
-                        'departamento' => $empleado->department,
                         'rol' => $empleado->role,
-                        'sucursal' => $empleado->branchOffice
                     ]
                 ]);
             } else {

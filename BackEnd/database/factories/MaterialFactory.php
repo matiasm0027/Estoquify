@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 use App\Models\Material;
+use App\Models\BranchOffice;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -13,14 +14,16 @@ class MaterialFactory extends Factory
 
     public function definition()
     {
-        $prefixes = ['MON', 'MOV', 'POR', 'AU', 'MOU', 'KEY'];
+        $state = $this->faker->randomElement(['active', 'inactive']);
+        $lowDate = $state === 'active' ? null : $this->faker->date();
+
+        $branchOfficeId = BranchOffice::all()->random()->id;
 
         return [
-            'prefix' => $this->faker->randomElement($prefixes),
-            'low_date' => $this->faker->date(),
+            'low_date' => $lowDate,
             'high_date' => $this->faker->date(),
-            'branch_office_id' => mt_rand(1, 10),
-            'state' => $this->faker->randomElement(['Disponible', 'No disponible']),
+            'state' => $state,
+            'branch_office_id' => $branchOfficeId,
         ];
     }
 }

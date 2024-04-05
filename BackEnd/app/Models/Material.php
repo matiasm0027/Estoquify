@@ -9,17 +9,30 @@ class Material extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['id', 'prefix', 'low_date', 'high_date', 'branch_office_id', 'state'];
+    protected $table = 'materials';
 
-    protected static function booted()
+    protected $fillable = ['id', 'low_date', 'high_date', 'branch_office_id', 'state'];
+
+    public function branchOffice()
     {
-        static::creating(function ($material) {
-            $lastMaterial = Material::where('id', 'like', $material->prefix . '%')->latest()->first();
+        return $this->belongsTo(BranchOffice::class);
+    }
 
-            $newIdNumber = $lastMaterial ? (int)substr($lastMaterial->id, strlen($material->prefix)) + 1 : 1;
-            $newId = $material->prefix . str_pad($newIdNumber, 3, '0', STR_PAD_LEFT);
+    public function category()
+    {
+        return $this->hasMany(Category::class, AttributeCategoryMaterial::class)
+                    ->withPivot('value', 'category_id');
+    }
 
-            $material->id = $newId;
-        });
+    public function attribute()
+    {
+        return $this->belongsToMany(Attribute::class, AttributeCategoryMaterial::class)
+                    ->withPivot('value', 'attribute_id');
+    }
+
+    public function employee()
+    {
+        return $this->belongsToMany(Employee::class, EmployeeMaterial::class)
+                    ->withPivot('assignment_date', 'return_date', 'employee_id');
     }
 }

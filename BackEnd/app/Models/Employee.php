@@ -11,27 +11,11 @@ class Employee extends Model
 {
     use HasFactory, Notifiable, HasApiTokens;
 
-    protected $table = 'employees'; // Nombre de la tabla en la base de datos
+    protected $table = 'employees';
 
-    protected $fillable = [
-        'name',
-        'last_name',
-        'email',
-        'password',
-        'phone_number',
-        'department_id',
-        'role_id',
-        'branch_office_id'
-    ];
+    protected $fillable = ['name', 'last_name', 'email', 'password', 'phone_number', 'department_id', 'role_id', 'branch_office_id'];
 
-    protected $hidden = [
-        'password', 'remember_token',
-    ];
-
-    public function department()
-    {
-        return $this->belongsTo(Department::class);
-    }
+    protected $hidden = ['password', 'remember_token',];
 
     public function role()
     {
@@ -42,4 +26,16 @@ class Employee extends Model
     {
         return $this->belongsTo(BranchOffice::class);
     }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function material()
+    {
+        return $this->belongsToMany(Material::class, EmployeeMaterial::class)
+                    ->withPivot('assignment_date', 'return_date', 'material_id');
+    }
+
 }

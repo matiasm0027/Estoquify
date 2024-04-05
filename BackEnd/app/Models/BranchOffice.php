@@ -8,14 +8,16 @@ class BranchOffice extends Model
 {
     use HasFactory;
 
+    protected $table = 'branch_offices';
+
     protected $fillable = ['name', 'its_central'];
 
-    public function employees()
+    public function employee()
     {
         return $this->hasMany(Employee::class);
     }
 
-    public function materials()
+    public function material()
     {
         return $this->hasMany(Material::class);
     }
