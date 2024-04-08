@@ -56,6 +56,9 @@ export class PeticionesService {
   eliminarEmpleado(id: number): Observable<any> {
     return this.http.delete(`${this.baseURL}/employees/${id}`);
   }
+  verificarCampo(tipo: string, valor: string): Observable<any> {
+    return this.http.get<any>(`${this.baseURL}/verificar/${tipo}/${valor}`);
+  }
 }
 
 

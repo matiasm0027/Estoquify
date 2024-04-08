@@ -43,4 +43,28 @@ class EmployeesController extends Controller
             return response()->json(['error' => 'Error interno del servidor'], 500);
         }
     }
+
+    public function verificarExistencia(Request $request, $tipo, $valor)
+    {
+        try {
+            // Validar el tipo de verificación
+            if ($tipo !== 'email' && $tipo !== 'username') {
+                return response()->json(['error' => 'Tipo de verificación no válido'], 400);
+            }
+
+            // Realizar la consulta para verificar la existencia del valor único
+            $usuario = Usuario::where($tipo, $valor)->first();
+
+            if ($usuario) {
+                // Si el valor ya existe en la base de datos, devuelve un error 409
+                return response()->json(['error' => "El $tipo ya está en uso"], 409);
+            } else {
+                // Si el valor no existe, devuelve un mensaje de éxito
+                return response()->json(['message' => "El $tipo está disponible"], 200);
+            }
+        } catch (\Exception $e) {
+            // En caso de error, devolver una respuesta con el error interno del servidor
+            return response()->json(['error' => 'Error interno del servidor'], 500);
+        }
+    }
 }

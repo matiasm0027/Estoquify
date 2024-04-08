@@ -4,18 +4,17 @@
             <img src="../../../assets/img/logo_png.png" alt="Logo" style="width: 100px; height: 100px;">
         </p>
         <p class="text-center text-condensedLight">Sign in with your Account</p>
-        <form [formGroup]="login" >
-            <!-- <form [formGroup]="login" (ngSubmit)="enviarLogin()"> Oriol la concha de tu madre haz funciones -->
+        <form [formGroup]="login" (ngSubmit)="enviarLogin()">
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                 <input class="mdl-textfield__input" type="text" id="email" formControlName="email">
                 <label class="mdl-textfield__label" for="email">Email</label>
                 <!-- Control de errores -->
                 <div *ngIf="login.get('email')?.errors?.['required'] && login.get('email')?.touched"
-                  class="error_form ">
-                  Este campo no puede quedar vacío.
+                    class="error_form mensaje error">
+                    This field cannot be empty.
                 </div>
-                <div *ngIf="login.get('email')?.errors?.['pattern'] && login.get('email')?.touched" class="error_form ">
-                  Formato inválido.
+                <div *ngIf="login.get('email')?.errors?.['pattern'] && login.get('email')?.touched" class="error_form mensaje error">
+                    Invalid format.
                 </div>
             </div>
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
@@ -23,19 +22,23 @@
                 <label class="mdl-textfield__label" for="pass">Password</label>
                 <!-- Control de errores -->
                 <div *ngIf="login.get('password')?.errors?.['required'] && login.get('password')?.touched"
-                  class="error_form ">
-                  Este campo no puede quedar vacío.
+                    class="error_form mensaje error">
+                    This field cannot be empty.
                 </div>
             </div>
             <div class="text-left">
-                <a routerLink="/forgot_password" style="text-decoration: none; font-size: 12px;">Forgot Password?</a>
+                <a routerLink="/forgot_password" style="text-decoration: none; font-size: 12px;">
+                    Forgot Password?</a>
             </div>
             <br>
             <button class="mdl-button mdl-js-button mdl-js-ripple-effect">
                 SIGN IN
             </button>
-             <!-- Aviso de error en el login -->
-             <div *ngIf="mensaje" class="error_form mt-3">{{ mensaje }}</div>
+            <!-- Respuesta exitosa en el login -->
+            <div *ngIf="mensaje" class="mensaje exitoso mt-3">{{ mensaje }}</div>
+
+            <!-- Mensajes de error específicos de la API -->
+            <div *ngIf="errorApi" class="mensaje error mt-3">{{ errorApi }}</div>
         </form>
     </div>
 </div>
