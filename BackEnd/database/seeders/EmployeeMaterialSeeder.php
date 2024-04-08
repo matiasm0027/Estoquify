@@ -14,8 +14,9 @@ class EmployeeMaterialSeeder extends Seeder
 
         $employees->each(function ($employee) {
             $materialsCount = rand(3, 4);
-            $materials = Material::factory()->count($materialsCount)->create(['branch_office_id' => $employee->branch_office_id]);
-
+            $materials = Material::factory()->count($materialsCount)->
+            create(['state' => 'active', 'low_date' => null, 'branch_office_id' => $employee -> branch_office_id]);
+            
             $materials->each(function ($material) use ($employee) {
                 $employee->material()->attach($material, [
                     'assignment_date' => now()->subDays(rand(1, 30)),

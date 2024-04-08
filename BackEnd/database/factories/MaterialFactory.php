@@ -14,8 +14,8 @@ class MaterialFactory extends Factory
 
     public function definition()
     {
-        $state = $this->faker->randomElement(['active', 'inactive']);
-        $lowDate = $state === 'active' ? null : $this->faker->date();
+        $state = $this->faker->randomElement(['inactive', 'available']);
+        $lowDate = $state === 'inactive' ? $this->faker->date() : null;
 
         $branchOfficeId = BranchOffice::all()->random()->id;
 

@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('attribute_category_material', function (Blueprint $table) {
             $table->id();
             $table->foreignId('material_id')->constrained('materials')->onDelete('cascade');
-            $table->foreignId('attribute_id')->constrained('attributes')->onDelete('cascade');
-            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
+            $table->foreignId('attribute_id')->constrained('attributes');
+            $table->foreignId('category_id')->constrained('categories');
             $table->string('value');
             $table->timestamps();
         });

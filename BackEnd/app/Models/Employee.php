@@ -38,4 +38,9 @@ class Employee extends Model
                     ->withPivot('assignment_date', 'return_date', 'material_id');
     }
 
+    public function report()
+    {
+        return $this->hasMany(Report::class);
+    }
+
 }

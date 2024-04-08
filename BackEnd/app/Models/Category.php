@@ -24,4 +24,10 @@ class Category extends Model
         return $this->belongsToMany(Attribute::class, AttributeCategoryMaterial::class)
                     ->withPivot('value', 'attribute_id');
     }
+    
+    public function report()
+    {
+        return $this->belongsToMany(Report::class, CategoryReport::class)
+                    ->withPivot('report_id');;
+    }
 }

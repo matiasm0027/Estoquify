@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('category_report', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('category_id')->constrained('categories');
+            $table->foreignId('report_id')->constrained('reports');
             $table->timestamps();
         });
     }
