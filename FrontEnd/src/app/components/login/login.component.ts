@@ -48,23 +48,23 @@ export class LoginComponent {
       },
       (error: any) => {
         // Verificar si el error es debido a una contraseña incorrecta o un correo electrónico inexistente
-        this.peticiones.verificarCampo('email', email).subscribe(
-          (respuesta) => {
-            // Aquí puedes manejar la respuesta exitosa del servidor
-            this.mensaje = respuesta.message ;
-          },
-          (verificacionError) => {
-            // Aquí puedes manejar los errores de la solicitud HTTP
-            console.error('Error al verificar campo:', verificacionError);
-            if (verificacionError.status === 400) {
-              this.errorApi = verificacionError.error.error ;
-            } else if (verificacionError.status === 409) {
-              this.errorApi = verificacionError.error.error ;
-            } else {
-              this.errorApi = verificacionError.error.error ;
-            }
-          }
-        );
+        // this.peticiones.verificarCampo('email', email).subscribe(
+        //   (respuesta) => {
+        //     // Aquí puedes manejar la respuesta exitosa del servidor
+        //     this.mensaje = respuesta.message ;
+        //   },
+        //   (verificacionError) => {
+        //     // Aquí puedes manejar los errores de la solicitud HTTP
+        //     console.error('Error al verificar campo:', verificacionError);
+        //     if (verificacionError.status === 400) {
+        //       this.errorApi = verificacionError.error.error ;
+        //     } else if (verificacionError.status === 409) {
+        //       this.errorApi = verificacionError.error.error ;
+        //     } else {
+        //       this.errorApi = verificacionError.error.error ;
+        //     }
+        //   }
+        // );
       }
     );
   }

@@ -16,6 +16,5 @@ use App\Http\Controllers\EmployeesController;
 */
 
 Route::post('/login', [EmployeesController::class, 'login']); // Iniciar sesión
-Route::get('/verificar/{tipo}/{valor}', [EmployeesController::class, 'verificarExistencia']); // Verificar existencia de valor único
-Route::middleware('auth:sanctum')->get('/user-details', [UsuarioController::class, 'userDetails']); // Detalles de usuario autenticado
+// Route::middleware('auth:sanctum')->get('/user-details', [UsuarioController::class, 'userDetails']); // Detalles de usuario autenticado
 
