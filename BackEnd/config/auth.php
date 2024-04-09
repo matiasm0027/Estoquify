@@ -14,8 +14,8 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web', // Guardia por defecto para la autenticación web
-        'passwords' => 'employees', // Usar el proveedor 'employees' para recuperación de contraseña
+        'guard' => 'api',
+        'passwords' => 'employees',
     ],
 
     /*
@@ -36,14 +36,14 @@ return [
     */
 
     'guards' => [
-        'web' => [ // Guardia para la autenticación web
+        'web' => [
             'driver' => 'session',
-            'provider' => 'employees', // Usar el proveedor 'employees' para autenticación web
+            'provider' => 'employees', 
         ],
 
-        'api' => [ // Guardia para la autenticación API (Sanctum)
-            'driver' => 'sanctum',
-            'provider' => 'employees', // Usar el proveedor 'employees' para autenticación API
+        'api' => [ 
+            'driver' => 'jwt',
+            'provider' => 'employees',
             'hash' => false,
         ],
     ],

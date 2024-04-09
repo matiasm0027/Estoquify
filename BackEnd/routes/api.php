@@ -15,6 +15,16 @@ use App\Http\Controllers\EmployeesController;
 |
 */
 
-Route::post('/login', [EmployeesController::class, 'login']); // Iniciar sesión
-// Route::middleware('auth:sanctum')->get('/user-details', [UsuarioController::class, 'userDetails']); // Detalles de usuario autenticado
+Route::group([
 
+    'middleware' => 'api',
+    'prefix' => 'auth'
+
+], function ($router) {
+
+    Route::post('login', [EmployeesController::class, 'login']);
+    Route::post('logout', [EmployeesController::class, 'logout']);
+    Route::post('refresh', [EmployeesController::class, 'refresh']);
+    Route::post('me', [EmployeesController::class, 'mw']);
+
+});

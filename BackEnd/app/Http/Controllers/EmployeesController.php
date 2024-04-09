@@ -1,33 +1,58 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
 use App\Models\Employee;
+
 class EmployeesController extends Controller
 {
-    public function login(Request $request)
+    //El constructor del controlador define un middleware (auth:api) que 
+    //protege todos los métodos del controlador, excepto el método login. 
+    public function __construct()
     {
-        $credentials = $request->only('email', 'password');
+        $this->middleware('auth:api', ['except' => ['login']]);
+    }
 
-        if (Auth::guard('employees')->attempt($credentials)) { // Utiliza el guardia 'employees'
-            $employee = Auth::guard('employees')->user(); // Obtiene el usuario autenticado
+    public function login()
+    {
+        $credentials = request(['email', 'password']);
 
-            $token = $employee->createToken('AuthToken')->plainTextToken;
-
-            return response()->json([
-                'token' => $token,
-                'employee' => [
-                    'id' => $employee->id,
-                    'name' => $employee->name,
-                    'email' => $employee->email,
-                    // Agrega más campos según sea necesario
-                ],
-            ]);
+        if (! $token = auth()->attempt($credentials)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        return response()->json(['error' => 'Credenciales incorrectas'], 401);
+        return $this->respondWithToken($token);
+    }
+
+    //devuelve los detalles del usuario autenticado actualmente.
+    public function me()
+    {
+        return response()->json(auth()->user());
+    }
+
+    public function logout()
+    {
+        auth()->logout();
+        return response()->json(['message' => 'Successfully logged out']);
+    }
+
+    //Este método refresca un token JWT expirado.
+    public function refresh()
+    {
+        return $this->respondWithToken(auth()->refresh());
+    }
+
+    //formato de respuesta del tokens
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth()->factory()->getTTL() * 60
+        ]);
     }
 }
