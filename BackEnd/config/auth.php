@@ -14,8 +14,8 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
-        'passwords' => 'users',
+        'guard' => 'web', // Guardia por defecto para la autenticación web
+        'passwords' => 'employees', // Usar el proveedor 'employees' para recuperación de contraseña
     ],
 
     /*
@@ -31,19 +31,19 @@ return [
     | users are actually retrieved out of your database or other storage
     | mechanisms used by this application to persist your user's data.
     |
-    | Supported: "session"
+    | Supported: "session", "token"
     |
     */
 
     'guards' => [
-        'web' => [
+        'web' => [ // Guardia para la autenticación web
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'employees', // Usar el proveedor 'employees' para autenticación web
         ],
-    
-        'api' => [
+
+        'api' => [ // Guardia para la autenticación API (Sanctum)
             'driver' => 'sanctum',
-            'provider' => 'users',
+            'provider' => 'employees', // Usar el proveedor 'employees' para autenticación API
             'hash' => false,
         ],
     ],
@@ -66,15 +66,10 @@ return [
     */
 
     'providers' => [
-        'users' => [
+        'employees' => [ // Proveedor para la tabla 'employees'
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => App\Models\Employee::class, // Modelo de los empleados
         ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
     ],
 
     /*
@@ -97,9 +92,9 @@ return [
     */
 
     'passwords' => [
-        'users' => [
-            'provider' => 'users',
-            'table' => 'password_reset_tokens',
+        'employees' => [ // Configuración de recuperación de contraseña para los empleados
+            'provider' => 'employees',
+            'table' => 'password_reset_tokens', // Nombre de la tabla de tokens de restablecimiento de contraseña
             'expire' => 60,
             'throttle' => 60,
         ],
