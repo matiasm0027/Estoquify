@@ -1,50 +1,65 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import './custom.js';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
+
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
-
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   errorMessage!: string;
 
   constructor(
-    private fb: FormBuilder,
-    private authService: ApiRequestService,
-    private router: Router
+    private formBuilder: FormBuilder,
+    private router: Router,
+    private apiService: ApiRequestService
   ) {
-    this.loginForm = this.fb.group({
+    this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
     });
   }
 
   ngOnInit(): void {
-    // Inicializar el formulario
+    // Check if user is already authenticated (optional)
+    // If so, redirect to a different page
+    if (localStorage.getItem('token')) {
+      this.router.navigate(['/home']); // Example: Redirect to dashboard
+    }
   }
 
   enviarLogin(): void {
     if (this.loginForm.valid) {
-      this.authService.login(this.loginForm.value).subscribe(
-        response => {
-          // Manejar la respuesta exitosa
-          this.router.navigate(['/home']);
-        },
-        error => {
-          // Manejar errores de autenticación
-          if (error.status === 401) {
-            this.errorMessage = error.error.error;
+      const credentials = {
+        email: this.loginForm.value.email,
+        password: this.loginForm.value.password
+      };
+
+      this.apiService.login(credentials).subscribe(
+        (response) => {
+          // Check if response contains access_token
+          if (response && response.access_token) {
+            // Save token to local storage
+            localStorage.setItem('token', response.access_token);
+
+            // Redirect to home page or desired route
+            this.router.navigate(['/home']); // Adjust '/home' to your desired route
           } else {
-            this.errorMessage = 'An unexpected error occurred';
+            // Handle unexpected response format
+            console.error('Unexpected response format:', response);
+            this.errorMessage = 'Unexpected response from server.';
           }
+        },
+        (error) => {
+          this.errorMessage = error.error.error; // Assuming Laravel sends error messages like this
         }
       );
     }
   }
 }
+

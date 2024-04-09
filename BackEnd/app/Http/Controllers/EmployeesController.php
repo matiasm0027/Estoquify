@@ -20,7 +20,8 @@ class EmployeesController extends Controller
     public function login()
     {
         $credentials = request(['email', 'password']);
-        var_dump($credentials);
+        
+        
         if (! $token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }

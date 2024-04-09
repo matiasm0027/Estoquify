@@ -17,18 +17,18 @@ export class SidebarComponent {
     ) {}
 
   logout(): void {
-    this.authService.logout().subscribe(
-      response => {
-        this.router.navigate(['/login']);
-        this.message = response.message;
-        console.log(response.message)
-        console.log(response)
-      },
-      error => {
-        console.error('Logout error:', error);
-        console.log(error)
-        this.message = 'Logout failed';
-      }
-    );
+    // this.authService.logout().subscribe(
+    //   response => {
+    //     this.router.navigate(['/login']);
+    //     this.message = response.message;
+    //     console.log(response.message)
+    //     console.log(response)
+    //   },
+    //   error => {
+    //     console.error('Logout error:', error);
+    //     console.log(error)
+    //     this.message = 'Logout failed';
+    //   }
+    // );
   }
 }

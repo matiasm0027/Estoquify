@@ -1,48 +1,44 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { UsuariosControlService } from '../usuarios/usuarios-control.service';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, catchError, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiRequestService {
-
   private apiUrl = 'http://localhost:8000/api';
 
-  constructor(private http: HttpClient, private usuariosControlService: UsuariosControlService) {}
-
-  //peticiones para la api
+  constructor(private http: HttpClient) {}
 
   login(credentials: { email: string, password: string }): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/auth/login`, credentials);
+    return this.http.post<any>(`${this.apiUrl}/auth/login`, credentials)
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          if (error.error instanceof ErrorEvent) {
+            // Client-side error
+            console.error('An error occurred:', error.error.message);
+          } else {
+            // Server-side error
+            console.error(
+              `Backend returned code ${error.status}, ` +
+              `body was: ${JSON.stringify(error.error)}`
+            );
+          }
+          // Throw a custom error or return an observable with a user-friendly error message
+          return throwError('Invalid credentials. Please try again.');
+        })
+      );
   }
 
   logout(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/auth/logout`);
+    return this.http.post<any>(`${this.apiUrl}/auth/logout`, {});
   }
 
-  getUserDetails(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/user-details`, {
-    });
+  me(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/me`);
   }
 
-  obtenerEmpleados(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/employees`);
-  }
-
-  crearEmpleado(empleado: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/employees`, empleado);
-  }
-
-  actualizarEmpleado(id: number, datos: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/employees/${id}`, datos);
-  }
-
-  eliminarEmpleado(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/employees/${id}`);
-  }
-  verificarCampo(tipo: string, valor: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/verificar/${tipo}/${valor}`);
+  refresh(): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/refresh`, {});
   }
 }
