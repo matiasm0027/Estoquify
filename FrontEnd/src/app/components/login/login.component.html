@@ -4,16 +4,16 @@
             <img src="../../../assets/img/logo_png.png" alt="Logo" style="width: 100px; height: 100px;">
         </p>
         <p class="text-center text-condensedLight">Sign in with your Account</p>
-        <form [formGroup]="login" (ngSubmit)="enviarLogin()">
+        <form [formGroup]="loginForm" (ngSubmit)="enviarLogin()">
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                 <input class="mdl-textfield__input" type="text" id="email" formControlName="email">
                 <label class="mdl-textfield__label" for="email">Email</label>
                 <!-- Control de errores -->
-                <div *ngIf="login.get('email')?.errors?.['required'] && login.get('email')?.touched"
-                    class="error_form mensaje error">
+                <div *ngIf="loginForm.get('email')?.errors?.['required'] && loginForm.get('email')?.touched"
+                    class="error_form mensaje_error">
                     This field cannot be empty.
                 </div>
-                <div *ngIf="login.get('email')?.errors?.['pattern'] && login.get('email')?.touched" class="error_form mensaje error">
+                <div *ngIf="loginForm.get('email')?.errors?.['pattern'] && loginForm.get('email')?.touched" class="error_form mensaje_error">
                     Invalid format.
                 </div>
             </div>
@@ -21,8 +21,8 @@
                 <input class="mdl-textfield__input" type="password" id="pass" formControlName="password">
                 <label class="mdl-textfield__label" for="pass">Password</label>
                 <!-- Control de errores -->
-                <div *ngIf="login.get('password')?.errors?.['required'] && login.get('password')?.touched"
-                    class="error_form mensaje error">
+                <div *ngIf="loginForm.get('password')?.errors?.['required'] && loginForm.get('password')?.touched"
+                    class="error_form mensaje_error">
                     This field cannot be empty.
                 </div>
             </div>
@@ -34,11 +34,8 @@
             <button class="mdl-button mdl-js-button mdl-js-ripple-effect">
                 SIGN IN
             </button>
-            <!-- Respuesta exitosa en el login -->
-            <div *ngIf="mensaje" class="mensaje exitoso mt-3">{{ mensaje }}</div>
-
             <!-- Mensajes de error específicos de la API -->
-            <div *ngIf="errorApi" class="mensaje error mt-3">{{ errorApi }}</div>
+            <div *ngIf="errorMessage" class="mensaje_error">{{ errorMessage }}</div>
         </form>
     </div>
 </div>

@@ -3,7 +3,7 @@
 }
 
 /* Estilo para mensajes de error */
-.mensaje.error {
+.mensaje_error {
     color: rgb(241, 99, 99);
     font-size: 15px;
 }
