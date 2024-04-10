@@ -21,5 +21,9 @@ export class UsuariosControlService {
     this.usuario = this.usuarioSubject.asObservable();
 
   }
+
+  logout(): void {
+    localStorage.removeItem('token');
+  }
 }
 
