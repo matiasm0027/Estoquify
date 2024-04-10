@@ -56,4 +56,24 @@ class EmployeesController extends Controller
             'expires_in' => auth()->factory()->getTTL() * 60
         ]);
     }
+
+    public function listEmployees()
+{
+    $employees = Employee::with('department', 'branchOffice')
+            ->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
+            ->get()
+            ->map(function ($employee) {
+                return [
+                    'id' => $employee->id,
+                    'name' => $employee->name,
+                    'last_name' => $employee->last_name,
+                    'email' => $employee->email,
+                    'department' => $employee->department ? $employee->department->name : null,
+                    'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
+                ];
+            });
+
+        return response()->json($employees);
+}
+
 }

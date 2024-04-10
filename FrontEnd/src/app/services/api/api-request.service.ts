@@ -25,4 +25,8 @@ export class ApiRequestService {
   refresh(): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/refresh`, {});
   }
+
+  listEmployees(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/listEmployees`);
+  }
 }
