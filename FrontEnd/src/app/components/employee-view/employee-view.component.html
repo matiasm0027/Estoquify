@@ -6,112 +6,130 @@
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-2xl font-bold">Empleados</h1>
             <div>
-                <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-4">
+                <button (click)="mostrarModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-4">
                     Añadir Empleado
                 </button>
-                <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                <button (click)="mostrarModalDeFiltros()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
                     Filtro
                 </button>
             </div>
         </div>
 
         <!-- Agrega la clase "border" y "border-gray-300" para el borde -->
-        <div class="table-container overflow-x-auto" >
+        <div class="table-container overflow-x-auto">
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-gray-300 lg:text-center md:text-center sm:text-center">
                 <thead class="text-xs text-gray-700 uppercase dark:text-gray-400">
                     <tr>
                         <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-800">
-                            Product name
+                            Nombre
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Color
+                            Apellido
                         </th>
                         <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-800">
-                            Category
+                            Departamento
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Price
+                            Sucursal
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-800">
+                            Email
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="border-b border-gray-200 dark:border-gray-700">
-                        <th scope="row"
-                            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
-                            Apple MacBook Pro 17"
-                        </th>
-                        <td class="px-6 py-4">
-                            Silver
-                        </td>
-                        <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
-                            Laptop
-                        </td>
-                        <td class="px-6 py-4">
-                            $2999
-                        </td>
-                    </tr>
-                    <tr class="border-b border-gray-200 dark:border-gray-700">
-                        <th scope="row"
-                            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
-                            Microsoft Surface Pro
-                        </th>
-                        <td class="px-6 py-4">
-                            White
-                        </td>
-                        <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
-                            Laptop PC
-                        </td>
-                        <td class="px-6 py-4">
-                            $1999
-                        </td>
-                    </tr>
-                    <tr class="border-b border-gray-200 dark:border-gray-700">
-                        <th scope="row"
-                            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
-                            Magic Mouse 2
-                        </th>
-                        <td class="px-6 py-4">
-                            Black
-                        </td>
-                        <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
-                            Accessories
-                        </td>
-                        <td class="px-6 py-4">
-                            $99
-                        </td>
-                    </tr>
-                    <tr class="border-b border-gray-200 dark:border-gray-700">
-                        <th scope="row"
-                            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
-                            Google Pixel Phone
-                        </th>
-                        <td class="px-6 py-4">
-                            Gray
-                        </td>
-                        <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
-                            Phone
-                        </td>
-                        <td class="px-6 py-4">
-                            $799
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row"
-                            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
-                            Apple Watch 5
-                        </th>
-                        <td class="px-6 py-4">
-                            Red
-                        </td>
-                        <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
-                            Wearables
-                        </td>
-                        <td class="px-6 py-4">
-                            $999
-                        </td>
+                    <tr *ngFor="let employee of employees">
+                        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">{{ employee.nombre }}</td>
+                        <td class="px-6 py-4">{{ employee.apellido }}</td>
+                        <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ employee.departamento }}</td>
+                        <td class="px-6 py-4">{{ employee.sucursal }}</td>
+                        <td class="px-6 py-4">{{ employee.email }}</td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div *ngIf="mostrarModalAgregar" class="fixed z-10 inset-0 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <!-- Contenido del modal -->
+        <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full">
+            <!-- Encabezado del modal -->
+            <div class="px-4 py-2 bg-gray-200">
+                <h3 class="text-lg font-bold">Añadir Empleado</h3>
+            </div>
+            <!-- Cuerpo del modal (aquí va el formulario) -->
+            <div class="p-4">
+                <!-- Formulario aquí -->
+                <form>
+                    <div class="mb-4">
+                        <label for="nombre" class="block text-gray-700">Nombre</label>
+                        <input type="text" id="nombre" name="nombre" class="form-input mt-1 block w-full" placeholder="Ingrese el nombre" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="apellido" class="block text-gray-700">Apellido</label>
+                        <input type="text" id="apellido" name="apellido" class="form-input mt-1 block w-full" placeholder="Ingrese el apellido" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="departamento" class="block text-gray-700">Departamento</label>
+                        <input type="text" id="departamento" name="departamento" class="form-input mt-1 block w-full" placeholder="Ingrese el departamento" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="sucursal" class="block text-gray-700">Sucursal</label>
+                        <input type="text" id="sucursal" name="sucursal" class="form-input mt-1 block w-full" placeholder="Ingrese la sucursal" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="email" class="block text-gray-700">Email</label>
+                        <input type="email" id="email" name="email" class="form-input mt-1 block w-full" placeholder="Ingrese el correo electrónico" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="block text-gray-700">Contraseña</label>
+                        <input type="password" id="password" name="password" class="form-input mt-1 block w-full" placeholder="Ingrese la contraseña" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="rol" class="block text-gray-700">Rol</label>
+                        <select id="rol" name="rol" class="form-select mt-1 block w-full" required>
+                            <option value="admin">Admin</option>
+                            <option value="user">User</option>
+                            <option value="responsable">Responsable</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar</button>
+                        <button (click)="cerrarModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal de filtros -->
+<div *ngIf="mostrarModalFiltros" class="fixed z-10 inset-0 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <!-- Contenido del modal -->
+        <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full">
+            <!-- Encabezado del modal -->
+            <div class="px-4 py-2 bg-gray-200">
+                <h3 class="text-lg font-bold">Filtrar por</h3>
+            </div>
+            <!-- Cuerpo del modal (aquí va el formulario) -->
+            <div class="p-4">
+                <!-- Formulario de filtros aquí -->
+                <form>
+                    <div class="mb-4">
+                        <label for="filtro" class="block text-gray-700">Selecciona un filtro:</label>
+                        <select id="filtro" name="filtro" class="form-select mt-1 block w-full" [(ngModel)]="filtroSeleccionado">
+                            <option value="departamento">Departamento</option>
+                            <option value="sucursal">Sucursal</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2" (click)="aplicarFiltro()">Aplicar</button>
+                        <button type="button" (click)="cerrarModalDeFiltros()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
