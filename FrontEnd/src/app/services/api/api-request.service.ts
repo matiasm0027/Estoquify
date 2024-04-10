@@ -14,10 +14,6 @@ export class ApiRequestService {
     return this.http.post<any>(`${this.apiUrl}/auth/login`, credentials)
   }
 
-  logout(): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/auth/logout`, {});
-  }
-
   me(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/auth/me`);
   }

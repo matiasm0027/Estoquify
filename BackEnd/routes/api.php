@@ -23,7 +23,6 @@ Route::group([
 ], function ($router) {
 
     Route::post('login', [EmployeesController::class, 'login']);
-    Route::post('logout', [EmployeesController::class, 'logout']);
     Route::post('refresh', [EmployeesController::class, 'refresh']);
     Route::post('me', [EmployeesController::class, 'me']);
     Route::get('listEmployees', [EmployeesController::class, 'listEmployees']);
