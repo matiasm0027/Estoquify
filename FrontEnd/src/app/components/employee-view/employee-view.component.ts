@@ -9,6 +9,7 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
 })
 
 export class EmployeeViewComponent implements OnInit {
+  page: number = 1;
   employees: any[] = [];
   mostrarModalAgregar: boolean = false;
   filtroSeleccionado: string = 'departamento';
