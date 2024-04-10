@@ -12,22 +12,6 @@ export class ApiRequestService {
 
   login(credentials: { email: string, password: string }): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/login`, credentials)
-      .pipe(
-        catchError((error: HttpErrorResponse) => {
-          if (error.error instanceof ErrorEvent) {
-            // Client-side error
-            console.error('An error occurred:', error.error.message);
-          } else {
-            // Server-side error
-            console.error(
-              `Backend returned code ${error.status}, ` +
-              `body was: ${JSON.stringify(error.error)}`
-            );
-          }
-          // Throw a custom error or return an observable with a user-friendly error message
-          return throwError('Invalid credentials. Please try again.');
-        })
-      );
   }
 
   logout(): Observable<any> {

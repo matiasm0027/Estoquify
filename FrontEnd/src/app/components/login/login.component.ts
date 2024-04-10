@@ -26,10 +26,8 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Check if user is already authenticated (optional)
-    // If so, redirect to a different page
     if (localStorage.getItem('token')) {
-      this.router.navigate(['/home']); // Example: Redirect to dashboard
+      this.router.navigate(['/home']);
     }
   }
 
@@ -42,21 +40,13 @@ export class LoginComponent implements OnInit {
 
       this.apiService.login(credentials).subscribe(
         (response) => {
-          // Check if response contains access_token
           if (response && response.access_token) {
-            // Save token to local storage
             localStorage.setItem('token', response.access_token);
-
-            // Redirect to home page or desired route
-            this.router.navigate(['/home']); // Adjust '/home' to your desired route
-          } else {
-            // Handle unexpected response format
-            console.error('Unexpected response format:', response);
-            this.errorMessage = 'Unexpected response from server.';
+            this.router.navigate(['/home']); 
           }
         },
         (error) => {
-          this.errorMessage = error.error.error; // Assuming Laravel sends error messages like this
+          this.errorMessage = error.error.error;
         }
       );
     }

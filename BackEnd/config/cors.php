@@ -1,34 +1,41 @@
-<?php
+<?php 
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Cross-Origin Resource Sharing (CORS) Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Here you may configure your settings for cross-origin resource sharing
-    | or "CORS". This determines what cross-origin operations may execute
-    | in web browsers. You are free to adjust these settings as needed.
-    |
-    | To learn more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-    |
-    */
+/*
+ * You can enable CORS for 1 or multiple paths.
+ * Example: ['api/*']
+ */
+'paths' => ['api/*'],
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+/*
+ * Matches the request method. `[*]` allows all methods.
+ */
+'allowed_methods' => ['*'],
 
-    'allowed_methods' => ['*'],
+/*
+ * Matches the request origin. `[*]` allows all origins.
+ */
+'allowed_origins' => ['http://localhost:4200'],
 
-    'allowed_origins' => ['*'],
+/*
+ * Matches the request origin with, similar to `Access-Control-Allow-Credentials`
+ */
+'supports_credentials' => false,
 
-    'allowed_origins_patterns' => ['*'],
+/*
+ * Sets the cache duration for the preflight response in seconds. 0 means always send it.
+ */
+'max_age' => 0,
 
-    'allowed_headers' => ['*'],
+/*
+ * Sets the allowed headers.
+ */
+'allowed_headers' => ['Content-Type', 'Authorization'],
 
-    'exposed_headers' => [],
-
-    'max_age' => 0,
-
-    'supports_credentials' => false,
+/*
+ * Sets the allowed headers when credentials are supported.
+ */
+'exposed_headers' => [],
 
 ];
