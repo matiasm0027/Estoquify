@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 
 @Component({
@@ -13,11 +12,10 @@ export class SidebarComponent {
 
   constructor(
     private authControlService: UsuariosControlService,
-    private router: Router
     ) {}
 
     logout(): void {
       this.authControlService.logout();
-      this.router.navigate(['/login']);
+      window.location.reload();
     }
 }
