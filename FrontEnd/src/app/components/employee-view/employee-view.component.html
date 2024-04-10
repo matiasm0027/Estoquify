@@ -39,10 +39,10 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let employee of employees">
-                        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">{{ employee.nombre }}</td>
-                        <td class="px-6 py-4">{{ employee.apellido }}</td>
-                        <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ employee.departamento }}</td>
-                        <td class="px-6 py-4">{{ employee.sucursal }}</td>
+                        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">{{ employee.name }}</td>
+                        <td class="px-6 py-4">{{ employee.last_name }}</td>
+                        <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ employee.department }}</td>
+                        <td class="px-6 py-4">{{ employee.branch_office }}</td>
                         <td class="px-6 py-4">{{ employee.email }}</td>
                     </tr>
                 </tbody>

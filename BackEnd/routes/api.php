@@ -27,4 +27,5 @@ Route::group([
     Route::post('refresh', [EmployeesController::class, 'refresh']);
     Route::post('me', [EmployeesController::class, 'me']);
     Route::get('listEmployees', [EmployeesController::class, 'listEmployees']);
+    Route::post('addEmployee', [EmployeesController::class, 'addEmployee']);
 });
