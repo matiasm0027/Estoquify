@@ -35,6 +35,12 @@ class EmployeesController extends Controller
         return response()->json(auth()->user());
     }
 
+    public function logout()
+    {
+        auth()->logout();
+        return response()->json(['message' => 'Successfully logged out']);
+    }
+
     //Este método refresca un token JWT expirado.
     public function refresh()
     {
@@ -52,21 +58,58 @@ class EmployeesController extends Controller
     }
 
     public function listEmployees()
-    {
-        $employees = Employee::with('department', 'branchOffice')
-                ->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
-                ->get()
-                ->map(function ($employee) {
-                    return [
-                        'id' => $employee->id,
-                        'name' => $employee->name,
-                        'last_name' => $employee->last_name,
-                        'email' => $employee->email,
-                        'department' => $employee->department ? $employee->department->name : null,
-                        'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
-                    ];
-                });
+{
+    $employees = Employee::with('department', 'branchOffice')
+            ->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
+            ->get()
+            ->map(function ($employee) {
+                return [
+                    'id' => $employee->id,
+                    'name' => $employee->name,
+                    'last_name' => $employee->last_name,
+                    'email' => $employee->email,
+                    'department' => $employee->department ? $employee->department->name : null,
+                    'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
+                ];
+            });
 
-            return response()->json($employees);
+        return response()->json($employees);
+}
+public function addEmployee(Request $request)
+{
+    // Validar los datos de entrada del formulario
+    $validatedData = $request->validate([
+        'nombre' => 'required',
+        'apellido' => 'required',
+        'email' => 'required',
+        'password' => 'required',
+        'departamento' => 'required',
+        'sucursal' => 'required',
+        'rol' => 'required', 
+        'telefonoMovil' => 'required',
+    ]);
+
+    try {
+        // Crear un nuevo objeto Employee y asignar los valores
+        $employee = new Employee();
+        $employee->name = $validatedData['nombre'];
+        $employee->last_name = $validatedData['apellido'];
+        $employee->email = $validatedData['email'];
+        $employee->password = bcrypt($validatedData['password']); // Encriptar la contraseña
+        $employee->department_id = $validatedData['departamento'];
+        $employee->branch_office_id = $validatedData['sucursal'];
+        $employee->role_id = $validatedData['rol'];
+        $employee->phone_number = $request->input('telefonoMovil');
+
+        // Guardar el nuevo empleado en la base de datos
+        $employee->save();
+
+        // Devolver una respuesta de éxito
+        return response()->json(['message' => 'Empleado añadido con éxito'], 201);
+    } catch (\Exception $e) {
+        // Capturar y manejar cualquier excepción que pueda ocurrir
+        return response()->json(['error' => 'Error al agregar empleado: ' . $e->getMessage()], 500);
     }
+}
+
 }

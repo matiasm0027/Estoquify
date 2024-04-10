@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { UsuariosControlService } from '../../services/usuarios/usuarios-control.service';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 
 @Component({
@@ -8,22 +8,44 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
   styleUrls: ['./employee-view.component.css']
 })
 
-export class EmployeeViewComponent {
+export class EmployeeViewComponent implements OnInit {
   employees: any[] = [];
   mostrarModalAgregar: boolean = false;
   filtroSeleccionado: string = 'departamento';
   mostrarModalFiltros: boolean = false;
-  nuevoEmpleado: any = {
-    nombre: '',
-    apellido: '',
-    departamento: '',
-    sucursal: '',
-    email: '',
-    password: '',
-    rol: ''
-  };
+  formularioEmpleado: FormGroup;
+  departamentos = [
+    { label: 'Computing', value: '1' },
+    { label: 'Billing', value: '2' },
+    { label: 'Accounting', value: '3' },
+    { label: 'Finance', value: '4' },
+    { label: 'Commercial', value: '5' },
+    { label: 'Sac', value: '6' },
+    { label: 'Shopping', value: '7' },
+    { label: 'Logistics', value: '8' }
+  ];
+  sucursales = [
+    { label: 'Barcelona', value: '1' },
+    { label: 'Madrid', value: '2' },
+    { label: 'Gerona', value: '3' },
+    { label: 'Tarragona', value: '4' },
+    { label: 'LLeida', value: '5' },
+    { label: 'Galicia', value: '6' },
+    { label: 'Malaga', value: '7' }
+  ];
 
-  constructor(private peticionesService: ApiRequestService, private sincro: UsuariosControlService) {}
+  constructor(private fb: FormBuilder, private peticionesService: ApiRequestService) {
+    this.formularioEmpleado = this.fb.group({
+      nombre: ['', Validators.required],
+      apellido: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required],
+      departamento: ['', Validators.required],
+      sucursal: ['', Validators.required],
+      rol: ['', Validators.required],
+      telefonoMovil: ['', Validators.required], 
+    });
+  }
 
   ngOnInit(): void {
     this.obtenerEmpleados();
@@ -35,16 +57,7 @@ export class EmployeeViewComponent {
 
   cerrarModal() {
     this.mostrarModalAgregar = false;
-    // Limpiar el objeto nuevoEmpleado para el próximo uso
-    this.nuevoEmpleado = {
-      nombre: '',
-      apellido: '',
-      departamento: '',
-      sucursal: '',
-      email: '',
-      password: '',
-      rol: ''
-    };
+    this.formularioEmpleado.reset();
   }
 
   mostrarModalDeFiltros(): void {
@@ -57,14 +70,12 @@ export class EmployeeViewComponent {
 
   aplicarFiltro(): void {
     // Implementa la lógica para aplicar el filtro seleccionado
-    // Puedes acceder al filtro seleccionado con this.filtroSeleccionado
   }
 
   obtenerEmpleados() {
     this.peticionesService.listEmployees().subscribe(
       (response: any[]) => {
         this.employees = response;
-        console.log(response);
       },
       error => {
         console.error('Error al obtener empleados:', error);
@@ -73,19 +84,20 @@ export class EmployeeViewComponent {
   }
 
   agregarEmpleado() {
-    this.peticionesService.addEmployee(this.nuevoEmpleado).subscribe(
-      (response: any) => {
-        // Agregar el nuevo empleado a la lista actual
-        this.employees.push(response);
-        console.log('Empleado añadido con éxito:', response);
-        // Cerrar el modal después de agregar el empleado
-        this.cerrarModal();
-      },
-      (error: any) => {
-        console.error('Error al agregar empleado:', error);
-        // Manejar los errores que puedan ocurrir durante la solicitud al servidor
-        // Aquí puedes mostrar un mensaje de error al usuario si es necesario
-      }
-    );
+    if (this.formularioEmpleado.valid) {
+      const nuevoEmpleado = this.formularioEmpleado.value;
+      this.peticionesService.addEmployee(nuevoEmpleado).subscribe(
+        (response: any) => {
+          this.employees.push(response);
+          console.log('Empleado añadido con éxito:', response);
+          this.cerrarModal();
+        },
+        (error: any) => {
+          console.error('Error al agregar empleado:', error);
+        }
+      );
+    } else {
+      console.error('Formulario inválido. Por favor, complete todos los campos requeridos.');
+    }
   }
 }
