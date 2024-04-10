@@ -26,7 +26,7 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (localStorage.getItem('token')) {
+    if (localStorage.getItem('itsLoged')) {
       this.router.navigate(['/home']);
     }
   }
@@ -41,6 +41,7 @@ export class LoginComponent implements OnInit {
       this.apiService.login(credentials).subscribe(
         (response) => {
           if (response && response.access_token) {
+            localStorage.setItem('itsLoged', 'true');
             localStorage.setItem('token', response.access_token);
             this.router.navigate(['/home']); 
           }

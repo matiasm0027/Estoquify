@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +11,7 @@ export class ApiRequestService {
   constructor(private http: HttpClient) {}
 
   login(credentials: { email: string, password: string }): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/auth/login`, credentials)
-  }
-
-  logout(): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/auth/logout`, {});
+    return this.http.post<any>(`${this.apiUrl}/auth/login`, credentials);
   }
 
   me(): Observable<any> {
@@ -24,5 +20,13 @@ export class ApiRequestService {
 
   refresh(): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/refresh`, {});
+  }
+
+  listEmployees(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/auth/listEmployees`);
+  }
+
+  addEmployee(employeeData: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/addEmployee`, employeeData);
   }
 }
