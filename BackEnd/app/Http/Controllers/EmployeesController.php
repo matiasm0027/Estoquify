@@ -10,8 +10,8 @@ use App\Models\Employee;
 
 class EmployeesController extends Controller
 {
-    //El constructor del controlador define un middleware (auth:api) que 
-    //protege todos los métodos del controlador, excepto el método login. 
+    //El constructor del controlador define un middleware (auth:api) que
+    //protege todos los métodos del controlador, excepto el método login.
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['login']]);
@@ -20,8 +20,8 @@ class EmployeesController extends Controller
     public function login()
     {
         $credentials = request(['email', 'password']);
-        
-        
+
+
         if (! $token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
@@ -75,7 +75,7 @@ class EmployeesController extends Controller
 
             return response()->json($employees);
     }
-    
+
     public function addEmployee(Request $request)
     {
         // Validar los datos de entrada del formulario
@@ -86,7 +86,7 @@ class EmployeesController extends Controller
             'password' => 'required',
             'departamento' => 'required',
             'sucursal' => 'required',
-            'rol' => 'required', 
+            'rol' => 'required',
             'telefonoMovil' => 'required',
         ]);
 
@@ -128,7 +128,7 @@ class EmployeesController extends Controller
             'password' => 'required',
             'departamento' => 'required',
             'sucursal' => 'required',
-            'rol' => 'required', 
+            'rol' => 'required',
             'telefonoMovil' => 'required',
         ]);
 
@@ -152,4 +152,45 @@ class EmployeesController extends Controller
             return response()->json(['error' => 'Error al agregar empleado: ' . $e->getMessage()], 500);
         }
     }
+
+    public function listEmployeesByDepartment($departmentId)
+{
+    $employees = Employee::with('department', 'branchOffice')
+        ->where('department_id', $departmentId)
+        ->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
+        ->get()
+        ->map(function ($employee) {
+            return [
+                'id' => $employee->id,
+                'name' => $employee->name,
+                'last_name' => $employee->last_name,
+                'email' => $employee->email,
+                'department' => $employee->department ? $employee->department->name : null,
+                'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
+            ];
+        });
+
+    return response()->json($employees);
+}
+
+public function listEmployeesByBranchOffice($branchOfficeId)
+{
+    $employees = Employee::with('department', 'branchOffice')
+        ->where('branch_office_id', $branchOfficeId)
+        ->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
+        ->get()
+        ->map(function ($employee) {
+            return [
+                'id' => $employee->id,
+                'name' => $employee->name,
+                'last_name' => $employee->last_name,
+                'email' => $employee->email,
+                'department' => $employee->department ? $employee->department->name : null,
+                'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
+            ];
+        });
+
+    return response()->json($employees);
+}
+
 }

@@ -27,4 +27,7 @@ Route::group([
     Route::post('me', [EmployeesController::class, 'me']);
     Route::get('listEmployees', [EmployeesController::class, 'listEmployees']);
     Route::post('addEmployee', [EmployeesController::class, 'addEmployee']);
+    Route::get('listEmployeesByDepartment/{departmentId}', [EmployeesController::class, 'listEmployeesByDepartment']);
+    Route::get('listEmployeesByBranchOffice/{branchOfficeId}', [EmployeesController::class, 'listEmployeesByBranchOffice']);
+
 });

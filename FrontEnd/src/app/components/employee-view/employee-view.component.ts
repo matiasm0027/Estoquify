@@ -44,7 +44,7 @@ export class EmployeeViewComponent implements OnInit {
       departamento: ['', Validators.required],
       sucursal: ['', Validators.required],
       rol: ['', Validators.required],
-      telefonoMovil: ['', Validators.required], 
+      telefonoMovil: ['', Validators.required],
     });
   }
 
@@ -70,8 +70,29 @@ export class EmployeeViewComponent implements OnInit {
   }
 
   aplicarFiltro(): void {
-    // Implementa la lógica para aplicar el filtro seleccionado
-  }
+    // Verificar el filtro seleccionado
+    if (this.filtroSeleccionado === 'departamento') {
+        // Filtrar empleados por departamento
+        this.peticionesService.listEmployeesByDepartment(this.formularioEmpleado.value.departamento).subscribe(
+            (response: any[]) => {
+                this.employees = response;
+            },
+            error => {
+                console.error('Error al filtrar empleados por departamento:', error);
+            }
+        );
+    } else if (this.filtroSeleccionado === 'sucursal') {
+        // Filtrar empleados por sucursal
+        this.peticionesService.listEmployeesByBranchOffice(this.formularioEmpleado.value.sucursal).subscribe(
+            (response: any[]) => {
+                this.employees = response;
+            },
+            error => {
+                console.error('Error al filtrar empleados por sucursal:', error);
+            }
+        );
+    }
+}
 
   obtenerEmpleados() {
     this.peticionesService.listEmployees().subscribe(
