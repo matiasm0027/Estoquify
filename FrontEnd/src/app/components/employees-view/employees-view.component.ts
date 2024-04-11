@@ -11,10 +11,13 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
 export class EmployeesViewComponent implements OnInit {
   page: number = 1;
   employees: any[] = [];
+  empleadosFiltrados: any[] = [];
   mostrarModalAgregar: boolean = false;
-  filtroSeleccionado: string = 'departamento';
+  filtroSeleccionado: string = 'quitar';
   mostrarModalFiltros: boolean = false;
   formularioEmpleado: FormGroup;
+  filtroDepartamento: string = '';
+  filtroSucursal: string = '';
   departamentos = [
     { label: 'Computing', value: '1' },
     { label: 'Billing', value: '2' },
@@ -70,34 +73,92 @@ export class EmployeesViewComponent implements OnInit {
   }
 
   aplicarFiltro(): void {
-    // Verificar el filtro seleccionado
-    if (this.filtroSeleccionado === 'departamento') {
-        // Filtrar empleados por departamento
-        this.peticionesService.listEmployeesByDepartment(this.formularioEmpleado.value.departamento).subscribe(
-            (response: any[]) => {
-                this.employees = response;
-            },
-            error => {
-                console.error('Error al filtrar empleados por departamento:', error);
-            }
-        );
-    } else if (this.filtroSeleccionado === 'sucursal') {
-        // Filtrar empleados por sucursal
-        this.peticionesService.listEmployeesByBranchOffice(this.formularioEmpleado.value.sucursal).subscribe(
-            (response: any[]) => {
-                this.employees = response;
-            },
-            error => {
-                console.error('Error al filtrar empleados por sucursal:', error);
-            }
-        );
+    switch (this.filtroSeleccionado) {
+      case 'departamento':
+        switch (this.filtroDepartamento) {
+          case 'Computing':
+            this.empleadosFiltrados = this.employees.filter(empleado => empleado.department === 'Computing');
+            break;
+          case 'Billing':
+            this.empleadosFiltrados = this.employees.filter(empleado => empleado.department === 'Billing');
+            break;
+          case 'Accounting':
+            this.empleadosFiltrados = this.employees.filter(empleado => empleado.department === 'Accounting');
+            break;
+          case 'Finance':
+            this.empleadosFiltrados = this.employees.filter(empleado => empleado.department === 'Finance');
+            break;
+          case 'Commercial':
+            this.empleadosFiltrados = this.employees.filter(empleado => empleado.department === 'Commercial');
+            break;
+          case 'Sac':
+            this.empleadosFiltrados = this.employees.filter(empleado => empleado.department === 'Sac');
+            break;
+          case 'Shopping':
+            this.empleadosFiltrados = this.employees.filter(empleado => empleado.department === 'Shopping');
+            break;
+          case 'Logistics':
+            this.empleadosFiltrados = this.employees.filter(empleado => empleado.department === 'Logistics');
+            break;
+          default:
+            // Si no se selecciona ningún departamento, mostrar todos los empleados
+            this.empleadosFiltrados = this.employees;
+            break;
+        }
+        break;
+      case 'sucursal':
+        switch (this.filtroSucursal) {
+          case 'Barcelona':
+            this.empleadosFiltrados = this.employees.filter(empleado => empleado.branch_office === 'Barcelona');
+            break;
+          case 'Madrid':
+            this.empleadosFiltrados = this.employees.filter(empleado => empleado.branch_office === 'Madrid');
+            break;
+          case 'Gerona':
+            this.empleadosFiltrados = this.employees.filter(empleado => empleado.branch_office === 'Gerona');
+            break;
+          case 'Tarragona':
+            this.empleadosFiltrados = this.employees.filter(empleado => empleado.branch_office === 'Tarragona');
+            break;
+          case 'LLeida':
+            this.empleadosFiltrados = this.employees.filter(empleado => empleado.branch_office === 'LLeida');
+            break;
+          case 'Galicia':
+            this.empleadosFiltrados = this.employees.filter(empleado => empleado.branch_office === 'Galicia');
+            break;
+          case 'Malaga':
+            this.empleadosFiltrados = this.employees.filter(empleado => empleado.branch_office === 'Malaga');
+            break;
+          default:
+            // Si no se selecciona ninguna sucursal, mostrar todos los empleados
+            this.empleadosFiltrados = this.employees;
+            break;
+        }
+        break;
+        case 'ambos':
+        if (this.filtroDepartamento && this.filtroSucursal) {
+          this.empleadosFiltrados = this.employees.filter(empleado =>
+            empleado.department === this.filtroDepartamento && empleado.branch_office === this.filtroSucursal);
+        } else {
+          // Si no se selecciona un departamento o sucursal, mostrar todos los empleados
+          this.empleadosFiltrados = this.employees;
+        }
+        break;
+      default:
+        // Si no se selecciona ningún filtro, mostrar todos los empleados
+        this.empleadosFiltrados = this.employees;
+        break;
     }
-}
+  }
+  
+  
 
   obtenerEmpleados() {
     this.peticionesService.listEmployees().subscribe(
       (response: any[]) => {
         this.employees = response;
+        this.empleadosFiltrados = response;
+        this.aplicarFiltro();
       },
       error => {
         console.error('Error al obtener empleados:', error);

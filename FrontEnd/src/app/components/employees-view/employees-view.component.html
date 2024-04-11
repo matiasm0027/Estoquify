@@ -38,7 +38,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let employee of employees | paginate: { itemsPerPage: 10, currentPage: page }">
+                    <tr *ngFor="let employee of empleadosFiltrados  | paginate: { itemsPerPage: 10, currentPage: page }">
                         <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">{{ employee.name }}</td>
                         <td class="px-6 py-4">{{ employee.last_name }}</td>
                         <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ employee.department }}</td>
@@ -51,6 +51,7 @@
         </div>
     </div>
 </div>
+
 <div *ngIf="mostrarModalAgregar" class="fixed z-10 inset-0 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen px-4">
         <!-- Contenido del modal -->
@@ -128,16 +129,33 @@
                     <div class="mb-4">
                         <label for="filtro" class="block text-gray-700">Selecciona un filtro:</label>
                         <select id="filtro" name="filtro" class="form-select mt-1 block w-full" [(ngModel)]="filtroSeleccionado">
+                            <option value="">Quitar Filtros</option>
                             <option value="departamento">Departamento</option>
                             <option value="sucursal">Sucursal</option>
+                            <option value="ambos">Sucursal y Departamento</option>
+                        </select>
+                    </div>
+                    <!-- Selector de departamento -->
+                    <div *ngIf="filtroSeleccionado === 'departamento' || filtroSeleccionado === 'ambos'" class="mb-4">
+                        <label for="filtroDepartamento" class="block text-gray-700">Selecciona un departamento:</label>
+                        <select id="filtroDepartamento" name="filtroDepartamento" class="form-select mt-1 block w-full" [(ngModel)]="filtroDepartamento">
+                            <option *ngFor="let departamento of departamentos" [value]="departamento.label">{{ departamento.label }}</option>
+                        </select>
+                    </div>
+                    <!-- Selector de sucursal -->
+                    <div *ngIf="filtroSeleccionado === 'sucursal' || filtroSeleccionado === 'ambos'" class="mb-4">
+                        <label for="filtroSucursal" class="block text-gray-700">Selecciona una sucursal:</label>
+                        <select id="filtroSucursal" name="filtroSucursal" class="form-select mt-1 block w-full" [(ngModel)]="filtroSucursal">
+                            <option *ngFor="let sucursal of sucursales" [value]="sucursal.label">{{ sucursal.label }}</option>
                         </select>
                     </div>
                     <div class="flex justify-end">
                         <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2" (click)="aplicarFiltro()">Aplicar</button>
-                        <button type="button" (click)="cerrarModalDeFiltros()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
+                        <button type="button" (click)="cerrarModalDeFiltros()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cerrar</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
