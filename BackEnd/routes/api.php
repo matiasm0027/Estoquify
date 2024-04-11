@@ -27,7 +27,9 @@ Route::group([
     Route::post('me', [EmployeesController::class, 'me']);
     Route::get('listEmployees', [EmployeesController::class, 'listEmployees']);
     Route::post('addEmployee', [EmployeesController::class, 'addEmployee']);
-    Route::get('listEmployeesByDepartment/{departmentId}', [EmployeesController::class, 'listEmployeesByDepartment']);
-    Route::get('listEmployeesByBranchOffice/{branchOfficeId}', [EmployeesController::class, 'listEmployeesByBranchOffice']);
-
+    Route::put('editEmployee/{id}', [EmployeesController::class, 'editEmployee']);
+    Route::delete('deleteEmployee/{id}', [EmployeesController::class, 'deleteEmployee']);
+    Route::get('listDepartment', [DepartmentController::class, 'listDepartment']);
+    Route::get('listBranchOffice', [BranchOfficeController::class, 'listBranchOffice']);
+    Route::get('listEmployeeMaterial/{id}', [EmployeesController::class, 'listEmployeeMaterial']);
 });

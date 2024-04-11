@@ -73,11 +73,21 @@ class EmployeesController extends Controller
                     ];
                 });
 
-            return response()->json($employees);
+        return response()->json($employees);
     }
 
     public function addEmployee(Request $request)
     {
+         // Verificar si el usuario está autenticado
+         $user = $request->user();
+         //dd($user->role_id);
+         if (!$user) {
+             return response()->json(['error' => 'Usuario no autenticado'], 401);
+         }
+
+         // Verificar si el usuario tiene el rol permitido para editar empleados (rol '1' para administrador)
+         $this->checkUserRole(['1']);
+
         // Validar los datos de entrada del formulario
         $validatedData = $request->validate([
             'nombre' => 'required',
@@ -116,81 +126,99 @@ class EmployeesController extends Controller
     public function editEmployee(Request $request, $id)
     {
         try {
-            // Verificar si el usuario autenticado tiene el rol de administrador
-            if ($request->user()->roles !== 'admin') {
-                return response()->json(['error' => 'Acceso no autorizado. Se requiere el rol de administrador'], 403);
+            // Verificar si el usuario está autenticado
+            $user = $request->user();
+            //dd($user->role_id);
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no autenticado'], 401);
             }
-            // Validar los datos de entrada del formulario
-        $validatedData = $request->validate([
-            'nombre' => 'required',
-            'apellido' => 'required',
-            'email' => 'required',
-            'password' => 'required',
-            'departamento' => 'required',
-            'sucursal' => 'required',
-            'rol' => 'required',
-            'telefonoMovil' => 'required',
-        ]);
 
-            $employee = new Employee();
+            // Verificar si el usuario tiene el rol permitido para editar empleados (rol '1' para administrador)
+            $this->checkUserRole(['1']);
+
+            // Validar los datos de entrada del formulario utilizando validate
+            $validatedData = $request->validate([
+                'nombre' => 'required',
+                'apellido' => 'required',
+                'email' => 'required|email',
+                'password' => 'required|min:6',
+                'departamento' => 'required',
+                'sucursal' => 'required',
+                'rol' => 'required',
+                'telefonoMovil' => 'required',
+            ]);
+
+            // Buscar al empleado por ID
+            $employee = Employee::find($id);
+
+            if (!$employee) {
+                return response()->json(['error' => 'Empleado no encontrado'], 404);
+            }
+
+            // Actualizar los datos del empleado con los valores validados
             $employee->name = $validatedData['nombre'];
             $employee->last_name = $validatedData['apellido'];
             $employee->email = $validatedData['email'];
-            $employee->password = bcrypt($validatedData['password']); // Encriptar la contraseña
+            $employee->password = bcrypt($validatedData['password']);
             $employee->department_id = $validatedData['departamento'];
             $employee->branch_office_id = $validatedData['sucursal'];
             $employee->role_id = $validatedData['rol'];
-            $employee->phone_number = $request->input('telefonoMovil');
+            $employee->phone_number = $validatedData['telefonoMovil'];
 
-            // Guardar el nuevo empleado en la base de datos
+            // Guardar los cambios en la base de datos
             $employee->save();
 
             // Devolver una respuesta de éxito
-            return response()->json(['message' => 'Empleado añadido con éxito'], 201);
+            return response()->json(['message' => 'Empleado editado con éxito'], 200);
         } catch (\Exception $e) {
             // Capturar y manejar cualquier excepción que pueda ocurrir
-            return response()->json(['error' => 'Error al agregar empleado: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Error al editar empleado: ' . $e->getMessage()], 500);
         }
     }
 
-    public function listEmployeesByDepartment($departmentId)
-{
-    $employees = Employee::with('department', 'branchOffice')
-        ->where('department_id', $departmentId)
-        ->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
-        ->get()
-        ->map(function ($employee) {
-            return [
-                'id' => $employee->id,
-                'name' => $employee->name,
-                'last_name' => $employee->last_name,
-                'email' => $employee->email,
-                'department' => $employee->department ? $employee->department->name : null,
-                'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
-            ];
-        });
+    public function deleteEmployee(Request $request, $id)
+    {
+        try {
+            // Verificar si el usuario está autenticado
+            $user = $request->user();
+            //dd($user->role_id);
+            if (!$user) {
+                return response()->json(['error' => 'Empleado no autenticado'], 401);
+            }
 
-    return response()->json($employees);
-}
+            // Verificar si el usuario tiene el rol permitido para editar empleados (rol '1' para administrador)
+            $this->checkUserRole(['1']);
 
-public function listEmployeesByBranchOffice($branchOfficeId)
-{
-    $employees = Employee::with('department', 'branchOffice')
-        ->where('branch_office_id', $branchOfficeId)
-        ->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
-        ->get()
-        ->map(function ($employee) {
-            return [
-                'id' => $employee->id,
-                'name' => $employee->name,
-                'last_name' => $employee->last_name,
-                'email' => $employee->email,
-                'department' => $employee->department ? $employee->department->name : null,
-                'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
-            ];
-        });
+            // Buscar al usuario por su ID
+            $employee = Employee::find($id);
 
-    return response()->json($employees);
-}
+            // Si no se encuentra al usuario devuelve un error 404
+            if (!$employee) {
+                return response()->json(['error' => 'Empleado no encontrado'], 404);
+            }
 
+            // Eliminar al usuario
+            $employee->delete();
+
+            return response()->json(['message' => 'Empleado eliminado correctamente'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
+        }
+    }
+
+    protected function checkUserRole($allowedRoles)
+    {
+        if (!Auth::check()) {
+            // El usuario no está autenticado
+            abort(401, 'Unauthorized');
+        }
+
+        $user = Auth::user();
+
+        if (!in_array($user->role_id, $allowedRoles)) {
+            // El usuario no tiene uno de los roles permitidos
+            abort(403, 'Access denied');
+        }
+    }
 }

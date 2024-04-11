@@ -30,15 +30,11 @@ export class ApiRequestService {
     return this.http.post<any>(`${this.apiUrl}/auth/addEmployee`, employeeData);
   }
 
-  listEmployeesByDepartment(departmentId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/auth/listEmployeesByDepartment/${departmentId}`);
+  editEmployee(id: any, employeeData: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/editEmployee/${id}`, employeeData);
   }
 
-  listEmployeesByBranchOffice(branchOfficeId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/auth/listEmployeesByBranchOffice/${branchOfficeId}`);
-  }
-
-  editEmployee(employeeData: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/auth/addEmployee`, employeeData);
+  deleteEmployee(id: any, employeeData: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/deleteEmployee/${id}`, employeeData);
   }
 }
