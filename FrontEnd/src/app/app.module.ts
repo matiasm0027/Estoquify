@@ -8,7 +8,7 @@ import { HomeComponent } from './components/home/home.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { EmployeeViewComponent } from './components/employee-view/employee-view.component';
+import { EmployeesViewComponent } from './components/employees-view/employees-view.component';
 import { FormsModule } from '@angular/forms';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { NgxPaginationModule } from 'ngx-pagination';
@@ -19,7 +19,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
     LoginComponent,
     HomeComponent,
     SidebarComponent,
-    EmployeeViewComponent
+    EmployeesViewComponent
   ],
   imports: [
     BrowserModule,

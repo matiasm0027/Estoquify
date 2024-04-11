@@ -108,53 +108,6 @@
                         <button (click)="cerrarModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
                     </div>
                 </form>
-                <!-- Formulario aquí -->
-                <form [formGroup]="formularioEmpleado" (submit)="editarEmpleado()">
-                    <div class="mb-4">
-                        <label for="nombre" class="block text-gray-700">Nombre</label>
-                        <input formControlName="nombre" type="text" id="nombre" name="nombre" class="form-input mt-1 block w-full" placeholder="Ingrese el nombre" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="apellido" class="block text-gray-700">Apellido</label>
-                        <input formControlName="apellido" type="text" id="apellido" name="apellido" class="form-input mt-1 block w-full" placeholder="Ingrese el apellido" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="email" class="block text-gray-700">Email</label>
-                        <input formControlName="email" type="email" id="email" name="email" class="form-input mt-1 block w-full" placeholder="Ingrese el correo electrónico" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="password" class="block text-gray-700">Contraseña</label>
-                        <input formControlName="password" type="password" id="password" name="password" class="form-input mt-1 block w-full" placeholder="Ingrese la contraseña" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="telefonoMovil" class="block text-gray-700">Teléfono Móvil</label>
-                        <input formControlName="telefonoMovil" type="tel" id="telefonoMovil" name="telefonoMovil" class="form-input mt-1 block w-full" placeholder="Ingrese el teléfono móvil">
-                    </div>
-                    <div class="mb-4">
-                        <label for="departamento" class="block text-gray-700">Departamento</label>
-                        <select formControlName="departamento" id="departamento" name="departamento" class="form-select mt-1 block w-full" required>
-                            <option *ngFor="let dept of departamentos" [value]="dept.value">{{ dept.label }}</option>
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="sucursal" class="block text-gray-700">Sucursal</label>
-                        <select formControlName="sucursal" id="sucursal" name="sucursal" class="form-select mt-1 block w-full" required>
-                            <option *ngFor="let suc of sucursales" [value]="suc.value">{{ suc.label }}</option>
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="rol" class="block text-gray-700">Rol</label>
-                        <select formControlName="rol" id="rol" name="rol" class="form-select mt-1 block w-full" required>
-                            <option value="1">Administrador</option>
-                            <option value="2">Responsable</option>
-                            <option value="3">Empleado</option>
-                        </select>
-                    </div>
-                    <div class="flex justify-end">
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar</button>
-                        <button (click)="cerrarModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>

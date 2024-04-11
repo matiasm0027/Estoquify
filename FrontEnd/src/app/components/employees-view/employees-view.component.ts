@@ -3,12 +3,12 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 
 @Component({
-  selector: 'app-employee-view',
-  templateUrl: './employee-view.component.html',
-  styleUrls: ['./employee-view.component.css']
+  selector: 'app-employees-view',
+  templateUrl: './employees-view.component.html',
+  styleUrls: ['./employees-view.component.css']
 })
 
-export class EmployeeViewComponent implements OnInit {
+export class EmployeesViewComponent implements OnInit {
   page: number = 1;
   employees: any[] = [];
   mostrarModalAgregar: boolean = false;
@@ -123,22 +123,6 @@ export class EmployeeViewComponent implements OnInit {
     }
   }
 
-  editarEmpleado() {
-    if (this.formularioEmpleado.valid) {
-      const editarEmpleado = this.formularioEmpleado.value;
-      this.peticionesService.editEmployee(editarEmpleado).subscribe(
-        (response: any) => {
-          this.employees.push(response);
-          console.log('Empleado editado con éxito:', response);
-          this.cerrarModal();
-        },
-        (error: any) => {
-          console.error('Error al editar empleado:', error);
-        }
-      );
-    } else {
-      console.error('Formulario inválido. Por favor, complete todos los campos requeridos.');
-    }
-  }
+  
 
 }
