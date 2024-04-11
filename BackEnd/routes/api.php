@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\DepartmentController;
 Use App\Http\Controllers\BranchOfficeController;
+use App\Http\Controllers\CategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,4 +35,10 @@ Route::group([
     Route::get('listDepartments', [DepartmentController::class, 'listDepartments']);
     Route::get('listBranchOffices', [BranchOfficeController::class, 'listBranchOffices']);
     Route::get('listEmployeeMaterial/{id}', [EmployeesController::class, 'listEmployeeMaterial']);
+
+    Route::get('categoryMaterialInfo', [CategoryController::class, 'getCategoryMaterialInfo']);
+
 });
+
+
+

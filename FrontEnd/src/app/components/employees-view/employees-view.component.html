@@ -87,13 +87,13 @@
                     <div class="mb-4">
                         <label for="departamento" class="block text-gray-700">Departamento</label>
                         <select formControlName="departamento" id="departamento" name="departamento" class="form-select mt-1 block w-full" required>
-                            <option *ngFor="let dept of departamentos" [value]="dept.value">{{ dept.label }}</option>
+                            <option *ngFor="let dept of departamentos" [value]="dept.id">{{ dept.name }}</option>
                         </select>
                     </div>
                     <div class="mb-4">
                         <label for="sucursal" class="block text-gray-700">Sucursal</label>
                         <select formControlName="sucursal" id="sucursal" name="sucursal" class="form-select mt-1 block w-full" required>
-                            <option *ngFor="let suc of sucursales" [value]="suc.value">{{ suc.label }}</option>
+                            <option *ngFor="let suc of sucursales" [value]="suc.id">{{ suc.name }}</option>
                         </select>
                     </div>
                     <div class="mb-4">

@@ -20,8 +20,8 @@ class Material extends Model
 
     public function category()
     {
-        return $this->hasMany(Category::class, AttributeCategoryMaterial::class)
-                    ->withPivot('value', 'category_id');
+        return $this->belongsToMany(Category::class, 'attribute_category_material', 'material_id', 'category_id')
+            ->withPivot('value');
     }
 
     public function attribute()
