@@ -38,7 +38,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let employee of employees | paginate: { itemsPerPage: 10, currentPage: page }">
+                    <tr *ngFor="let employee of empleadosFiltrados  | paginate: { itemsPerPage: 10, currentPage: page }">
                         <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">{{ employee.name }}</td>
                         <td class="px-6 py-4">{{ employee.last_name }}</td>
                         <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ employee.department }}</td>
@@ -51,6 +51,7 @@
         </div>
     </div>
 </div>
+
 <div *ngIf="mostrarModalAgregar" class="fixed z-10 inset-0 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen px-4">
         <!-- Contenido del modal -->
@@ -63,53 +64,6 @@
             <div class="p-4">
                 <!-- Formulario aquí -->
                 <form [formGroup]="formularioEmpleado" (submit)="agregarEmpleado()">
-                    <div class="mb-4">
-                        <label for="nombre" class="block text-gray-700">Nombre</label>
-                        <input formControlName="nombre" type="text" id="nombre" name="nombre" class="form-input mt-1 block w-full" placeholder="Ingrese el nombre" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="apellido" class="block text-gray-700">Apellido</label>
-                        <input formControlName="apellido" type="text" id="apellido" name="apellido" class="form-input mt-1 block w-full" placeholder="Ingrese el apellido" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="email" class="block text-gray-700">Email</label>
-                        <input formControlName="email" type="email" id="email" name="email" class="form-input mt-1 block w-full" placeholder="Ingrese el correo electrónico" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="password" class="block text-gray-700">Contraseña</label>
-                        <input formControlName="password" type="password" id="password" name="password" class="form-input mt-1 block w-full" placeholder="Ingrese la contraseña" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="telefonoMovil" class="block text-gray-700">Teléfono Móvil</label>
-                        <input formControlName="telefonoMovil" type="tel" id="telefonoMovil" name="telefonoMovil" class="form-input mt-1 block w-full" placeholder="Ingrese el teléfono móvil">
-                    </div>
-                    <div class="mb-4">
-                        <label for="departamento" class="block text-gray-700">Departamento</label>
-                        <select formControlName="departamento" id="departamento" name="departamento" class="form-select mt-1 block w-full" required>
-                            <option *ngFor="let dept of departamentos" [value]="dept.value">{{ dept.label }}</option>
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="sucursal" class="block text-gray-700">Sucursal</label>
-                        <select formControlName="sucursal" id="sucursal" name="sucursal" class="form-select mt-1 block w-full" required>
-                            <option *ngFor="let suc of sucursales" [value]="suc.value">{{ suc.label }}</option>
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="rol" class="block text-gray-700">Rol</label>
-                        <select formControlName="rol" id="rol" name="rol" class="form-select mt-1 block w-full" required>
-                            <option value="1">Administrador</option>
-                            <option value="2">Responsable</option>
-                            <option value="3">Empleado</option>
-                        </select>
-                    </div>
-                    <div class="flex justify-end">
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar</button>
-                        <button (click)="cerrarModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
-                    </div>
-                </form>
-                <!-- Formulario aquí -->
-                <form [formGroup]="formularioEmpleado" (submit)="editarEmpleado()">
                     <div class="mb-4">
                         <label for="nombre" class="block text-gray-700">Nombre</label>
                         <input formControlName="nombre" type="text" id="nombre" name="nombre" class="form-input mt-1 block w-full" placeholder="Ingrese el nombre" required>
@@ -175,16 +129,33 @@
                     <div class="mb-4">
                         <label for="filtro" class="block text-gray-700">Selecciona un filtro:</label>
                         <select id="filtro" name="filtro" class="form-select mt-1 block w-full" [(ngModel)]="filtroSeleccionado">
+                            <option value="">Quitar Filtros</option>
                             <option value="departamento">Departamento</option>
                             <option value="sucursal">Sucursal</option>
+                            <option value="ambos">Sucursal y Departamento</option>
+                        </select>
+                    </div>
+                    <!-- Selector de departamento -->
+                    <div *ngIf="filtroSeleccionado === 'departamento' || filtroSeleccionado === 'ambos'" class="mb-4">
+                        <label for="filtroDepartamento" class="block text-gray-700">Selecciona un departamento:</label>
+                        <select id="filtroDepartamento" name="filtroDepartamento" class="form-select mt-1 block w-full" [(ngModel)]="filtroDepartamento">
+                            <option *ngFor="let departamento of departamentos" [value]="departamento.label">{{ departamento.label }}</option>
+                        </select>
+                    </div>
+                    <!-- Selector de sucursal -->
+                    <div *ngIf="filtroSeleccionado === 'sucursal' || filtroSeleccionado === 'ambos'" class="mb-4">
+                        <label for="filtroSucursal" class="block text-gray-700">Selecciona una sucursal:</label>
+                        <select id="filtroSucursal" name="filtroSucursal" class="form-select mt-1 block w-full" [(ngModel)]="filtroSucursal">
+                            <option *ngFor="let sucursal of sucursales" [value]="sucursal.label">{{ sucursal.label }}</option>
                         </select>
                     </div>
                     <div class="flex justify-end">
                         <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2" (click)="aplicarFiltro()">Aplicar</button>
-                        <button type="button" (click)="cerrarModalDeFiltros()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
+                        <button type="button" (click)="cerrarModalDeFiltros()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cerrar</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
