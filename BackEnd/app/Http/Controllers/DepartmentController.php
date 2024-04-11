@@ -15,10 +15,10 @@ class DepartmentController extends Controller
         $this->middleware('auth:api', ['except' => ['login']]);
     }
 
-    public function listDepartment()
+    public function listDepartments()
     {
         $departments = Department::all();
 
-        return response()->json($department);
+        return response()->json($departments);
     }
 }

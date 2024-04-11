@@ -16,10 +16,10 @@ class BranchOfficeController extends Controller
         $this->middleware('auth:api', ['except' => ['login']]);
     }
 
-    public function listBranchOffice()
+    public function listBranchOffices()
     {
-        $branchOffice = BranchOffice::all();
+        $branchOffices = BranchOffice::all();
 
-        return response()->json($branchOffice);
+        return response()->json($branchOffices);
     }
 }

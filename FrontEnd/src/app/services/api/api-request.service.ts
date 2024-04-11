@@ -37,4 +37,12 @@ export class ApiRequestService {
   deleteEmployee(id: any, employeeData: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/deleteEmployee/${id}`, employeeData);
   }
+
+  listDepartments(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/auth/listDepartments`);
+  }
+
+  listBranchOffices(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/auth/listBranchOffices`);
+  }
 }

@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmployeesController;
+use App\Http\Controllers\DepartmentController;
+Use App\Http\Controllers\BranchOfficeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +31,7 @@ Route::group([
     Route::post('addEmployee', [EmployeesController::class, 'addEmployee']);
     Route::put('editEmployee/{id}', [EmployeesController::class, 'editEmployee']);
     Route::delete('deleteEmployee/{id}', [EmployeesController::class, 'deleteEmployee']);
-    Route::get('listDepartment', [DepartmentController::class, 'listDepartment']);
-    Route::get('listBranchOffice', [BranchOfficeController::class, 'listBranchOffice']);
+    Route::get('listDepartments', [DepartmentController::class, 'listDepartments']);
+    Route::get('listBranchOffices', [BranchOfficeController::class, 'listBranchOffices']);
     Route::get('listEmployeeMaterial/{id}', [EmployeesController::class, 'listEmployeeMaterial']);
 });
