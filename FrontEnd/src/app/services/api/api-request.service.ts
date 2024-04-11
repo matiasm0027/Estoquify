@@ -37,4 +37,8 @@ export class ApiRequestService {
   listEmployeesByBranchOffice(branchOfficeId: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/auth/listEmployeesByBranchOffice/${branchOfficeId}`);
   }
+
+  editEmployee(employeeData: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/addEmployee`, employeeData);
+  }
 }

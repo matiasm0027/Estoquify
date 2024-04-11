@@ -122,4 +122,23 @@ export class EmployeeViewComponent implements OnInit {
       console.error('Formulario inválido. Por favor, complete todos los campos requeridos.');
     }
   }
+
+  editarEmpleado() {
+    if (this.formularioEmpleado.valid) {
+      const editarEmpleado = this.formularioEmpleado.value;
+      this.peticionesService.editEmployee(editarEmpleado).subscribe(
+        (response: any) => {
+          this.employees.push(response);
+          console.log('Empleado editado con éxito:', response);
+          this.cerrarModal();
+        },
+        (error: any) => {
+          console.error('Error al editar empleado:', error);
+        }
+      );
+    } else {
+      console.error('Formulario inválido. Por favor, complete todos los campos requeridos.');
+    }
+  }
+
 }
