@@ -1,4 +1,5 @@
-.sidebar{
-    width: 200px;
-    
-}
+@media (max-width: 1024px) {
+    .sidebar.hidden {
+      display: none;
+    }
+  }

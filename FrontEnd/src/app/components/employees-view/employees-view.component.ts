@@ -20,6 +20,8 @@ export class EmployeesViewComponent implements OnInit {
   filtroSucursal: string = '';
   departamentos: any[] = [];
   sucursales: any[] = [];
+  sidebarVisible: boolean = true;
+  sidebarWidth: number = 250;
 
   constructor(private fb: FormBuilder, private peticionesService: ApiRequestService) {
     this.formularioEmpleado = this.fb.group({
@@ -38,6 +40,15 @@ export class EmployeesViewComponent implements OnInit {
     this.obtenerEmpleados();
     this.obtenerDepartamento();
     this.obtenerSucursales();
+  }
+
+  toggleSidebar() {
+    this.sidebarVisible = !this.sidebarVisible;
+    if (this.sidebarVisible) {
+      this.sidebarWidth = 250; // Ancho del sidebar cuando es visible
+    } else {
+      this.sidebarWidth = 0; // Ancho del sidebar cuando es invisible
+    }
   }
 
   obtenerDepartamento() {
