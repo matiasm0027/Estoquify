@@ -14,6 +14,7 @@ import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { ApiRequestService } from './services/api/api-request.service';
 import { EmployeeDetailsComponent } from './components/employee-details/employee-details.component';
+import { CategoriesViewComponent } from './components/categories-view/categories-view.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { EmployeeDetailsComponent } from './components/employee-details/employee
     HomeComponent,
     SidebarComponent,
     EmployeesViewComponent,
-    EmployeeDetailsComponent
+    EmployeeDetailsComponent,
+    CategoriesViewComponent
   ],
   imports: [
     BrowserModule,
