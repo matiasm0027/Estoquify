@@ -14,11 +14,13 @@ export class HomeComponent implements OnInit {
 
 
   reportes: any[] = [];
+  materials: any[] = [];
 
   constructor(private ApiRequestService: ApiRequestService) {}
 
   ngOnInit(): void {
     this.obtenerReportes();
+    this.obtenerCantidadMaterial();
   }
 
   toggleSidebar() {
@@ -45,5 +47,20 @@ export class HomeComponent implements OnInit {
       }
     );
   }
+
+  obtenerCantidadMaterial(){
+    this.ApiRequestService.categoryMaterialInfo().subscribe(
+      (response: any[]) => {
+        this.materials = response.map(material => ({
+          name: material.category_name, // Cambiar a category_name
+          total_material: material.total_materials, // Cambiar a total_materials
+          activeMaterial: material.active_materials, // Cambiar a active_materials
+          availableMaterial: material.available_materials, // Cambiar a available_materials
+          inactiveMaterial: material.inactive_materials // Cambiar a inactive_materials
+        }));
+      }
+    );
+  }
+
 
 }

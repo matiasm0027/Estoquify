@@ -47,6 +47,10 @@ export class ApiRequestService {
   }
 
   listReportes(): Observable<any[]>{
-    return this.http.get<any[]>(`${this.apiUrl}/auth/listreports`);
+    return this.http.get<any[]>(`${this.apiUrl}/auth/listReports`);
+  }
+
+  categoryMaterialInfo(): Observable<any[]>{
+    return this.http.get<any[]>(`${this.apiUrl}/auth/categoryMaterialInfo`);
   }
 }
