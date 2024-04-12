@@ -10,7 +10,12 @@ use App\Models\Material;
 
 class CategoryController extends Controller
 {
-    public function getCategoryMaterialInfo()
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['categoryMaterialInfo']]);
+    }
+
+    public function categoryMaterialInfo()
     {
         // Obtener todas las categorías con sus materiales asociados y atributos
         $categories = Category::with('material')
