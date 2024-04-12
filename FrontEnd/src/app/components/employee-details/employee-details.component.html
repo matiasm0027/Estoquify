@@ -63,7 +63,7 @@
                 <ng-container *ngFor="let material of employeeDetails.materials">
                     <div class="bg-white p-4 rounded shadow">
                         <p><strong>Categoría:</strong> {{ material.category_name }}</p>
-                        <p><strong>ID del Material:</strong> {{ material.material_id ? material.material_id : 'Material no asignado' }}</p>
+                        <p><strong>Material:</strong> {{ material.material_name ? material.material_name : 'Material no asignado' }}</p>
                     </div>
                 </ng-container>
             </div>
