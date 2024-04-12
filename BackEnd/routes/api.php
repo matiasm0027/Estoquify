@@ -7,6 +7,7 @@ use App\Http\Controllers\DepartmentController;
 Use App\Http\Controllers\BranchOfficeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\EmployeeMaterialController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +39,7 @@ Route::group([
     Route::get('listEmployeeMaterial/{id}', [EmployeesController::class, 'listEmployeeMaterial']);
     Route::get('categoryMaterialInfo', [CategoryController::class, 'categoryMaterialInfo']);
     Route::get('listReports', [ReportController::class, 'listReports']);
+    Route::get('/listAssignments/{id}', [EmployeeMaterialController::class, 'listAssignments']);
 
 });
 

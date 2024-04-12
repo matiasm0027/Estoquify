@@ -34,8 +34,8 @@ class Employee extends Authenticatable implements JWTSubject
 
     public function material()
     {
-        return $this->belongsToMany(Material::class, EmployeeMaterial::class)
-                    ->withPivot('assignment_date', 'return_date', 'material_id');
+        return $this->belongsToMany(Material::class, 'employee_material', 'employee_id', 'material_id')
+            ->withPivot('assignment_date', 'return_date');
     }
 
     public function report()

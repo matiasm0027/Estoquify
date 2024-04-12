@@ -78,6 +78,7 @@ class EmployeesController extends Controller
 
     public function addEmployee(Request $request)
     {
+        try {
          // Verificar si el usuario está autenticado
          $user = $request->user();
          //dd($user->role_id);
@@ -100,7 +101,7 @@ class EmployeesController extends Controller
             'telefonoMovil' => 'required',
         ]);
 
-        try {
+        
             // Crear un nuevo objeto Employee y asignar los valores
             $employee = new Employee();
             $employee->name = $validatedData['nombre'];
