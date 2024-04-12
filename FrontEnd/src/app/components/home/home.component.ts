@@ -42,6 +42,7 @@ export class HomeComponent implements OnInit {
         .map(reporte => ({
           id: reporte.id,
           solicitud: reporte.petition,
+          prioridad: reporte.priority,
           estado: reporte.state,
           empleado: reporte.employee_id,
           nameempleado: reporte.employee_name
