@@ -61,4 +61,9 @@ export class ApiRequestService {
   changePassword(password: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/changePassword`, { password });
   }
+  
+  getEmployeeDetails(employeeId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/employeeInfoAssignments/${employeeId}`);
+
+  }
 }

@@ -13,6 +13,8 @@ import { FormsModule } from '@angular/forms';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { ApiRequestService } from './services/api/api-request.service';
+import { EmployeeDetailsComponent } from './components/employee-details/employee-details.component';
+import { CategoriesViewComponent } from './components/categories-view/categories-view.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +22,9 @@ import { ApiRequestService } from './services/api/api-request.service';
     LoginComponent,
     HomeComponent,
     SidebarComponent,
-    EmployeesViewComponent
+    EmployeesViewComponent,
+    EmployeeDetailsComponent,
+    CategoriesViewComponent
   ],
   imports: [
     BrowserModule,
