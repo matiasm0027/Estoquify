@@ -45,4 +45,8 @@ export class ApiRequestService {
   listBranchOffices(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/auth/listBranchOffices`);
   }
+
+  listReportes(): Observable<any[]>{
+    return this.http.get<any[]>(`${this.apiUrl}/auth/listreports`);
+  }
 }

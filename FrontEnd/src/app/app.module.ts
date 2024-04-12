@@ -12,6 +12,7 @@ import { EmployeesViewComponent } from './components/employees-view/employees-vi
 import { FormsModule } from '@angular/forms';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { ApiRequestService } from './services/api/api-request.service';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    ApiRequestService
   ],
   bootstrap: [AppComponent]
 })
