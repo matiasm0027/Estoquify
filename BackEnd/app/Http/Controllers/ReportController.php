@@ -14,7 +14,19 @@ class ReportController extends Controller
 
     public function listReports()
     {
-        $reports = Report::all();
+         // Obtener todos los reportes con los datos del empleado asociado
+        $reports = Report::with('employee')
+        ->get()
+        ->map(function ($report) {
+            return [
+                'id' => $report->id,
+                'date' => $report->date,
+                'petition' => $report->petition,
+                'state' => $report->state,
+                'priority' => $report->priority,
+                'employee_name' => $report->employee->name . ' ' . $report->employee->last_name,
+            ];
+        });
 
         return response()->json($reports);
     }
