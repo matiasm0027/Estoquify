@@ -1,0 +1,44 @@
+<div class="">
+    <div class="flex flex-col" [style.marginLeft.px]="sidebarVisible ? 0 : 64"> <!-- Ajusta el margen izquierdo -->
+        <app-sidebar *ngIf="sidebarVisible"></app-sidebar>
+    </div>
+    <div class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 box-fl container">
+        <!-- Contenido de la vista de detalles del empleado -->
+        <div class="bg-white p-6 rounded shadow" *ngIf="employeeDetails">
+            <h1 class="text-2xl font-bold mb-4">Detalles del Empleado</h1>
+            <!-- Tabla para mostrar los detalles específicos del empleado -->
+            <table class="table-auto w-full">
+                <tbody>
+                    <tr>
+                        <td class="py-2"><strong>Nombre:</strong></td>
+                        <td class="py-2">{{ employeeDetails?.name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="py-2"><strong>Apellido:</strong></td>
+                        <td class="py-2">{{ employeeDetails?.last_name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="py-2"><strong>Email:</strong></td>
+                        <td class="py-2">{{ employeeDetails?.email }}</td>
+                    </tr>
+                    <tr>
+                        <td class="py-2"><strong>Teléfono Móvil:</strong></td>
+                        <td class="py-2">{{ employeeDetails?.phone_number }}</td>
+                    </tr>
+                    <tr>
+                        <td class="py-2"><strong>Departamento:</strong></td>
+                        <td class="py-2">{{ employeeDetails?.department }}</td>
+                    </tr>
+                    <tr>
+                        <td class="py-2"><strong>Rol:</strong></td>
+                        <td class="py-2">{{ employeeDetails?.role.charAt(0).toUpperCase() + employeeDetails?.role.slice(1) }}</td>
+                    </tr>
+                    <tr>
+                        <td class="py-2"><strong>Sucursal:</strong></td>
+                        <td class="py-2">{{ employeeDetails?.branch_office }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -53,4 +53,8 @@ export class ApiRequestService {
   categoryMaterialInfo(): Observable<any[]>{
     return this.http.get<any[]>(`${this.apiUrl}/auth/categoryMaterialInfo`);
   }
+
+  getEmployeeDetails(employeeId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/employeeInfoAssignments/${employeeId}`);
+  }
 }
