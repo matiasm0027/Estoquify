@@ -11,6 +11,7 @@ export class CategoriesViewComponent implements OnInit{
   sidebarWidth: number = 250;
 
   materials: any[] = [];
+  mostrarModalAgregar: boolean = false;
 
   constructor(private ApiRequestService: ApiRequestService) {}
   
@@ -42,6 +43,11 @@ export class CategoriesViewComponent implements OnInit{
       }
     );
   }
+
+  mostrarModal() {
+    this.mostrarModalAgregar = true;
+  }
+
 
 }
 
