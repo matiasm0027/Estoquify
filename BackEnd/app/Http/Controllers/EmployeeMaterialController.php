@@ -14,7 +14,7 @@ class EmployeeMaterialController extends Controller
     public function employeeInfoAssignments($id)
     {
         // Obtener el empleado específico con los materiales asignados activos
-        $employee = Employee::with(['department', 'branchOffice', 'material' => function ($query) {
+        $employee = Employee::with(['role', 'department', 'branchOffice', 'material' => function ($query) {
         }])->find($id);
 
         if (!$employee) {
@@ -27,6 +27,7 @@ class EmployeeMaterialController extends Controller
             'last_name' => $employee->last_name,
             'email' => $employee->email,
             'phone_number' => $employee->phone_number,
+            'role' => $employee->role ? $employee->role->name : null,
             'department' => $employee->department ? $employee->department->name : null,
             'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
             'materials' => $employee->material->map(function ($material){
