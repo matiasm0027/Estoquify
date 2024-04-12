@@ -1,4 +1,5 @@
-import { Component, Renderer2 } from '@angular/core';
+import { Component, OnInit, Renderer2 } from '@angular/core';
+import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 
 @Component({
@@ -6,14 +7,21 @@ import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-contr
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit{
 
   message!: string;
+  employeeName!: string;
 
   constructor(
     private authControlService: UsuariosControlService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private apiRequest: ApiRequestService,
     ) {}
+
+    ngOnInit(): void {
+      this.getLoggedUser();
+
+    }
 
     logout(): void {
       this.authControlService.logout();
@@ -24,5 +32,16 @@ export class SidebarComponent {
       if (sidebar) {
         sidebar.classList.toggle('hidden'); // Agrega o quita la clase 'hidden'
       }
+    }
+
+    getLoggedUser(): void {
+      this.apiRequest.me().subscribe(
+        (response: any) => {
+          this.employeeName = response.name + ' ' + response.last_name;
+        },
+        error => {
+          console.error('Error when obtaining data from the logged in user:', error);
+        }
+      );
     }
 }

@@ -29,7 +29,7 @@ Route::group([
 
     Route::post('login', [EmployeesController::class, 'login']);
     Route::post('refresh', [EmployeesController::class, 'refresh']);
-    Route::post('me', [EmployeesController::class, 'me']);
+    Route::get('me', [EmployeesController::class, 'me']);
     Route::get('listEmployees', [EmployeesController::class, 'listEmployees']);
     Route::post('addEmployee', [EmployeesController::class, 'addEmployee']);
     Route::put('editEmployee/{id}', [EmployeesController::class, 'editEmployee']);
@@ -39,7 +39,7 @@ Route::group([
     Route::get('listEmployeeMaterial/{id}', [EmployeesController::class, 'listEmployeeMaterial']);
     Route::get('categoryMaterialInfo', [CategoryController::class, 'categoryMaterialInfo']);
     Route::get('listReports', [ReportController::class, 'listReports']);
-    Route::get('/listAssignments/{id}', [EmployeeMaterialController::class, 'listAssignments']);
+    Route::get('employeeInfoAssignments/{id}', [EmployeeMaterialController::class, 'employeeInfoAssignments']);
 
 });
 
