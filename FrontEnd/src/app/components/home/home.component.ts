@@ -21,6 +21,7 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.obtenerReportes();
     this.obtenerCantidadMaterial();
+    this.mostrarMaterialesDisponiblesBajos
   }
 
   toggleSidebar() {
@@ -66,5 +67,16 @@ export class HomeComponent implements OnInit {
     );
   }
 
-
+  mostrarMaterialesDisponiblesBajos() {
+    // Filtrar los materiales con una cantidad disponible de menos de 5 unidades
+    const materialesDisponiblesBajos = this.materials.filter(material => material.availableMaterial < 5);
+    
+    // Mostrar los materiales disponibles bajos en pantalla
+    materialesDisponiblesBajos.forEach(material => {
+        if (material.availableMaterial < 5) {
+            console.log(`Quedan pocas unidades disponibles de ${material.name}: ${material.availableMaterial}`);
+            // Aquí puedes agregar lógica adicional para mostrar en pantalla
+        }
+    });
+}
 }
