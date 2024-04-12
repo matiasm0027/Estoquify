@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 
@@ -14,7 +14,7 @@ export class EmployeeDetailsComponent implements OnInit {
   sidebarVisible: boolean = true;
   sidebarWidth: number = 250;
 
-  constructor(private route: ActivatedRoute, private employeeService: ApiRequestService) { }
+  constructor(private route: ActivatedRoute, private employeeService: ApiRequestService, private router: Router,) { }
 
   ngOnInit(): void {
     this.getEmployeeIdFromRoute();
@@ -50,6 +50,25 @@ export class EmployeeDetailsComponent implements OnInit {
         }
       );
       
+  }
+  confirmDelete(employee: any): void {
+    const confirmacion = confirm(`¿Estás seguro de que quieres eliminar a ${employee.name}?`);
+    if (confirmacion) {
+
+      this.deleteEmployee(this.employeeDetails.employee_id);
+    }
+  }
+
+  deleteEmployee(id: number): void {
+    this.employeeService.deleteEmployees(id).subscribe(
+      (response) => {
+        console.log('Empleado eliminado correctamente', response);
+        this.router.navigate(['/employees_view']); 
+      },
+      error => {
+        console.error(`Error al eliminar empleado con ID ${id}:`, error);
+      }
+    );
   }
 }
 
