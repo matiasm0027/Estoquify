@@ -10,7 +10,7 @@ import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-contr
 })
 export class EmployeeDetailsComponent implements OnInit {
   employeeId!: number;
-  employeeDetails: any;
+  employeeDetails: any = {};
   sidebarVisible: boolean = true;
   sidebarWidth: number = 250;
 

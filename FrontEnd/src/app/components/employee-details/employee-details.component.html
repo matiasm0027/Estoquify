@@ -5,7 +5,21 @@
     <div class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 box-fl container">
         <!-- Contenido de la vista de detalles del empleado -->
         <div class="bg-white p-6 rounded shadow" *ngIf="employeeDetails">
-            <h1 class="text-2xl font-bold mb-4">Detalles del Empleado</h1>
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-2xl font-bold">Detalles del Empleado</h1>
+                <!-- Botones para editar, eliminar y volver -->
+                <div class="space-x-4">
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                        Editar
+                    </button>
+                    <button class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+                        Eliminar
+                    </button>
+                    <button class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">
+                        Volver
+                    </button>
+                </div>
+            </div>
             <!-- Tabla para mostrar los detalles específicos del empleado -->
             <table class="table-auto w-full">
                 <tbody>
@@ -31,7 +45,7 @@
                     </tr>
                     <tr>
                         <td class="py-2"><strong>Rol:</strong></td>
-                        <td class="py-2">{{ employeeDetails?.role.charAt(0).toUpperCase() + employeeDetails?.role.slice(1) }}</td>
+                        <td class="py-2">{{ employeeDetails?.role?.charAt(0).toUpperCase() + employeeDetails?.role?.slice(1) }}</td>
                     </tr>
                     <tr>
                         <td class="py-2"><strong>Sucursal:</strong></td>
@@ -39,6 +53,20 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+        
+        <!-- Tabla para mostrar los materiales asignados al empleado -->
+        <div class="bg-white p-6 rounded shadow" *ngIf="employeeDetails">
+            <h2 class="text-2xl font-bold my-4">Materiales Asignados</h2>
+            <div class="grid grid-cols-3 gap-4">
+                <!-- Iterar sobre las categorías y sus materiales asignados -->
+                <ng-container *ngFor="let material of employeeDetails.materials">
+                    <div class="bg-white p-4 rounded shadow">
+                        <p><strong>Categoría:</strong> {{ material.category_name }}</p>
+                        <p><strong>ID del Material:</strong> {{ material.material_id ? material.material_id : 'Material no asignado' }}</p>
+                    </div>
+                </ng-container>
+            </div>
         </div>
     </div>
 </div>
