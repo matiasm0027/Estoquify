@@ -32,7 +32,7 @@ class Material extends Model
 
     public function employee()
     {
-        return $this->belongsToMany(Employee::class, EmployeeMaterial::class)
-                    ->withPivot('assignment_date', 'return_date', 'employee_id');
+        return $this->belongsToMany(Employee::class, 'employee_material', 'material_id', 'employee_id')
+            ->withPivot('assignment_date', 'return_date');
     }
 }
