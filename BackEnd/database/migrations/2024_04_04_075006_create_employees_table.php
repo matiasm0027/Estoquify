@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('email', 100)->unique();
             $table->string('password', 255);
             $table->string('phone_number', 15);
+            $table->boolean('first_login')->default(true);
             $table->foreignId('department_id')->constrained('departments')->onDelete('cascade');
             $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
             $table->foreignId('branch_office_id')->constrained('branch_offices')->onDelete('cascade');
