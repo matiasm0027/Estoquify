@@ -35,11 +35,15 @@ export class HomeComponent implements OnInit {
   obtenerReportes() {
     this.ApiRequestService.listReportes().subscribe(
       (response: any[]) => {
-        this.reportes = response.map(reporte => ({
+        
+        this.reportes = response
+        .filter(reporte => reporte.state === 'pending')
+        .map(reporte => ({
           id: reporte.id,
-          fecha: reporte.date,
+          solicitud: reporte.petition,
           estado: reporte.state,
-          empleado: reporte.employee_id
+          empleado: reporte.employee_id,
+          nameempleado: reporte.employee_name
         }));
       },
       error => {
