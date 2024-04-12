@@ -36,6 +36,7 @@ class EmployeeMaterialController extends Controller
                 return [
                     'category_name' => $categoryName,
                     'material_id' => $material->id,
+                    'material_name' => $material->name,
                 ];
             }),
         ];

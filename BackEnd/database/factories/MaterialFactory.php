@@ -20,6 +20,7 @@ class MaterialFactory extends Factory
         $branchOfficeId = BranchOffice::all()->random()->id;
 
         return [
+            'name' => $this->faker->word(),
             'low_date' => $lowDate,
             'high_date' => $this->faker->date(),
             'state' => $state,

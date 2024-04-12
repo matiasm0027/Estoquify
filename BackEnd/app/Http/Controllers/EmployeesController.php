@@ -21,10 +21,12 @@ class EmployeesController extends Controller
     {
         $credentials = request(['email', 'password']);
 
-
         if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Invalid credentials'], 401);
+            return response()->json(['error' => 'Credenciales inválidas'], 401);
         }
+
+        // Obtener el usuario autenticado
+        $user = auth()->user();
 
         return $this->respondWithToken($token);
     }
@@ -55,6 +57,25 @@ class EmployeesController extends Controller
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60
         ]);
+    }
+
+    public function changePassword(Request $request)
+    {
+        $user = auth()->user(); // Obtén el usuario autenticado
+
+        if ($user->password_changed) {
+            return response()->json(['message' => 'La contraseña ya ha sido cambiada previamente'], 400);
+        }
+
+        $request->validate([
+            'password' => 'required|string|',
+        ]);
+
+        $user->password = Hash::make($request->password);
+        $user->password_changed = true;
+        $user->save();
+
+        return response()->json(['message' => 'Contraseña cambiada exitosamente'], 200);
     }
 
     public function listEmployees()
