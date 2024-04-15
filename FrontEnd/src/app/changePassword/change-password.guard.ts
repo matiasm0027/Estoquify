@@ -15,11 +15,10 @@ export class ChangePasswordGuard implements CanActivate {
     const firstLogin = localStorage.getItem('first_login');
     console.log(firstLogin)
     if (!firstLogin) {
-      return true; // Permite la navegación
+      return true; 
     } else {
-      console.log(firstLogin+'hola')
-      this.router.navigate(['/change_password']); // Redirige a la página de cambio de contraseña
-      return false; // Bloquea la navegación
+      this.router.navigate(['/change_password']); 
+      return false;
     }
   }
 }
