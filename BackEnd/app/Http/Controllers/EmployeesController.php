@@ -3,13 +3,17 @@
 namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\ResetPassword;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use App\Models\Employee;
+use Illuminate\Support\Facades\Log;
+use App\Mail\ResetPassword;
 
 class EmployeesController extends Controller
 {
@@ -17,7 +21,7 @@ class EmployeesController extends Controller
     //protege todos los métodos del controlador, excepto el método login.
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'resetPassword']]);
+        $this->middleware('auth:api', ['except' => ['login', 'resetPassword', 'resetPasswordRequest']]);
     }
 
     public function login()
@@ -90,24 +94,24 @@ class EmployeesController extends Controller
         return response()->json(['message' => 'Password changed successfully.'], 200);
     }
 
-    public function resetPassword(Request $request)
+    public function resetPasswordRequest(Request $request)
 {
     try {
-        $email = $request->input('email');
 
-        // Query the database to find the employee with the specified email
+        $email = $request->input('email');
+        \Log::info('Email received:', ['email' => $request]);
+        \Log::info('Email received2:', ['email' => $request->input('email')]);
+
         $employee = Employee::where('email', $email)->first();
 
         if (!$employee) {
-            return response()->json(['error' => 'Email not found in our database'], 400);
+            return response()->json(['error' => 'Email not found in our database: ' . $email], 400);
         }
 
-        // Implement the logic to send the reset password email
         $this->sendResetPasswordEmail($email);
 
         return response()->json(['message' => 'Reset password email sent successfully, please check your inbox.'], 200);
     } catch (\Exception $e) {
-        // Log the error for debugging purposes
         \Log::error('Reset password error: ' . $e->getMessage());
 
         // Return an error response with a meaningful message
@@ -118,9 +122,58 @@ class EmployeesController extends Controller
 
     public function sendResetPasswordEmail($email)
     {
-        Mail::to($email)->send(new ResetPassword());
+        $oldToken = DB::table('password_resets')->where('email', $email)->first();
+
+        if ($oldToken) {
+            return $oldToken->token;
+        }
+
+        $token = Str::random(60);
+        Mail::to($email)->send(new ResetPassword($token));
+
+        $this->saveToken($token, $email);
+
+
+        return $token;
     }
 
+    public function saveToken($token, $email){
+        DB::table('password_resets')->insert([
+            "email" => $email,
+            "token" => $token,
+            "created_at" => Carbon::now()
+        ]);
+    }
+
+    public function resetPassword(Request $request){
+
+        $validated = $request->validate([
+            'email' => 'required',
+            'newPassword' => 'required',
+            'confirmPassword' => 'required|string|same:newPassword',
+            'resetToken' => 'required',
+        ]);
+
+        return $this->resetPasswordTable($validated) ? $this->changePasswordDB($validated) :
+        $this->NotFound();
+    }
+
+    public function resetPasswordTable($request)
+    {
+        return DB::table('password_resets')->where(['email' => $request -> email, 'token' => $request -> resetToken]);
+    }
+
+    public function NotFound(){
+        return response()->json(['error' => 'Token or email incorrect']);
+    }
+
+    public function changePasswordDB($request){
+        $employee = Employee::whereEmail($request->email)->first();
+        $employee->Update(['password' => bcrypt($request->newPassword)]);
+        $this->resetPasswordTable($request)->delete();
+        return response()->json(['message' => 'Successfully Changed Password'], 200);
+
+    }
 
     public function listEmployees()
     {

@@ -66,8 +66,14 @@ export class ApiRequestService {
     return this.http.delete<any>(`${this.apiUrl}/auth/deleteEmployee/${employee}`);
   }
 
-  resetPassword(email: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/auth/resetPassword`, email);
+  resetPasswordRequest(email: string): Observable<any> {
+    const requestBody = { email: email };
+    console.log(requestBody)
+    return this.http.post<any>(`${this.apiUrl}/auth/resetPasswordRequest`, requestBody);
   }
 
+  resetPassword(email: string, password: string, confirmPassword:string, resetToken:string): Observable<any> {
+    //const requestBody = { email: email };
+    return this.http.post<any>(`${this.apiUrl}/auth/resetPassword`, {email, password, confirmPassword, resetToken});
+  }
 }

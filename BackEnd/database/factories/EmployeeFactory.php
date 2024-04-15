@@ -24,7 +24,7 @@ class EmployeeFactory extends Factory
 
         $randomNumber = $this->faker->numberBetween(100, 800);
         $name = $this->faker->firstName();
-        $email = $name . $randomNumber . '@gmail.com';
+        $email = strtolower($name) . $randomNumber . '@gmail.com';
         $phone_number = $this->faker->numerify('#########');
 
         return [

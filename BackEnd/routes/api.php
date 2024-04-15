@@ -36,7 +36,9 @@ Route::group([
     Route::put('changePassword', [EmployeesController::class, 'changePassword']);
     Route::delete('deleteEmployee/{id}', [EmployeesController::class, 'deleteEmployee']);
     Route::get('listEmployeeMaterial/{id}', [EmployeesController::class, 'listEmployeeMaterial']);
+    Route::post('resetPasswordRequest', [EmployeesController::class, 'resetPasswordRequest']);
     Route::post('resetPassword', [EmployeesController::class, 'resetPassword']);
+
     Route::get('employeeInfoAssignments/{id}', [EmployeeMaterialController::class, 'employeeInfoAssignments']);
 
     Route::get('listDepartments', [DepartmentController::class, 'listDepartments']);

@@ -1,10 +1,10 @@
 <x-mail::message>
-# Introduction
+# Change Password Request
 
-The body of your message.
+Click on the button below to change password
 
-<x-mail::button :url="''">
-Button Text
+<x-mail::button :url="'http://localhost:4200/reset_password?token='.$token">
+Reset Password
 </x-mail::button>
 
 Thanks,<br>
