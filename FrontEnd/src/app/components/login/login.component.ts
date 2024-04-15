@@ -43,7 +43,13 @@ export class LoginComponent implements OnInit {
           if (response && response.access_token) {
             localStorage.setItem('itsLoged', 'true');
             localStorage.setItem('token', response.access_token);
-            this.router.navigate(['/home']); 
+            if (response.first_login) {
+              localStorage.setItem('first_login', 'true');
+              this.router.navigate(['/change_password']);
+            } else {
+              console.log(response)
+              this.router.navigate(['/home']);
+            }
           }
         },
         (error) => {

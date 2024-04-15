@@ -15,6 +15,8 @@ import { NgxPaginationModule } from 'ngx-pagination';
 import { ApiRequestService } from './services/api/api-request.service';
 import { EmployeeDetailsComponent } from './components/employee-details/employee-details.component';
 import { CategoriesViewComponent } from './components/categories-view/categories-view.component';
+import { ChangePasswordComponent } from './components/change-password/change-password.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +26,9 @@ import { CategoriesViewComponent } from './components/categories-view/categories
     SidebarComponent,
     EmployeesViewComponent,
     EmployeeDetailsComponent,
-    CategoriesViewComponent
+    CategoriesViewComponent,
+    ChangePasswordComponent,
+    ForgotPasswordComponent,
   ],
   imports: [
     BrowserModule,

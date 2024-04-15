@@ -54,12 +54,8 @@ export class ApiRequestService {
     return this.http.get<any[]>(`${this.apiUrl}/auth/categoryMaterialInfo`);
   }
 
-  checkFirstLogin(): Observable<{ first_login: boolean }> {
-    return this.http.get<{ first_login: boolean }>(`${this.apiUrl}/auth/checkFirstLogin`);
-  }
-
-  changePassword(password: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/auth/changePassword`, { password });
+  changePassword(newPassword: string, confirmPassword: string): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/auth/changePassword`, { newPassword, confirmPassword });
   }
 
   getEmployeeDetails(employeeId: number): Observable<any> {
@@ -69,5 +65,9 @@ export class ApiRequestService {
   deleteEmployees(employee: any): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/auth/deleteEmployee/${employee}`);
   }
-  
+
+  resetPassword(email: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/resetPassword`, email);
+  }
+
 }

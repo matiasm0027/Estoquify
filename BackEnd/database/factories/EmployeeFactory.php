@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class EmployeeFactory extends Factory
 {
     protected $model = Employee::class;
-    
+
     public function definition(): array
     {
         $roleIds = Role::pluck('id')->toArray();

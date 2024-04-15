@@ -4,17 +4,18 @@ import { CanActivate, Router } from '@angular/router';
 @Injectable({
   providedIn: 'root'
 })
-//https://codingpotions.com/angular-seguridad
 export class MyGuardGuard implements CanActivate {
-  constructor(
-    private router : Router,
-    ){
-  }
-  canActivate():any {
-    if (localStorage.getItem('token')) {
+
+  constructor(private router: Router) {}
+
+  canActivate(): boolean {
+    const token = localStorage.getItem('token');
+    if (token) {
       return true;
-    }
-    this.router.navigate(['/login']);
+    } else {
+      this.router.navigate(['/login']);
       return false;
+    }
   }
+
 }

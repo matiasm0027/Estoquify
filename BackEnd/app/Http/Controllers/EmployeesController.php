@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ResetPassword;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Employee;
 
 class EmployeesController extends Controller
@@ -14,7 +17,7 @@ class EmployeesController extends Controller
     //protege todos los métodos del controlador, excepto el método login.
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('auth:api', ['except' => ['login', 'resetPassword']]);
     }
 
     public function login()
@@ -25,10 +28,8 @@ class EmployeesController extends Controller
             return response()->json(['error' => 'Credenciales inválidas'], 401);
         }
 
-        // Obtener el usuario autenticado
-        $user = auth()->user();
-
         return $this->respondWithToken($token);
+
     }
 
     //devuelve los detalles del usuario autenticado actualmente.
@@ -52,31 +53,74 @@ class EmployeesController extends Controller
     //formato de respuesta del tokens
     protected function respondWithToken($token)
     {
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
-        ]);
+        $user = auth()->user();
+        if ($user->first_login === 1) {
+            return response()->json([
+                'first_login' => true,
+                'access_token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => auth()->factory()->getTTL() * 60
+            ]);
+        } else {
+            return response()->json([
+                'access_token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => auth()->factory()->getTTL() * 60
+            ]);
+        }
     }
 
     public function changePassword(Request $request)
     {
         $user = auth()->user(); // Obtén el usuario autenticado
 
-        if ($user->password_changed) {
-            return response()->json(['message' => 'La contraseña ya ha sido cambiada previamente'], 400);
+        if (!$user->first_login) {
+            return response()->json(['message' => 'The password has already been changed previously.'], 400);
         }
 
         $request->validate([
-            'password' => 'required|string|',
+            'newPassword' => 'required|string',
+            'confirmPassword' => 'required|string|same:newPassword',
         ]);
 
-        $user->password = Hash::make($request->password);
-        $user->password_changed = true;
+        $user->password = Hash::make($request->newPassword);
+        $user->first_login = false;
         $user->save();
 
-        return response()->json(['message' => 'Contraseña cambiada exitosamente'], 200);
+        return response()->json(['message' => 'Password changed successfully.'], 200);
     }
+
+    public function resetPassword(Request $request)
+{
+    try {
+        $email = $request->input('email');
+
+        // Query the database to find the employee with the specified email
+        $employee = Employee::where('email', $email)->first();
+
+        if (!$employee) {
+            return response()->json(['error' => 'Email not found in our database'], 400);
+        }
+
+        // Implement the logic to send the reset password email
+        $this->sendResetPasswordEmail($email);
+
+        return response()->json(['message' => 'Reset password email sent successfully, please check your inbox.'], 200);
+    } catch (\Exception $e) {
+        // Log the error for debugging purposes
+        \Log::error('Reset password error: ' . $e->getMessage());
+
+        // Return an error response with a meaningful message
+        return response()->json(['error' => 'An unexpected error occurred while processing your request.'], 500);
+    }
+}
+
+
+    public function sendResetPasswordEmail($email)
+    {
+        Mail::to($email)->send(new ResetPassword());
+    }
+
 
     public function listEmployees()
     {
@@ -122,7 +166,7 @@ class EmployeesController extends Controller
             'telefonoMovil' => 'required',
         ]);
 
-        
+
             // Crear un nuevo objeto Employee y asignar los valores
             $employee = new Employee();
             $employee->name = $validatedData['nombre'];
@@ -132,7 +176,7 @@ class EmployeesController extends Controller
             $employee->department_id = $validatedData['departamento'];
             $employee->branch_office_id = $validatedData['sucursal'];
             $employee->role_id = $validatedData['rol'];
-            $employee->phone_number = $request->input('telefonoMovil');
+            $employee->phone_number = $validatedData['telefonoMovil'];
 
             // Guardar el nuevo empleado en la base de datos
             $employee->save();

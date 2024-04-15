@@ -33,13 +33,19 @@ Route::group([
     Route::get('listEmployees', [EmployeesController::class, 'listEmployees']);
     Route::post('addEmployee', [EmployeesController::class, 'addEmployee']);
     Route::put('editEmployee/{id}', [EmployeesController::class, 'editEmployee']);
+    Route::put('changePassword', [EmployeesController::class, 'changePassword']);
     Route::delete('deleteEmployee/{id}', [EmployeesController::class, 'deleteEmployee']);
+    Route::get('listEmployeeMaterial/{id}', [EmployeesController::class, 'listEmployeeMaterial']);
+    Route::post('resetPassword', [EmployeesController::class, 'resetPassword']);
+    Route::get('employeeInfoAssignments/{id}', [EmployeeMaterialController::class, 'employeeInfoAssignments']);
+
     Route::get('listDepartments', [DepartmentController::class, 'listDepartments']);
     Route::get('listBranchOffices', [BranchOfficeController::class, 'listBranchOffices']);
-    Route::get('listEmployeeMaterial/{id}', [EmployeesController::class, 'listEmployeeMaterial']);
+
     Route::get('categoryMaterialInfo', [CategoryController::class, 'categoryMaterialInfo']);
+
     Route::get('listReports', [ReportController::class, 'listReports']);
-    Route::get('employeeInfoAssignments/{id}', [EmployeeMaterialController::class, 'employeeInfoAssignments']);
+
 
 });
 
