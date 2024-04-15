@@ -24,6 +24,7 @@ export class UsuariosControlService {
 
   logout(): void {
     localStorage.removeItem('token');
+    localStorage.removeItem('itsLoged');
   }
 }
 
