@@ -13,7 +13,6 @@ export class ChangePasswordGuard implements CanActivate {
 
   canActivate(): boolean {
     const firstLogin = localStorage.getItem('first_login');
-    console.log(firstLogin)
     if (!firstLogin) {
       return true; 
     } else {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ApiRequestService } from 'src/app/services/api/api-request.service'; // Elimina la extensión .js
@@ -8,7 +8,7 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service'; //
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.css']
 })
-export class ResetPasswordComponent {
+export class ResetPasswordComponent implements OnInit{
   resetPasswordForm: FormGroup;
   errorMessage: string | null = null;
   resetToken!: string;
@@ -30,6 +30,12 @@ export class ResetPasswordComponent {
     route.queryParams.subscribe(params => {
       this.resetToken = params['token']
     });
+  }
+
+  ngOnInit(): void {
+    if (!this.resetToken){
+      this.router.navigate(['/login']);
+    }
   }
 
   submitResetPassword(): void {

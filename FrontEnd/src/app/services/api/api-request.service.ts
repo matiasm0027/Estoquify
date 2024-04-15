@@ -68,7 +68,6 @@ export class ApiRequestService {
 
   resetPasswordRequest(email: string): Observable<any> {
     const requestBody = { email: email };
-    console.log(requestBody)
     return this.http.post<any>(`${this.apiUrl}/auth/resetPasswordRequest`, requestBody);
   }
 

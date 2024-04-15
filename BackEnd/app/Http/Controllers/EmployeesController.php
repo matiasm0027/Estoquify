@@ -95,29 +95,26 @@ class EmployeesController extends Controller
     }
 
     public function resetPasswordRequest(Request $request)
-{
-    try {
+    {
+        try {
 
-        $email = $request->input('email');
-        \Log::info('Email received:', ['email' => $request]);
-        \Log::info('Email received2:', ['email' => $request->input('email')]);
+            $email = $request->input('email');
 
-        $employee = Employee::where('email', $email)->first();
 
-        if (!$employee) {
-            return response()->json(['error' => 'Email not found in our database: ' . $email], 400);
+            $employee = Employee::where('email', $email)->first();
+
+            if (!$employee) {
+                return response()->json(['error' => 'Email not found in our database'], 400);
+            }
+
+            $this->sendResetPasswordEmail($email);
+
+            return response()->json(['message' => 'Reset password email sent successfully, please check your inbox.'], 200);
+        } catch (\Exception $e) {
+            // Return an error response with a meaningful message
+            return response()->json(['error' => 'An unexpected error occurred while processing your request.'], 500);
         }
-
-        $this->sendResetPasswordEmail($email);
-
-        return response()->json(['message' => 'Reset password email sent successfully, please check your inbox.'], 200);
-    } catch (\Exception $e) {
-        \Log::error('Reset password error enmail?: ' . $e->getMessage());
-
-        // Return an error response with a meaningful message
-        return response()->json(['error' => 'An unexpected error occurred while processing your request.'], 500);
     }
-}
 
 
     public function sendResetPasswordEmail($email)
