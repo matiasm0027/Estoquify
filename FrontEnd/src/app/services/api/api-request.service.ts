@@ -72,9 +72,15 @@ export class ApiRequestService {
     return this.http.post<any>(`${this.apiUrl}/auth/resetPasswordRequest`, requestBody);
   }
 
-  resetPassword(email: string, password: string, confirmPassword:string, resetToken:string): Observable<any> {
-    //const requestBody = { email: email };
-    return this.http.post<any>(`${this.apiUrl}/auth/resetPassword`, {email, password, confirmPassword, resetToken});
+  resetPassword(email: string, newPassword: string, confirmPassword: string, resetToken: string): Observable<any> {
+    console.log('estamos en japo')
+    const requestData = {
+      email: email,
+      newPassword: newPassword,
+      confirmPassword: confirmPassword,
+      resetToken: resetToken
+    };
+    return this.http.post<any>(`${this.apiUrl}/auth/resetPassword`, requestData);
   }
 
   getCategoryDetails(employeeId: number): Observable<any> {
