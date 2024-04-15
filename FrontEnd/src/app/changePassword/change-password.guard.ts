@@ -17,7 +17,7 @@ export class ChangePasswordGuard implements CanActivate {
     if (!firstLogin) {
       return true; // Permite la navegación
     } else {
-      console.log(firstLogin)
+      console.log(firstLogin+'hola')
       this.router.navigate(['/change_password']); // Redirige a la página de cambio de contraseña
       return false; // Bloquea la navegación
     }

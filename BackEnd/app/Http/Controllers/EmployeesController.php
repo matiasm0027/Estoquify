@@ -112,7 +112,7 @@ class EmployeesController extends Controller
 
         return response()->json(['message' => 'Reset password email sent successfully, please check your inbox.'], 200);
     } catch (\Exception $e) {
-        \Log::error('Reset password error: ' . $e->getMessage());
+        \Log::error('Reset password error enmail?: ' . $e->getMessage());
 
         // Return an error response with a meaningful message
         return response()->json(['error' => 'An unexpected error occurred while processing your request.'], 500);
@@ -145,8 +145,9 @@ class EmployeesController extends Controller
         ]);
     }
 
-    public function resetPassword(Request $request){
-
+    public function resetPassword(Request $request)
+{
+    try {
         $validated = $request->validate([
             'email' => 'required',
             'newPassword' => 'required',
@@ -155,12 +156,21 @@ class EmployeesController extends Controller
         ]);
 
         return $this->resetPasswordTable($validated) ? $this->changePasswordDB($validated) :
-        $this->NotFound();
+            $this->NotFound();
+    } catch (\Exception $e) {
+        \Log::error('Reset password erroremail2: ' . $e->getMessage());
+
+        // Return an error response with a meaningful message
+        return response()->json(['error' => 'An unexpected error occurred while processing your request.'], 500);
     }
+}
 
     public function resetPasswordTable($request)
     {
-        return DB::table('password_resets')->where(['email' => $request -> email, 'token' => $request -> resetToken]);
+        \Log::info($request['email']);
+
+        // Accede a los valores del array utilizando la sintaxis de array
+        return DB::table('password_resets')->where(['email' => $request['email'], 'token' => $request['resetToken']]);
     }
 
     public function NotFound(){
@@ -168,8 +178,8 @@ class EmployeesController extends Controller
     }
 
     public function changePasswordDB($request){
-        $employee = Employee::whereEmail($request->email)->first();
-        $employee->Update(['password' => bcrypt($request->newPassword)]);
+        $employee = Employee::whereEmail($request['email'])->first();
+        $employee->Update(['password' => bcrypt($request['newPassword'])]);
         $this->resetPasswordTable($request)->delete();
         return response()->json(['message' => 'Successfully Changed Password'], 200);
 

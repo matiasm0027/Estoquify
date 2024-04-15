@@ -42,10 +42,10 @@ export class ResetPasswordComponent {
         this.passwordsMatchError = true;
         return;
       }
-
+      console.log('antes de la llegada wuapos')
       this.apiService.resetPassword(email, newPassword, confirmPassword, this.resetToken).subscribe(
         (response) => {
-          console.log(response)
+          console.log(response+'llegamos wuapos')
           this.router.navigate(['/login']);
         },
         (error) => {
