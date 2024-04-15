@@ -14,14 +14,14 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
-  { path: 'forgot_password', component: ForgotPasswordComponent, canActivate: [ChangePasswordGuard]},
-  { path: 'reset_password', component: ResetPasswordComponent, canActivate: [ChangePasswordGuard]},
-  { path: 'home', component: HomeComponent, canActivate: [MyGuardGuard, ChangePasswordGuard]},
-  { path: 'employees_view', component: EmployeesViewComponent, canActivate: [MyGuardGuard, ChangePasswordGuard] },
-  { path: 'employees_details', component: EmployeeDetailsComponent, canActivate: [MyGuardGuard, ChangePasswordGuard] },
-  { path: 'employees_details/:id', component: EmployeeDetailsComponent, canActivate: [MyGuardGuard, ChangePasswordGuard] },
-  { path: 'categories_view', component: CategoriesViewComponent, canActivate: [MyGuardGuard, ChangePasswordGuard]},
-  { path: 'change_password', component: ChangePasswordComponent, canActivate: [MyGuardGuard, ChangePasswordGuard]},
+  { path: 'forgot_password', component: ForgotPasswordComponent, canActivate: []},
+  { path: 'reset_password', component: ResetPasswordComponent, canActivate: []},
+  { path: 'home', component: HomeComponent, canActivate: [MyGuardGuard, ]},
+  { path: 'employees_view', component: EmployeesViewComponent, canActivate: [MyGuardGuard, ] },
+  { path: 'employees_details', component: EmployeeDetailsComponent, canActivate: [MyGuardGuard, ] },
+  { path: 'employees_details/:id', component: EmployeeDetailsComponent, canActivate: [MyGuardGuard, ] },
+  { path: 'categories_view', component: CategoriesViewComponent, canActivate: [MyGuardGuard, ]},
+  { path: 'change_password', component: ChangePasswordComponent, canActivate: [MyGuardGuard, ]},
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', component: NotFoundComponent }
 
