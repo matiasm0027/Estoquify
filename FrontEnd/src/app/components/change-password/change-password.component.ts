@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import './custom.js';
@@ -8,7 +8,8 @@ import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-contr
 @Component({
   selector: 'app-change-password',
   templateUrl: './change-password.component.html',
-  styleUrls: ['./change-password.component.css']
+  styleUrls: ['./change-password.component.css'],
+
 })
 export class ChangePasswordComponent implements OnInit {
   changePasswordForm: FormGroup;
@@ -29,12 +30,14 @@ export class ChangePasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    customfunction();
     if (!localStorage.getItem('first_login')) {
        this.router.navigate(['/home']);
     }
 
   }
 
+ 
   submitChangePassword(): void {
     if (this.changePasswordForm.valid) {
       const newPassword = this.changePasswordForm.value.newPassword;
@@ -59,3 +62,7 @@ export class ChangePasswordComponent implements OnInit {
     }
   }
 }
+function customfunction() {
+  throw new Error('Function not implemented.');
+}
+

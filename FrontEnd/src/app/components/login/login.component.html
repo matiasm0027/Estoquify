@@ -5,9 +5,10 @@
         </p>
         <p class="text-center text-condensedLight">Sign in with your Account</p>
         <form [formGroup]="loginForm" (ngSubmit)="enviarLogin()">
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <div class="mdl-textfield mdl-js-textfield custom-textfield">
+                <label for="email">Email</label>
                 <input class="mdl-textfield__input" type="text" id="email" formControlName="email">
-                <label class="mdl-textfield__label" for="email">Email</label>
+                
                 <!-- Control de errores -->
                 <div *ngIf="loginForm.get('email')?.errors?.['required'] && loginForm.get('email')?.touched"
                     class="error_form mensaje_error">
@@ -17,9 +18,10 @@
                     Invalid format.
                 </div>
             </div>
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <div class="mdl-textfield mdl-js-textfield custom-textfield">
+                <label for="pass">Password</label>
                 <input class="mdl-textfield__input" type="password" id="pass" formControlName="password">
-                <label class="mdl-textfield__label" for="pass">Password</label>
+                
                 <!-- Control de errores -->
                 <div *ngIf="loginForm.get('password')?.errors?.['required'] && loginForm.get('password')?.touched"
                     class="error_form mensaje_error">

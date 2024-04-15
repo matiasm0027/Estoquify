@@ -11,7 +11,7 @@ export class HomeComponent implements OnInit {
   
   sidebarVisible: boolean = true;
   sidebarWidth: number = 250;
-
+  employeeRole!: string;
 
   reportes: any[] = [];
   materials: any[] = [];
@@ -22,6 +22,7 @@ export class HomeComponent implements OnInit {
     this.obtenerReportes();
     this.obtenerCantidadMaterial();
     this.mostrarMaterialesDisponiblesBajos
+    this.getLoggedUser();
   }
 
   toggleSidebar() {
@@ -79,5 +80,22 @@ export class HomeComponent implements OnInit {
             // Aquí puedes agregar lógica adicional para mostrar en pantalla
         }
     });
+}
+
+getLoggedUser(): void {
+  this.ApiRequestService.me().subscribe(
+    (response: any) => {
+      const roleId = response.role_id;
+      console.log(response.role_id)
+      if (roleId === 1) {
+        this.employeeRole = 'admin';
+      } else {
+        this.employeeRole = 'usuario';
+      }
+    },
+    error => {
+      console.error('Error when obtaining data from the logged in user:', error);
+    }
+  );
 }
 }
