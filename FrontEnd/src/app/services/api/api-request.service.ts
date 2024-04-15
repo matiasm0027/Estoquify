@@ -76,4 +76,8 @@ export class ApiRequestService {
     //const requestBody = { email: email };
     return this.http.post<any>(`${this.apiUrl}/auth/resetPassword`, {email, password, confirmPassword, resetToken});
   }
+
+  getCategoryDetails(employeeId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/employeeInfoAssignments/${employeeId}`);
+  }
 }

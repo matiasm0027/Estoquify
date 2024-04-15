@@ -1,0 +1,35 @@
+<div class="bg-white p-6 rounded shadow" *ngIf="categoryDetails">
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold">Detalles del Material</h1>
+        <!-- Botones para editar, eliminar y volver -->
+        <div class="space-x-4">
+            <button class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 px-4 rounded border border-blue-500">
+                Editar
+            </button>
+            <button class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 px-4 rounded border border-red-500">
+                Eliminar
+            </button>
+            <button class="bg-white-500 hover:bg-white hover:text-gray-500 font-bold py-2 px-4 rounded border border-gray-500">
+                Volver
+            </button>
+        </div>
+    </div>
+    <!-- Tabla para mostrar los detalles específicos del empleado -->
+    <table class="table-auto w-full">
+        <tbody>
+            <tr>
+                <td class="py-2"><strong>Id:</strong></td>
+                <td class="py-2">{{ categoryDetails?.id }}</td>
+            </tr>
+            <tr>
+                <td class="py-2"><strong>Nombre:</strong></td>
+                <td class="py-2">{{ categoryDetails?.name }}</td>
+            </tr>
+            
+            <tr>
+                <td class="py-2"><strong>State:</strong></td>
+                <td class="py-2">{{ categoryDetails?.state }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

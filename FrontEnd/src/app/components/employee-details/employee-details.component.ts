@@ -49,7 +49,7 @@ export class EmployeeDetailsComponent implements OnInit {
           console.error('Error al obtener detalles del empleado:', error);
         }
       );
-      
+
   }
   confirmDelete(employee: any): void {
     const confirmacion = confirm(`¿Estás seguro de que quieres eliminar a ${employee.name}?`);

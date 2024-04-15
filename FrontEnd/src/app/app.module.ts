@@ -18,6 +18,7 @@ import { CategoriesViewComponent } from './components/categories-view/categories
 import { ChangePasswordComponent } from './components/change-password/change-password.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { CategoryDetailsComponent } from './components/category-details/category-details.component';
 
 @NgModule({
   declarations: [
@@ -28,9 +29,11 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
     EmployeesViewComponent,
     EmployeeDetailsComponent,
     CategoriesViewComponent,
+    CategoryDetailsComponent,
     ChangePasswordComponent,
     ForgotPasswordComponent,
-    ResetPasswordComponent,
+    ResetPasswordComponent
+    
   ],
   imports: [
     BrowserModule,
