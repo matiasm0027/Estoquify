@@ -31,7 +31,7 @@ export class ApiRequestService {
   }
 
   editEmployee(id: any, employeeData: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/auth/editEmployee/${id}`, employeeData);
+    return this.http.put<any>(`${this.apiUrl}/auth/editEmployee/${id}`, employeeData);
   }
 
   deleteEmployee(id: any, employeeData: any): Observable<any> {

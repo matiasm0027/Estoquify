@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
@@ -17,40 +17,47 @@ export class EmployeeDetailsComponent implements OnInit {
   departamentos: any[] = [];
   sucursales: any[] = [];
   mostrarModalEditar: boolean = false;
-  formularioEmpleado: FormGroup;
- 
+  formularioEmpleado!: FormGroup;
+  roles: any[] = [
+    { id: 1, name: 'Administrador' },
+    { id: 2, name: 'Manager' },
+    { id: 3, name: 'User' }
+  ];
 
-  constructor(private fb: FormBuilder,private route: ActivatedRoute, private employeeService: ApiRequestService, private router: Router,) {
-    this.formularioEmpleado = this.fb.group({
-      nombre: ['', Validators.required],
-      apellido: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
-      departamento: ['', Validators.required],
-      sucursal: ['', Validators.required],
-      rol: ['', Validators.required],
-      telefonoMovil: ['', Validators.required],
-    });
-   }
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private employeeService: ApiRequestService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.getEmployeeIdFromRoute();
+    this.obtenerDepartamento();
+    this.obtenerSucursales();
     this.getEmployeeDetails();
+  }
+
+  initForm() {
+    this.formularioEmpleado = this.fb.group({
+      nombre: [this.employeeDetails.name, Validators.required],
+      apellido: [this.employeeDetails.last_name, Validators.required],
+      email: [this.employeeDetails.email, [Validators.required, Validators.email]],
+      departamento: [this.employeeDetails.department, Validators.required],
+      sucursal: [this.employeeDetails.branch_office, Validators.required],
+      rol: [this.employeeDetails.role, Validators.required],
+      telefonoMovil: [this.employeeDetails.phone_number]
+    });
   }
 
   toggleSidebar() {
     this.sidebarVisible = !this.sidebarVisible;
-    if (this.sidebarVisible) {
-      this.sidebarWidth = 250; // Ancho del sidebar cuando es visible
-    } else {
-      this.sidebarWidth = 0; // Ancho del sidebar cuando es invisible
-    }
+    this.sidebarWidth = this.sidebarVisible ? 250 : 0;
   }
 
   getEmployeeIdFromRoute(): void {
     this.route.params.subscribe(params => {
-      this.employeeId = +params['id']; // Obtener el id del empleado de la ruta
-      console.log(this.employeeId)
+      this.employeeId = +params['id'];
     });
   }
 
@@ -59,17 +66,16 @@ export class EmployeeDetailsComponent implements OnInit {
       .subscribe(
         (employee: any) => {
           this.employeeDetails = employee;
-          console.log(employee)
-           // Verifica los detalles del empleado en la consola
+          this.initForm(); // Initialize form after employee details are fetched
         },
         (error: any) => {
           console.error('Error al obtener detalles del empleado:', error);
         }
       );
-
   }
-  volver(){
-    this.router.navigate(['/employees_view'])
+
+  volver() {
+    this.router.navigate(['/employees_view']);
   }
 
   mostrarModal() {
@@ -81,24 +87,24 @@ export class EmployeeDetailsComponent implements OnInit {
     this.getEmployeeDetails();
     this.formularioEmpleado.reset();
   }
+
   editarEmpleado(): void {
-    if (this.formularioEmpleado.valid) {
+   
+      if (this.formularioEmpleado.valid) {
       const empleadoEditado = {
         id: this.employeeId,
         nombre: this.formularioEmpleado.value.nombre,
         apellido: this.formularioEmpleado.value.apellido,
         email: this.formularioEmpleado.value.email,
-        password: this.formularioEmpleado.value.password,
         departamento: this.formularioEmpleado.value.departamento,
         sucursal: this.formularioEmpleado.value.sucursal,
         rol: this.formularioEmpleado.value.rol,
         telefonoMovil: this.formularioEmpleado.value.telefonoMovil
       };
-  
+
       this.employeeService.editEmployee(this.employeeId, empleadoEditado).subscribe(
         (response: any) => {
           console.log('Empleado editado correctamente', response);
-          // Puedes cerrar el modal y actualizar la lista de empleados o hacer cualquier otra acción necesaria
           this.cerrarModal();
           this.getEmployeeDetails();
         },
@@ -107,7 +113,6 @@ export class EmployeeDetailsComponent implements OnInit {
         }
       );
     } else {
-      // Si el formulario no es válido, puedes mostrar un mensaje de error o realizar alguna otra acción
       console.error('Formulario inválido');
     }
   }
@@ -133,11 +138,11 @@ export class EmployeeDetailsComponent implements OnInit {
       }
     );
   }
+
   confirmDelete(employee: any): void {
     const confirmacion = confirm(`¿Estás seguro de que quieres eliminar a ${employee.name}?`);
     if (confirmacion) {
-
-      this.deleteEmployee(this.employeeDetails.employee_id);
+      this.deleteEmployee(employee.employee_id);
     }
   }
 
@@ -153,4 +158,3 @@ export class EmployeeDetailsComponent implements OnInit {
     );
   }
 }
-

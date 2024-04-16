@@ -267,7 +267,7 @@ class EmployeesController extends Controller
                 'nombre' => 'required',
                 'apellido' => 'required',
                 'email' => 'required|email',
-                'password' => 'required|min:6',
+                'password' => 'min:6',
                 'departamento' => 'required',
                 'sucursal' => 'required',
                 'rol' => 'required',

@@ -12,7 +12,7 @@
                     <button (click)="mostrarModal()" class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 px-4 rounded border border-blue-500">
                         Editar
                     </button>
-                    <button (click)="confirmDelete(employeeDetails.id)" class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 px-4 rounded border border-red-500">
+                    <button (click)="confirmDelete(employeeDetails)" class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 px-4 rounded border border-red-500">
                         Eliminar
                     </button>
                     <button (click)="volver()" class="bg-white-500 hover:bg-white hover:text-gray-500 font-bold py-2 px-4 rounded border border-gray-500">
@@ -93,31 +93,34 @@
                                 <input formControlName="email" type="email" id="email" name="email" class="form-input mt-1 block w-full" placeholder="Ingrese el correo electrónico" required>
                             </div>
                             <div class="mb-4">
-                                <label for="password" class="block text-gray-700">Contraseña</label>
-                                <input formControlName="password" type="password" id="password" name="password" class="form-input mt-1 block w-full" placeholder="Ingrese la contraseña" required>
-                            </div>
-                            <div class="mb-4">
                                 <label for="telefonoMovil" class="block text-gray-700">Teléfono Móvil</label>
                                 <input formControlName="telefonoMovil" type="tel" id="telefonoMovil" name="telefonoMovil" class="form-input mt-1 block w-full" placeholder="Ingrese el teléfono móvil">
                             </div>
                             <div class="mb-4">
                                 <label for="departamento" class="block text-gray-700">Departamento</label>
                                 <select formControlName="departamento" id="departamento" name="departamento" class="form-select mt-1 block w-full" required>
-                                    <option *ngFor="let dept of departamentos" [value]="dept.id">{{ dept.name }}</option>
+                                    <option [ngValue]="employeeDetails.department">{{ employeeDetails.department }}</option>
+                                    <ng-container *ngFor="let dept of departamentos">
+                                        <option *ngIf="dept.name !== employeeDetails.department" [value]="dept.id">{{ dept.name }}</option>
+                                    </ng-container>
                                 </select>
                             </div>
                             <div class="mb-4">
                                 <label for="sucursal" class="block text-gray-700">Sucursal</label>
                                 <select formControlName="sucursal" id="sucursal" name="sucursal" class="form-select mt-1 block w-full" required>
-                                    <option *ngFor="let suc of sucursales" [value]="suc.id">{{ suc.name }}</option>
+                                    <option [ngValue]="employeeDetails.branch_office">{{ employeeDetails.branch_office }}</option>
+                                    <ng-container *ngFor="let suc of sucursales">
+                                        <option *ngIf="suc.name !== employeeDetails.branch_office" [value]="suc.id">{{ suc.name }}</option>
+                                    </ng-container>
                                 </select>
                             </div>
                             <div class="mb-4">
                                 <label for="rol" class="block text-gray-700">Rol</label>
                                 <select formControlName="rol" id="rol" name="rol" class="form-select mt-1 block w-full" required>
-                                    <option value="1">Administrador</option>
-                                    <option value="2">Responsable</option>
-                                    <option value="3">Empleado</option>
+                                    <option [ngValue]="employeeDetails.role">{{ employeeDetails.role }}</option>
+                                    <ng-container *ngFor="let rol of roles">
+                                        <option *ngIf="rol.name !== employeeDetails.role" [value]="rol.id">{{ rol.name }}</option>
+                                    </ng-container>
                                 </select>
                             </div>
                             <!-- Botones -->
