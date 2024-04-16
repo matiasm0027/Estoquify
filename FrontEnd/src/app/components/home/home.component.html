@@ -1,201 +1,173 @@
 <div>
-  <div class="flex flex-col">
-      <app-sidebar></app-sidebar>
-  </div>
-  <div class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-16 md:ml-64 md:mr-12 sm:mt-12 sm:ml-40 sm:mr-12 box-fl container">
-      <ng-container *ngIf="employeeRole === 'admin'; else userRole">
-          <!-- Tablas para el rol de admin -->
-          <table class="w-full">
-              <tr>
-                  <td>
-                      <div class="table-container overflow-x-auto">
-                          <!-- Tabla 1 -->
-                          <div>
-                              <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Categoria Materiales</h3>
-                          </div>
-                          <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-gray-300 lg:text-center md:text-center sm:text-center">
-                              <thead class="text-xs text-gray-700 uppercase dark:text-gray-400 bg-blue-50 dark:bg-blue-800">
-                                  <tr>
-                                      <th scope="col" class="px-6 py-3">
-                                          Nombre
-                                      </th>
-                                      <th scope="col" class="px-6 py-3">
-                                          Total
-                                      </th>
-                                      <th scope="col" class="px-6 py-3">
-                                          Asignados
-                                      </th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                                  <tr class="border-b border-gray-200 dark:border-gray-700" *ngFor="let material of materials">
-                                      <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
-                                          {{ material.name }}
-                                      </th>
-                                      <td class="px-6 py-4">
-                                          {{ material.total_material }}
-                                      </td>
-                                      <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
-                                          {{ material.activeMaterial}}
-                                      </td>
-                                  </tr>
-                              </tbody>
-                          </table>
-                      </div>
-                  </td>
-                  <td>
-                      <div class="table-container overflow-x-auto" style="margin-left: 20px;">
-                          <!-- Tabla 2 -->
-                          <div>
-                              <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Control de Stock</h3>
-                          </div>
-                          <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-gray-300 lg:text-center md:text-center sm:text-center">
-                              <thead class="text-xs text-gray-700 uppercase dark:text-gray-400 bg-blue-50 dark:bg-blue-800">
-                                  <tr>
-                                      <th scope="col" class="px-6 py-3">
-                                          Nombre
-                                      </th>
-                                      <th scope="col" class="px-6 py-3">
-                                          Cantidad Disponible
-                                      </th>
-                                      <th scope="col" class="px-6 py-3">
-                                          Cantidad de bajas
-                                      </th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                                  <tr *ngFor="let material of materials" class="border-b border-gray-200 dark:border-gray-700">
-                                      <td class="'bg-orange dark:bg-orange-20' px-6 py-4">
-                                          {{ material.name }}
-                                      </td>
-                                      <td [ngClass]="{
-                                          'bg-green-200 dark:bg-green-600': material.availableMaterial > 5,
-                                          'bg-orange-200 dark:bg-orange-600': material.availableMaterial === 5,
-                                          'bg-red-200 dark:bg-red-600': material.availableMaterial < 5
-                                      }" class="px-6 py-4">
-                                          {{ material.availableMaterial }}
-                                      </td>
-                                      <td class="px-6 py-4">
-                                          {{ material.inactiveMaterial }}
-                                      </td>
-                                  </tr>
-                              </tbody>
-                          </table>
-                      </div>
-                  </td>
-              </tr>
-              <tr>
-                  <td colspan="2">
-                      <div class="table-container overflow-x-auto">
-                          <!-- Tabla 3 (Reportes) -->
-                          <div>
-                              <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Reportes</h3>
-                          </div>
-                          <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-gray-300 lg:text-center md:text-center sm:text-center">
-                              <thead class="text-xs text-gray-700 uppercase dark:text-gray-400 bg-blue-50 dark:bg-blue-800">
-                                  <tr>
-                                      <th scope="col" class="px-6 py-3">
-                                          Id
-                                      </th>
-                                      <th scope="col" class="px-6 py-3 ">
-                                          Descripción
-                                      </th>
-                                      <th scope="col" class="px-6 py-3">
-                                          Prioridad
-                                      </th>
-                                      <th scope="col" class="px-6 py-3">
-                                          Estado
-                                      </th>
-                                      <th scope="col" class="px-6 py-3">
-                                          Usuario
-                                      </th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                                  <tr *ngFor="let reporte of reportes" class="border-b border-gray-200 dark:border-gray-700">
-                                      <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
-                                          {{ reporte.id }}
-                                      </th>
-                                      <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
-                                          {{ reporte.solicitud }}
-                                      </td>
-                                      <td class="px-6 py-4" [ngClass]="{
-                                          'bg-yellow-200 dark:bg-yellow-600': reporte.prioridad === 'medium',
-                                          'bg-red-200 dark:bg-red-600': reporte.prioridad === 'high',
-                                          'bg-green-200 dark:bg-green-600': reporte.prioridad === 'low'
-                                      }">
-                                          {{ reporte.prioridad }}
-                                      </td>
-                                      <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800 ">
-                                          {{ reporte.estado }}
-                                      </td>
-                                      <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
-                                          {{ reporte.nameempleado }}
-                                      </td>
-                                  </tr>
-                              </tbody>
-                          </table>
-                      </div>
-                  </td>
-              </tr>
-          </table>
-      </ng-container>
-      <ng-template #userRole>
-          <!-- Tablas para otros roles que no sean admin -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <!-- Tabla 1 -->
-              <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm">
-                  <div class="bg-blue-50 px-6 py-4">
-                      <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Categoría de Materiales</h3>
-                  </div>
-                  <div class="overflow-x-auto">
-                      <table class="w-full text-sm text-gray-700 dark:text-gray-400">
-                          <thead class="bg-blue-100">
-                              <tr>
-                                  <th class="px-6 py-3 text-left">Nombre</th>
-                                  <th class="px-6 py-3 text-left">Total</th>
-                                  <th class="px-6 py-3 text-left">Asignados</th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              <tr *ngFor="let material of materials" class="odd:bg-blue-50 even:bg-blue-200">
-                                  <td class="px-6 py-4 whitespace-nowrap">{{ material.name }}</td>
-                                  <td class="px-6 py-4">{{ material.total_material }}</td>
-                                  <td class="px-6 py-4">{{ material.activeMaterial }}</td>
-                              </tr>
-                          </tbody>
-                      </table>
-                  </div>
-              </div>
-              <!-- Tabla 2 -->
-              <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm">
-                  <div class="bg-blue-50 px-6 py-4">
-                      <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Control de Stock</h3>
-                  </div>
-                  <div class="overflow-x-auto">
-                      <table class="w-full text-sm text-gray-700 dark:text-gray-400">
-                          <thead class="bg-blue-100">
-                              <tr>
-                                  <th class="px-6 py-3 text-left">Nombre</th>
-                                  <th class="px-6 py-3 text-left">Cantidad Disponible</th>
-                                  <th class="px-6 py-3 text-left">Cantidad de Bajas</th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              <tr *ngFor="let material of materials" class="odd:bg-blue-50 even:bg-blue-200">
-                                  <td class="px-6 py-4 whitespace-nowrap">{{ material.name }}</td>
-                                  <td [ngClass]="{
-                                      'text-green-600': material.availableMaterial > 5,
-                                      'text-orange-600': material.availableMaterial === 5,
-                                      'text-red-600': material.availableMaterial < 5
-                                  }" class="px-6 py-4">{{ material.availableMaterial }}</td>
-                                  <td class="px-6 py-4">{{ material.inactiveMaterial }}</td>
-                              </tr>
-                          </tbody>
-                      </table>
-                  </div>
-              </div>
-          </div>
-      </ng-template>
-  </div>
+    <div class="flex flex-col">
+        <app-sidebar></app-sidebar>
+    </div>
+    <div
+        class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-16 md:ml-64 md:mr-12 sm:mt-12 sm:ml-40 sm:mr-12 box-fl container">
+        <ng-container *ngIf="employeeRole === 'admin'; else userRole">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Tabla 1 - Categoría de Materiales -->
+                <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm">
+                    <div class="bg-blue-50 px-6 py-4">
+                        <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Categoría de Materiales</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-gray-700 dark:text-gray-400">
+                            <thead class="bg-blue-100">
+                                <tr>
+                                    <th class="px-6 py-3 text-left">Nombre</th>
+                                    <th class="px-6 py-3 text-left">Total</th>
+                                    <th class="px-6 py-3 text-left">Asignados</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let material of materials" class="odd:bg-blue-50 even:bg-blue-200">
+                                    <td class="px-6 py-4 whitespace-nowrap">{{ material.name }}</td>
+                                    <td class="px-6 py-4">{{ material.total_material }}</td>
+                                    <td class="px-6 py-4">{{ material.activeMaterial }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Tabla 2 - Control de Stock -->
+                <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm">
+                    <div class="bg-blue-50 px-6 py-4">
+                        <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Control de Stock</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-gray-700 dark:text-gray-400">
+                            <thead class="bg-blue-100">
+                                <tr>
+                                    <th class="px-6 py-3 text-left">Nombre</th>
+                                    <th class="px-6 py-3 text-left">Cantidad Disponible</th>
+                                    <th class="px-6 py-3 text-left">Cantidad de Bajas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let material of materials" class="odd:bg-blue-50 even:bg-blue-200">
+                                    <td class="px-6 py-4 whitespace-nowrap">{{ material.name }}</td>
+                                    <td [ngClass]="{
+                                        'text-green-600': material.availableMaterial > 5,
+                                        'text-orange-600': material.availableMaterial === 5,
+                                        'text-red-600': material.availableMaterial < 5
+                                    }" class="px-6 py-4">{{ material.availableMaterial }}</td>
+                                    <td class="px-6 py-4">{{ material.inactiveMaterial }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <br>
+                <!-- Tabla 3 - Reportes -->
+                <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm">
+                    <div class="bg-blue-50 px-6 py-4">
+                        <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Reportes</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-gray-700 dark:text-gray-400">
+                            <thead class="bg-blue-100">
+                                <tr>
+                                    <th class="px-6 py-3 text-left">Id</th>
+                                    <th class="px-6 py-3 text-left">Descripción</th>
+                                    <th class="px-6 py-3 text-left">Prioridad</th>
+                                    <th class="px-6 py-3 text-left">Estado</th>
+                                    <th class="px-6 py-3 text-left">Usuario</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let reporte of reportes" class="odd:bg-blue-50 even:bg-blue-200">
+                                    <td class="px-6 py-4 whitespace-nowrap">{{ reporte.id }}</td>
+                                    <td class="px-6 py-4">{{ reporte.solicitud }}</td>
+                                    <td [ngClass]="{
+                                        'bg-yellow-200 dark:bg-yellow-600': reporte.prioridad === 'medium',
+                                        'bg-red-200 dark:bg-red-600': reporte.prioridad === 'high',
+                                        'bg-green-200 dark:bg-green-600': reporte.prioridad === 'low'
+                                    }" class="px-6 py-4">{{ reporte.prioridad }}</td>
+                                    <td class="px-6 py-4">{{ reporte.estado }}</td>
+                                    <td class="px-6 py-4">{{ reporte.nameempleado }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            <br>
+        </ng-container>
+        <ng-template #userRole>
+            <div class="flex justify-center mt-8">
+                <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm w-full md:w-1/2">
+                    <div class="bg-blue-50 px-6 py-4">
+                        <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Información
+                            del Empleado</h3>
+                    </div>
+                    <div class="p-4">
+                        <p><strong>Nombre:</strong> {{ employee.name }}</p>
+                        <p><strong>Apellido:</strong> {{ employee.last_name }}</p>
+                        <p><strong>Email:</strong> {{ employee.email }}</p>
+                        <p><strong>Número de teléfono:</strong> {{ employee.phone_number }}</p>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <!-- Tablas para otros roles que no sean admin -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Tabla 1 -->
+                <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm">
+                    <div class="bg-blue-50 px-6 py-4">
+                        <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Categoría de
+                            Materiales</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-gray-700 dark:text-gray-400">
+                            <thead class="bg-blue-100">
+                                <tr>
+                                    <th class="px-6 py-3 text-left">Nombre</th>
+                                    <th class="px-6 py-3 text-left">Total</th>
+                                    <th class="px-6 py-3 text-left">Asignados</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let material of materials" class="odd:bg-blue-50 even:bg-blue-200">
+                                    <td class="px-6 py-4 whitespace-nowrap">{{ material.name }}</td>
+                                    <td class="px-6 py-4">{{ material.total_material }}</td>
+                                    <td class="px-6 py-4">{{ material.activeMaterial }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Tabla 2 -->
+                <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm">
+                    <div class="bg-blue-50 px-6 py-4">
+                        <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Control de Stock
+                        </h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-gray-700 dark:text-gray-400">
+                            <thead class="bg-blue-100">
+                                <tr>
+                                    <th class="px-6 py-3 text-left">Nombre</th>
+                                    <th class="px-6 py-3 text-left">Cantidad Disponible</th>
+                                    <th class="px-6 py-3 text-left">Cantidad de Bajas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let material of materials" class="odd:bg-blue-50 even:bg-blue-200">
+                                    <td class="px-6 py-4 whitespace-nowrap">{{ material.name }}</td>
+                                    <td [ngClass]="{
+                        'text-green-600': material.availableMaterial > 5,
+                        'text-orange-600': material.availableMaterial === 5,
+                        'text-red-600': material.availableMaterial < 5
+                    }" class="px-6 py-4">{{ material.availableMaterial }}</td>
+                                    <td class="px-6 py-4">{{ material.inactiveMaterial }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+               
+            </div>
+        </ng-template>
+    </div>
 </div>
