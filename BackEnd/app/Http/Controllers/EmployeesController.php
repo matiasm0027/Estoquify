@@ -182,24 +182,28 @@ class EmployeesController extends Controller
 
     }
 
-    public function listEmployees()
+    public function listEmployees(Request $request)
     {
+        $user = $request->user()->id;
+
         $employees = Employee::with('department', 'branchOffice')
-                ->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
-                ->get()
-                ->map(function ($employee) {
-                    return [
-                        'id' => $employee->id,
-                        'name' => $employee->name,
-                        'last_name' => $employee->last_name,
-                        'email' => $employee->email,
-                        'department' => $employee->department ? $employee->department->name : null,
-                        'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
-                    ];
-                });
+            ->where('id', '!=', $user) // Excluir al usuario actual
+            ->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
+            ->get()
+            ->map(function ($employee) {
+                return [
+                    'id' => $employee->id,
+                    'name' => $employee->name,
+                    'last_name' => $employee->last_name,
+                    'email' => $employee->email,
+                    'department' => $employee->department ? $employee->department->name : null,
+                    'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
+                ];
+            });
 
         return response()->json($employees);
     }
+
 
     public function addEmployee(Request $request)
     {
