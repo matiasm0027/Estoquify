@@ -46,14 +46,15 @@
                             {{ material.inactiveMaterial}}
                         </td>
                         <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
-                            <button (click)="mostrarModalEditar(material.id)" class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 px-4 rounded border border-blue-500">
+                            <button (click)="mostrarModalEditar(material.id)"
+                                    class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 px-4 rounded border border-blue-500 mr-2">
                                 Editar
                             </button>
-                            <button (click)="confirmDelete(material)" class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 px-4 rounded border border-red-500">
+                            <button (click)="confirmDelete(material)"
+                                    class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 px-4 rounded border border-red-500">
                                 Eliminar
                             </button>
-                        </td>
-                        
+                        </td>      
                     </tr>
                 </tbody>
             </table>
