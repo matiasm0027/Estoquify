@@ -93,6 +93,7 @@ export class EmployeesViewComponent implements OnInit {
     this.mostrarModalFiltros = false;
   }
 
+
   aplicarFiltro(): void {
     this.empleadosFiltrados = this.employees.filter(empleado => {
       if (this.filtroSeleccionado === 'departamento') {
