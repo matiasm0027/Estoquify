@@ -16,6 +16,8 @@ export class CategoriesViewComponent implements OnInit{
   mostrarModalAgregar: boolean = false;
   mostrarModalEdit: boolean = false;
   categoryID: string = "" ;
+  errorMessage!: string;
+  successMessage!: string;
 
   constructor(
     private ApiRequestService: ApiRequestService,
@@ -63,14 +65,12 @@ export class CategoriesViewComponent implements OnInit{
       this.ApiRequestService.addCategory(newCategory).subscribe(
         (response: any) => {
           this.cerrarModal();
-          //window.location.reload();
+          this.successMessage = response.message;
         },
         (error: any) => {
-          console.error('Error al agregar Categoria:', error);
+          this.errorMessage = error.error.error;
         }
       );
-    } else {
-      console.error('Formulario inválido. Por favor, complete todos los campos requeridos.');
     }
   }
 
@@ -78,7 +78,6 @@ export class CategoriesViewComponent implements OnInit{
     console.log(category)
     const confirmacion = confirm(`¿Estás seguro de que quieres eliminar la cateogria ${category.name}?`);
     if (confirmacion) {
-
       this.deleteCategory(category.id);
     }
   }
@@ -86,11 +85,11 @@ export class CategoriesViewComponent implements OnInit{
   deleteCategory(id: number): void {
     this.ApiRequestService.deleteCategory(id).subscribe(
       (response) => {
-        console.log('Categoria eliminada correctamente', response);
+        this.successMessage = response.message;
         this.obtenerCantidadMaterial();
       },
       error => {
-        console.error(`Error al eliminar categoria con ID ${id}:`, error);
+        this.errorMessage = error.error.error;
       }
     );
   }
@@ -103,13 +102,12 @@ export class CategoriesViewComponent implements OnInit{
   
       this.ApiRequestService.editCategory(this.categoryID, categoryEdit).subscribe(
         (response: any) => {
-          console.log('Categoria editado correctamente', response);
-          // Puedes cerrar el modal y actualizar la lista de empleados o hacer cualquier otra acción necesaria
+          this.successMessage = response.message;
           this.cerrarModalEdit();
           this.obtenerCantidadMaterial();
         },
         (error: any) => {
-          console.error('Error al editar categoria:', error);
+          this.errorMessage = error.error.error;
         }
       );
     } else {

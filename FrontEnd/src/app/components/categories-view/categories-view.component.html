@@ -107,4 +107,7 @@
                     </div>
                 </div>
             </div>
+
+            <div *ngIf="successMessage" class="mensaje_exitoso">{{ successMessage }}</div>
+            <div *ngIf="errorMessage" class="mensaje_error">{{ errorMessage }}</div>
 </div>

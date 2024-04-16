@@ -2,4 +2,11 @@
     width: calc(100%);
     
   }
-  
+.mensaje_exitoso {
+    color: green;
+}
+
+.mensaje_error {
+    color: rgb(241, 99, 99);
+    font-size: 15px;
+}
