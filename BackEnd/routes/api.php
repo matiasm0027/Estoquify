@@ -45,6 +45,9 @@ Route::group([
     Route::get('listBranchOffices', [BranchOfficeController::class, 'listBranchOffices']);
 
     Route::get('categoryMaterialInfo', [CategoryController::class, 'categoryMaterialInfo']);
+    Route::post('addCategory', [CategoryController::class, 'addCategory']);
+    Route::put('editCategory/{id}', [CategoryController::class, 'editCategory']);
+    Route::delete('deleteCategory/{id}', [CategoryController::class, 'deleteCategory']);
 
     Route::get('listReports', [ReportController::class, 'listReports']);
 

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 
 @Component({
@@ -9,11 +11,21 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
 export class CategoriesViewComponent implements OnInit{
   sidebarVisible: boolean = true;
   sidebarWidth: number = 250;
-
+  categoryForm: FormGroup;
   materials: any[] = [];
   mostrarModalAgregar: boolean = false;
+  mostrarModalEdit: boolean = false;
+  categoryID: string = "" ;
 
-  constructor(private ApiRequestService: ApiRequestService) {}
+  constructor(
+    private ApiRequestService: ApiRequestService,
+    private fb: FormBuilder,
+    ) 
+  {
+    this.categoryForm = this.fb.group({
+      name: ['', Validators.required],
+    });
+  }
   
   ngOnInit(): void {
     this.obtenerCantidadMaterial();
@@ -34,6 +46,7 @@ export class CategoriesViewComponent implements OnInit{
     this.ApiRequestService.categoryMaterialInfo().subscribe(
       (response: any[]) => {
         this.materials = response.map(material => ({
+          id: material.category_id,
           name: material.category_name, // Cambiar a category_name
           total_material: material.total_materials, // Cambiar a total_materials
           activeMaterial: material.active_materials, // Cambiar a active_materials
@@ -44,10 +57,88 @@ export class CategoriesViewComponent implements OnInit{
     );
   }
 
+  categoryAdd() {
+    if (this.categoryForm.valid) {
+      const newCategory = this.categoryForm.value;
+      this.ApiRequestService.addCategory(newCategory).subscribe(
+        (response: any) => {
+          this.cerrarModal();
+          //window.location.reload();
+        },
+        (error: any) => {
+          console.error('Error al agregar Categoria:', error);
+        }
+      );
+    } else {
+      console.error('Formulario inválido. Por favor, complete todos los campos requeridos.');
+    }
+  }
+
+  confirmDelete(category: any): void {
+    console.log(category)
+    const confirmacion = confirm(`¿Estás seguro de que quieres eliminar la cateogria ${category.name}?`);
+    if (confirmacion) {
+
+      this.deleteCategory(category.id);
+    }
+  }
+
+  deleteCategory(id: number): void {
+    this.ApiRequestService.deleteCategory(id).subscribe(
+      (response) => {
+        console.log('Categoria eliminada correctamente', response);
+        this.obtenerCantidadMaterial();
+      },
+      error => {
+        console.error(`Error al eliminar categoria con ID ${id}:`, error);
+      }
+    );
+  }
+
+  editCategory(): void {
+    if (this.categoryForm.valid) {
+      const categoryEdit = {
+        name: this.categoryForm.value.name,
+      };
+  
+      this.ApiRequestService.editCategory(this.categoryID, categoryEdit).subscribe(
+        (response: any) => {
+          console.log('Categoria editado correctamente', response);
+          // Puedes cerrar el modal y actualizar la lista de empleados o hacer cualquier otra acción necesaria
+          this.cerrarModalEdit();
+          this.obtenerCantidadMaterial();
+        },
+        (error: any) => {
+          console.error('Error al editar categoria:', error);
+        }
+      );
+    } else {
+      // Si el formulario no es válido, puedes mostrar un mensaje de error o realizar alguna otra acción
+      console.error('Formulario inválido');
+    }
+  }
+
   mostrarModal() {
     this.mostrarModalAgregar = true;
   }
 
+  mostrarModalEditar(id:any) {
+    this.categoryID = id;
+    this.mostrarModalEdit = true;
+  }
+
+  cerrarModalEdit() {
+    this.mostrarModalEdit = false;
+    this.obtenerCantidadMaterial();
+    this.categoryID = "";
+    this.categoryForm.reset();
+  }
+
+  cerrarModal() {
+    this.mostrarModalAgregar = false;
+    this.obtenerCantidadMaterial();
+    this.categoryForm.reset();
+  }
 
 }
 

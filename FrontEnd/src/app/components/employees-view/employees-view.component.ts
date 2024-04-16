@@ -125,7 +125,6 @@ export class EmployeesViewComponent implements OnInit {
       const nuevoEmpleado = this.formularioEmpleado.value;
       this.peticionesService.addEmployee(nuevoEmpleado).subscribe(
         (response: any) => {
-          this.employees.push(response);
           console.log('Empleado añadido con éxito:', response);
           this.cerrarModal();
         },

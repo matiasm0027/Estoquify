@@ -34,10 +34,6 @@ export class ApiRequestService {
     return this.http.put<any>(`${this.apiUrl}/auth/editEmployee/${id}`, employeeData);
   }
 
-  deleteEmployee(id: any, employeeData: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/auth/deleteEmployee/${id}`, employeeData);
-  }
-
   listDepartments(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/auth/listDepartments`);
   }
@@ -72,7 +68,6 @@ export class ApiRequestService {
   }
 
   resetPassword(email: string, newPassword: string, confirmPassword: string, resetToken: string): Observable<any> {
-    console.log('estamos en japo')
     const requestData = {
       email: email,
       newPassword: newPassword,
@@ -84,5 +79,17 @@ export class ApiRequestService {
 
   getCategoryDetails(employeeId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/auth/employeeInfoAssignments/${employeeId}`);
+  }
+
+  addCategory(category: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/addCategory`, category);
+  }
+
+  editCategory(id: any, category: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/auth/editCategory/${id}`, category);
+  }
+
+  deleteCategory(id: any): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/auth/deleteCategory/${id}`);
   }
 }
