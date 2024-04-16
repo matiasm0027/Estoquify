@@ -58,8 +58,8 @@ export class ApiRequestService {
     return this.http.get<any>(`${this.apiUrl}/auth/employeeInfoAssignments/${employeeId}`);
   }
 
-  deleteEmployees(employee: any): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/auth/deleteEmployee/${employee}`);
+  deleteEmployees(id: any): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/auth/deleteEmployee/${id}`);
   }
 
   resetPasswordRequest(email: string): Observable<any> {

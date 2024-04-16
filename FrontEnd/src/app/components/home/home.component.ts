@@ -12,17 +12,18 @@ export class HomeComponent implements OnInit {
   sidebarVisible: boolean = true;
   sidebarWidth: number = 250;
   employeeRole!: string;
-  employee: any;
+  employee!: any;
   reportes: any[] = [];
   materials: any[] = [];
 
   constructor(private ApiRequestService: ApiRequestService) {}
 
   ngOnInit(): void {
+    this.getLoggedUser();
     this.obtenerReportes();
     this.obtenerCantidadMaterial();
     this.mostrarMaterialesDisponiblesBajos
-    this.getLoggedUser();
+    
   }
 
   toggleSidebar() {
@@ -85,13 +86,13 @@ export class HomeComponent implements OnInit {
 getLoggedUser(): void {
   this.ApiRequestService.me().subscribe(
     (response: any) => {
-      this.employee = response;
-      console.log(this.employee)
       const roleId = response.role_id;
-      console.log(response.role_id)
+     
+      
       if (roleId === 1) {
         this.employeeRole = 'admin';
       } else {
+        this.employee = response;
         this.employeeRole = 'usuario';
       }
     },

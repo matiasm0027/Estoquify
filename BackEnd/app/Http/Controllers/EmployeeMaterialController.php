@@ -30,6 +30,9 @@ class EmployeeMaterialController extends Controller
             'role' => $employee->role ? $employee->role->name : null,
             'department' => $employee->department ? $employee->department->name : null,
             'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
+            'role_id' => $employee->role ? $employee->role->id : null,
+            'department_id' => $employee->department ? $employee->department->id : null,
+            'branch_office_id' => $employee->branchOffice ? $employee->branchOffice->id : null,
             'materials' => $employee->material->map(function ($material){
             $material->wherePivot('state', 'active'); 
             $categoryName = $material->category->first()->name ?? null;

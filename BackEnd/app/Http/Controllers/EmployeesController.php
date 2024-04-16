@@ -267,7 +267,6 @@ class EmployeesController extends Controller
                 'nombre' => 'required',
                 'apellido' => 'required',
                 'email' => 'required|email',
-                'password' => 'min:6',
                 'departamento' => 'required',
                 'sucursal' => 'required',
                 'rol' => 'required',
@@ -285,7 +284,6 @@ class EmployeesController extends Controller
             $employee->name = $validatedData['nombre'];
             $employee->last_name = $validatedData['apellido'];
             $employee->email = $validatedData['email'];
-            $employee->password = bcrypt($validatedData['password']);
             $employee->department_id = $validatedData['departamento'];
             $employee->branch_office_id = $validatedData['sucursal'];
             $employee->role_id = $validatedData['rol'];
@@ -307,41 +305,40 @@ class EmployeesController extends Controller
         try {
             // Verificar si el usuario está autenticado
             $user = $request->user();
-            //dd($user->role_id);
             if (!$user) {
                 return response()->json(['error' => 'Empleado no autenticado'], 401);
             }
-
-            // Verificar si el usuario tiene el rol permitido para editar empleados (rol '1' para administrador)
+    
+            // Verificar si el usuario tiene el rol permitido para eliminar empleados (rol '1' para administrador)
             $this->checkUserRole(['1']);
-
-            // Buscar al usuario por su ID
+    
+            // Buscar al empleado por su ID
             $employee = Employee::find($id);
-
-            // Si no se encuentra al usuario devuelve un error 404
+    
+            // Si no se encuentra al empleado, devuelve un error 404
             if (!$employee) {
                 return response()->json(['error' => 'Empleado no encontrado'], 404);
             }
-
-            // Eliminar al usuario
+    
+            // Eliminar al empleado
             $employee->delete();
-
+    
             return response()->json(['message' => 'Empleado eliminado correctamente'], 200);
-
         } catch (\Exception $e) {
+            \Log::error('Error al eliminar empleado: ' . $e->getMessage());
             return response()->json(['error' => 'Error interno del servidor'], 500);
         }
     }
-
+    
     protected function checkUserRole($allowedRoles)
     {
         if (!Auth::check()) {
             // El usuario no está autenticado
             abort(401, 'Unauthorized');
         }
-
+    
         $user = Auth::user();
-
+    
         if (!in_array($user->role_id, $allowedRoles)) {
             // El usuario no tiene uno de los roles permitidos
             abort(403, 'Access denied');

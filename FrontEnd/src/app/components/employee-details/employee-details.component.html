@@ -9,13 +9,16 @@
                 <h1 class="text-2xl font-bold">Detalles del Empleado</h1>
                 <!-- Botones para editar, eliminar y volver -->
                 <div class="space-x-4">
-                    <button (click)="mostrarModal()" class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 px-4 rounded border border-blue-500">
+                    <button (click)="mostrarModal()"
+                        class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 px-4 rounded border border-blue-500">
                         Editar
                     </button>
-                    <button (click)="confirmDelete(employeeDetails)" class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 px-4 rounded border border-red-500">
+                    <button (click)="confirmDelete(employeeDetails)"
+                        class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 px-4 rounded border border-red-500">
                         Eliminar
                     </button>
-                    <button (click)="volver()" class="bg-white-500 hover:bg-white hover:text-gray-500 font-bold py-2 px-4 rounded border border-gray-500">
+                    <button (click)="volver()"
+                        class="bg-white-500 hover:bg-white hover:text-gray-500 font-bold py-2 px-4 rounded border border-gray-500">
                         Volver
                     </button>
                 </div>
@@ -45,7 +48,8 @@
                     </tr>
                     <tr>
                         <td class="py-2"><strong>Rol:</strong></td>
-                        <td class="py-2">{{ employeeDetails?.role?.charAt(0).toUpperCase() + employeeDetails?.role?.slice(1) }}</td>
+                        <td class="py-2">{{ employeeDetails?.role?.charAt(0).toUpperCase() +
+                            employeeDetails?.role?.slice(1) }}</td>
                     </tr>
                     <tr>
                         <td class="py-2"><strong>Sucursal:</strong></td>
@@ -54,7 +58,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         <!-- Tabla para mostrar los materiales asignados al empleado -->
         <div class="bg-white p-6 rounded shadow" *ngIf="employeeDetails">
             <h2 class="text-2xl font-bold my-4">Materiales Asignados</h2>
@@ -63,7 +67,8 @@
                 <ng-container *ngFor="let material of employeeDetails.materials">
                     <div class="bg-white p-4 rounded shadow">
                         <p><strong>Categoría:</strong> {{ material.category_name }}</p>
-                        <p><strong>Material:</strong> {{ material.material_name ? material.material_name : 'Material no asignado' }}</p>
+                        <p><strong>Material:</strong> {{ material.material_name ? material.material_name : 'Material no
+                            asignado' }}</p>
                     </div>
                 </ng-container>
             </div>
@@ -82,51 +87,73 @@
                         <form [formGroup]="formularioEmpleado" (submit)="editarEmpleado()">
                             <div class="mb-4">
                                 <label for="nombre" class="block text-gray-700">Nombre</label>
-                                <input formControlName="nombre" type="text" id="nombre" name="nombre" class="form-input mt-1 block w-full" placeholder="Ingrese el nombre" required>
+                                <input formControlName="nombre" type="text" id="nombre" name="nombre"
+                                    class="form-input mt-1 block w-full" placeholder="Ingrese el nombre" required>
                             </div>
                             <div class="mb-4">
                                 <label for="apellido" class="block text-gray-700">Apellido</label>
-                                <input formControlName="apellido" type="text" id="apellido" name="apellido" class="form-input mt-1 block w-full" placeholder="Ingrese el apellido" required>
+                                <input formControlName="apellido" type="text" id="apellido" name="apellido"
+                                    class="form-input mt-1 block w-full" placeholder="Ingrese el apellido" required>
                             </div>
                             <div class="mb-4">
                                 <label for="email" class="block text-gray-700">Email</label>
-                                <input formControlName="email" type="email" id="email" name="email" class="form-input mt-1 block w-full" placeholder="Ingrese el correo electrónico" required>
+                                <input formControlName="email" type="email" id="email" name="email"
+                                    class="form-input mt-1 block w-full" placeholder="Ingrese el correo electrónico"
+                                    required>
                             </div>
                             <div class="mb-4">
                                 <label for="telefonoMovil" class="block text-gray-700">Teléfono Móvil</label>
-                                <input formControlName="telefonoMovil" type="tel" id="telefonoMovil" name="telefonoMovil" class="form-input mt-1 block w-full" placeholder="Ingrese el teléfono móvil">
+                                <input formControlName="telefonoMovil" type="tel" id="telefonoMovil"
+                                    name="telefonoMovil" class="form-input mt-1 block w-full"
+                                    placeholder="Ingrese el teléfono móvil">
                             </div>
+
                             <div class="mb-4">
                                 <label for="departamento" class="block text-gray-700">Departamento</label>
-                                <select formControlName="departamento" id="departamento" name="departamento" class="form-select mt-1 block w-full" required>
-                                    <option [ngValue]="employeeDetails.department">{{ employeeDetails.department }}</option>
+                                <select formControlName="departamento" id="departamento" name="departamento"
+                                    class="form-select mt-1 block w-full" required>
                                     <ng-container *ngFor="let dept of departamentos">
-                                        <option *ngIf="dept.name !== employeeDetails.department" [value]="dept.id">{{ dept.name }}</option>
+                                        <option [value]="dept.id" [selected]="dept.name === employeeDetails.department">
+                                            {{ dept.name }}</option>
                                     </ng-container>
                                 </select>
+                                <div class="text-gray-500 text-sm mt-1">Si no se selecciona ninguna opción, se mantendrá
+                                    "{{ employeeDetails.department }}" por defecto.</div>
                             </div>
+
                             <div class="mb-4">
                                 <label for="sucursal" class="block text-gray-700">Sucursal</label>
-                                <select formControlName="sucursal" id="sucursal" name="sucursal" class="form-select mt-1 block w-full" required>
-                                    <option [ngValue]="employeeDetails.branch_office">{{ employeeDetails.branch_office }}</option>
+                                <select formControlName="sucursal" id="sucursal" name="sucursal"
+                                    class="form-select mt-1 block w-full" required>
                                     <ng-container *ngFor="let suc of sucursales">
-                                        <option *ngIf="suc.name !== employeeDetails.branch_office" [value]="suc.id">{{ suc.name }}</option>
+                                        <option [value]="suc.id"
+                                            [selected]="suc.name === employeeDetails.branch_office">
+                                            {{ suc.name }}</option>
                                     </ng-container>
                                 </select>
+                                <div class="text-gray-500 text-sm mt-1">Si no se selecciona ninguna opción, se mantendrá
+                                    "{{ employeeDetails.branch_office }}" por defecto.</div>
                             </div>
+
                             <div class="mb-4">
                                 <label for="rol" class="block text-gray-700">Rol</label>
-                                <select formControlName="rol" id="rol" name="rol" class="form-select mt-1 block w-full" required>
-                                    <option [ngValue]="employeeDetails.role">{{ employeeDetails.role }}</option>
+                                <select formControlName="rol" id="rol" name="rol" class="form-select mt-1 block w-full"
+                                    required>
                                     <ng-container *ngFor="let rol of roles">
-                                        <option *ngIf="rol.name !== employeeDetails.role" [value]="rol.id">{{ rol.name }}</option>
+                                        <option [value]="rol.id" [selected]="rol.name === employeeDetails.role">
+                                            {{ rol.name }}</option>
                                     </ng-container>
                                 </select>
+                                <div class="text-gray-500 text-sm mt-1">Si no se selecciona ninguna opción, se mantendrá
+                                    "{{ employeeDetails.role }}" por defecto.</div>
                             </div>
                             <!-- Botones -->
                             <div class="flex justify-end">
-                                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar Cambios</button>
-                                <button (click)="cerrarModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
+                                <button type="submit"
+                                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar
+                                    Cambios</button>
+                                <button (click)="cerrarModal()"
+                                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
                             </div>
                         </form>
                     </div>
