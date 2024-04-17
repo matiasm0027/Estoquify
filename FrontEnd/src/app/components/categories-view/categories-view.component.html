@@ -31,7 +31,12 @@
                 <tbody>
                     <tr class="border-b border-gray-200 dark:border-gray-700" *ngFor="let material of materials">
                         <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
+                            <span class="flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-4 w-4 mr-1 ">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
                             <a [routerLink]="['/categories_details']">{{ material.name }}</a>
+                        </span>
                         </th>
                         <td class="px-6 py-4">
                             {{ material.total_material }}
