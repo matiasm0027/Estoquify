@@ -8,6 +8,7 @@ Use App\Http\Controllers\BranchOfficeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\EmployeeMaterialController;
+use App\Http\Controllers\CategoriaMaterialController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +45,8 @@ Route::group([
     Route::get('listDepartments', [DepartmentController::class, 'listDepartments']);
     Route::get('listBranchOffices', [BranchOfficeController::class, 'listBranchOffices']);
 
+
+    Route::get('categoryInfoAssignments/{id}', [CategoriaMaterialController::class, 'categoryInfoAssignments']);
     Route::get('categoryMaterialInfo', [CategoryController::class, 'categoryMaterialInfo']);
     Route::post('addCategory', [CategoryController::class, 'addCategory']);
     Route::put('editCategory/{id}', [CategoryController::class, 'editCategory']);

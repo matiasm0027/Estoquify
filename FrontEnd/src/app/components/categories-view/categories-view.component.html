@@ -35,7 +35,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-4 w-4 mr-1 ">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                 </svg>
-                            <a [routerLink]="['/categories_details']">{{ material.name }}</a>
+                            <a [routerLink]="['/categories_details', material.id]">{{ material.name }}</a>
                         </span>
                         </th>
                         <td class="px-6 py-4">
@@ -44,13 +44,13 @@
                         <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
                             {{ material.activeMaterial}}
                         </td>
-                        <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
+                        <td class="px-6 py-4">
                             {{ material.availableMaterial}}
                         </td>
                         <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
                             {{ material.inactiveMaterial}}
                         </td>
-                        <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
+                        <td class="px-6 py-4">
                             <button (click)="mostrarModalEditar(material.id)"
                                     class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 px-4 rounded border border-blue-500 mr-2">
                                 Editar

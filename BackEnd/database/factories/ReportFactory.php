@@ -17,7 +17,7 @@ class ReportFactory extends Factory
     {
 
         $employeeManagerId = Employee::where('role_id', 2)->inRandomOrder()->first();
-        $priorities = ['high', 'medium', 'low'];
+        $priorities = ['High', 'Medium', 'Low'];
         $states = ['pending', 'accepted', 'denied']; 
 
         return [

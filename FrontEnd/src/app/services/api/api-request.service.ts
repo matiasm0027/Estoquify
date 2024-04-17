@@ -58,6 +58,10 @@ export class ApiRequestService {
     return this.http.get<any>(`${this.apiUrl}/auth/employeeInfoAssignments/${employeeId}`);
   }
 
+  getCategoriaDetails(categoryId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/categoryInfoAssignments/${categoryId}`);
+  }
+
   deleteEmployees(id: any): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/auth/deleteEmployee/${id}`);
   }

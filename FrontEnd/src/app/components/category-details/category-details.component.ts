@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -8,42 +8,91 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   templateUrl: './category-details.component.html',
   styleUrls: ['./category-details.component.css']
 })
-export class CategoryDetailsComponent {
-  categoryName!: number;
-  categoryDetails: any ={};
-  formularioEmpleado!: FormGroup;
-
+export class CategoryDetailsComponent implements OnInit {
+  categoryId!: number;
+  categoryDetails: any = {};
+  formularioCategoria!: FormGroup;
+  sidebarVisible: boolean = true;
+  sidebarWidth: number = 250;
+  mostrarModalAgregar: boolean = false;
+  mostrarModalFiltros: boolean = false;
+  sucursales: any[] = [];
 
   constructor(
-    private ApiRequestService: ApiRequestService,
     private fb: FormBuilder,
+    private route: ActivatedRoute,
     private categoryService: ApiRequestService,
-  ){}
-
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    this.ObtenerCategoryDetails
+    this.getCategoriaIdFromRoute();
+    this.getCategoriaDetails();
+    this.obtenerSucursales();
   }
 
   initForm() {
-    this.formularioEmpleado = this.fb.group({
+    this.formularioCategoria = this.fb.group({
       nombre: [this.categoryDetails.name, Validators.required],
-      apellido: [this.categoryDetails.last_name, Validators.required],
-      email: [this.categoryDetails.email, [Validators.required, Validators.email]],
-      departamento: [this.categoryDetails.department, Validators.required],
-      sucursal: [this.categoryDetails.branch_office, Validators.required],
-      rol: [this.categoryDetails.role, Validators.required],
-      telefonoMovil: [this.categoryDetails.phone_number]
+      descripcion: [this.categoryDetails.description, Validators.required],
+      // Otros campos de formulario para la categoría
     });
   }
 
+  toggleSidebar() {
+    this.sidebarVisible = !this.sidebarVisible;
+    this.sidebarWidth = this.sidebarVisible ? 250 : 0;
+  }
 
-    ObtenerCategoryDetails(){
-    this.ApiRequestService.MaterialDetails().subscribe(
-        (response: any[]) => {
-          this.categoryDetails = response;
+  obtenerSucursales() {
+    this.categoryService.listBranchOffices().subscribe(
+      (response: any[]) => {
+        this.sucursales = response;
+      },
+      error => {
+        console.error('Error al obtener sucursales:', error);
+      }
+    );
+  }
+
+  getNombreSucursal(branch_office_id: number): string {
+    const sucursal = this.sucursales.find(suc => suc.id === branch_office_id);
+    return sucursal ? sucursal.name : 'N/A';
+  }
+
+  getCategoriaIdFromRoute(): void {
+    this.route.params.subscribe(params => {
+      this.categoryId = +params['id'];
+    });
+  }
+
+  getCategoriaDetails(): void {
+    this.categoryService.getCategoriaDetails(this.categoryId)
+      .subscribe(
+        (categoria: any) => {
+          console.log(categoria)
+          this.categoryDetails = categoria; // Convertir el objeto de categoría a una matriz
         },
+        (error: any) => {
+          console.error('Error al obtener detalles de la categoría:', error);
+        }
       );
-  }  
+  }
+
+  volver() {
+    this.router.navigate(['/categories_view']);
+  }
+  mostrarModal() {
+    this.mostrarModalAgregar = true;
+  }
+  mostrarModalDeFiltros(): void {
+    this.mostrarModalFiltros = true;
+    
+  }
+
+ 
+
+ 
+
+  // Otras funciones como confirmar eliminación y eliminar categoría
 }
-  

@@ -1,46 +1,102 @@
-<div class="bg-white p-6 rounded shadow" *ngIf="categoryDetails">
-    <div class="flex justify-between items-center mb-4">
-        <h1 class="text-2xl font-bold">Detalles del Material</h1>
-        <!-- Botones para editar, eliminar y volver -->
-        <div class="space-x-4">
-            <button class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 px-4 rounded border border-blue-500">
-                Editar
-            </button>
-            <button class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 px-4 rounded border border-red-500">
-                Eliminar
-            </button>
-            <button class="bg-white-500 hover:bg-white hover:text-gray-500 font-bold py-2 px-4 rounded border border-gray-500">
-                Volver
-            </button>
+<div class="flex">
+    <!-- Sidebar -->
+    <div class="flex flex-col" [style.marginLeft.px]="sidebarVisible ? 0 : 64">
+        <app-sidebar *ngIf="sidebarVisible"></app-sidebar>
+    </div>
+    
+    <!-- Contenido de la página -->
+    <div class="flex flex-col justify-center lg:mt-24 lg:ml-80 lg:mr-12 box-fl container">
+        <!-- Contenido de la vista de detalles del material -->
+        <div class="bg-white p-6 rounded shadow" *ngIf="categoryDetails">
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-2xl font-bold">Detalles del Material</h1>
+                <div class="space-x-4">
+                    <button (click)="mostrarModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-4">
+                        Añadir Material
+                    </button>
+                    <button (click)="mostrarModalDeFiltros()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                        Filtro
+                    </button>
+                </div>
+            </div>
+            <div class="table-container overflow-x-auto">
+                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-gray-300">
+                    <thead class="text-xs text-gray-700 uppercase dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
+                                ID
+                            </th>
+                            <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
+                                Nombre
+                            </th>
+                            <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
+                                Fecha Alta
+                            </th>
+                            <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
+                                Fecha Baja
+                            </th>
+                            <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
+                                Valor
+                            </th>
+                            <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
+                                Departamento
+                            </th>
+                            <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
+                                Estado
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let material of categoryDetails.materials" >
+                            <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ material.id }}</td>
+                            <td class="px-6 py-4 text-gray-700"><strong>{{ material.name }}</strong></td>
+                            <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ material.high_date }}</td>
+                            <td class="px-6 py-4">{{ material.low_date }}</td>
+                            <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ material.pivot.value }}</td>
+                            <td class="px-6 py-4">{{ getNombreSucursal(material.branch_office_id) }}</td>
+                            <td class="px-6 py-4">
+                                <span [ngClass]="{'text-green-500 dark:text-green-800': material.state === 'available', 'text-red-500 dark:text-red-800': material.state === 'inactive'}">{{ material.state }}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div *ngIf="mostrarModalAgregar" class="fixed z-10 inset-0 overflow-y-auto">
+                <div class="flex items-center justify-center min-h-screen px-4">
+                    <!-- Contenido del modal -->
+                    <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full">
+                        <!-- Encabezado del modal -->
+                        <div class="px-4 py-2 bg-gray-200">
+                            <h3 class="text-lg font-bold">Añadir Material</h3>
+                        </div>
+                        <!-- Cuerpo del modal (aquí va el formulario) -->
+                        <div class="p-4">
+                            <!-- Formulario aquí -->
+                            <form>
+                                <!-- <div class="mb-4">
+                                    <label for="nombreMaterial" class="block text-gray-700">Nombre</label>
+                                    <input type="text" id="nombreMaterial" name="nombreMaterial" class="form-input mt-1 block w-full" placeholder="Ingrese el nombre del material" [(ngModel)]="nombreMaterial">
+                                </div>
+                                <div class="mb-4">
+                                    <label for="valor" class="block text-gray-700">Valor</label>
+                                    <input type="text" id="valor" name="valor" class="form-input mt-1 block w-full" placeholder="Ingrese el valor" [(ngModel)]="valor">
+                                </div> -->
+                                <div class="mb-4">
+                                    <label for="estado" class="block text-gray-700">Estado</label>
+                                    <!-- <select id="estado" name="estado" class="form-select mt-1 block w-full" [(ngModel)]="estado">
+                                        <option value="available">Disponible</option>
+                                        <option value="inactive">Inactivo</option>
+                                    </select> -->
+                                </div>
+                                <div class="flex justify-end">
+                                    <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar</button>
+                                    <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <!-- Tabla para mostrar los detalles específicos del empleado -->
-    <table class="table-auto w-full">
-        <thead class="text-xs text-gray-700 uppercase dark:text-gray-400">
-            <tr>
-                <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-800">
-                    ID
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Sucursal
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Departamento
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Empleado
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let categoria of categoryDetails" class="odd:bg-blue-50 even:bg-blue-200">
-                <td class="px-6 py-4">{{ categoria.id}}</td>
-                <td class="px-6 py-4">{{ categoria.sucursal}}</td>
-                <td class="px-6 py-4">{{ categoria.departamento}}</td>
-                <td class="px-6 py-4">{{ categoria.empleado}}</td>
-            </tr>
-            
-            <td>
-        </tbody>
-    </table>
 </div>

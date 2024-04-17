@@ -23,7 +23,7 @@ const routes: Routes = [
   { path: 'employees_details/:id', component: EmployeeDetailsComponent, canActivate: [MyGuardGuard, ChangePasswordGuard ] },
   { path: 'categories_view', component: CategoriesViewComponent, canActivate: [MyGuardGuard, ChangePasswordGuard ]},
   { path: 'categories_details', component: CategoryDetailsComponent, canActivate: [MyGuardGuard, ChangePasswordGuard ]},
-  { path: 'categories_details/id', component: CategoryDetailsComponent, canActivate: [MyGuardGuard, ChangePasswordGuard ]},
+  { path: 'categories_details/:id', component: CategoryDetailsComponent, canActivate: [MyGuardGuard, ChangePasswordGuard ]},
   { path: 'change_password', component: ChangePasswordComponent, canActivate: [MyGuardGuard, ]},
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', component: NotFoundComponent }
