@@ -33,9 +33,13 @@
             </tr>
         </thead>
         <tbody>
-            <td>
-
-            </td>
+            <tr *ngFor="let categoria of categoryDetails" class="odd:bg-blue-50 even:bg-blue-200">
+                <td class="px-6 py-4">{{ categoria.id}}</td>
+                <td class="px-6 py-4">{{ categoria.sucursal}}</td>
+                <td class="px-6 py-4">{{ categoria.departamento}}</td>
+                <td class="px-6 py-4">{{ categoria.empleado}}</td>
+            </tr>
+            
             <td>
         </tbody>
     </table>

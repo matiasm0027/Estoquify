@@ -9,19 +9,20 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   styleUrls: ['./category-details.component.css']
 })
 export class CategoryDetailsComponent {
-  categoryId!: number;
+  categoryName!: number;
   categoryDetails: any ={};
   formularioEmpleado!: FormGroup;
 
 
   constructor(
+    private ApiRequestService: ApiRequestService,
     private fb: FormBuilder,
     private categoryService: ApiRequestService,
   ){}
 
 
   ngOnInit(): void {
-    this.getCategoryDetails
+    this.ObtenerCategoryDetails
   }
 
   initForm() {
@@ -37,19 +38,12 @@ export class CategoryDetailsComponent {
   }
 
 
-  getCategoryDetails(): void {
-    this.categoryService.getEmployeeDetails(this.categoryId)
-      .subscribe(
-        (employee: any) => {
-          this.categoryDetails = employee;
-          this.initForm(); // Initialize form after employee details are fetched
+    ObtenerCategoryDetails(){
+    this.ApiRequestService.MaterialDetails().subscribe(
+        (response: any[]) => {
+          this.categoryDetails = response;
         },
-        (error: any) => {
-          console.error('Error al obtener detalles del empleado:', error);
-        }
       );
-  }
-
-  
+  }  
 }
   

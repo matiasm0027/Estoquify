@@ -92,4 +92,8 @@ export class ApiRequestService {
   deleteCategory(id: any): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/auth/deleteCategory/${id}`);
   }
+
+  MaterialDetails(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/employeeInfoAssignments/$`);
+  }
 }
