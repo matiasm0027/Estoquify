@@ -66,9 +66,11 @@ export class CategoriesViewComponent implements OnInit{
         (response: any) => {
           this.cerrarModal();
           this.successMessage = response.message;
+          this.clearMessagesAfterDelay();
         },
         (error: any) => {
           this.errorMessage = error.error.error;
+          this.clearMessagesAfterDelay();
         }
       );
     }
@@ -87,9 +89,11 @@ export class CategoriesViewComponent implements OnInit{
       (response) => {
         this.successMessage = response.message;
         this.obtenerCantidadMaterial();
+        this.clearMessagesAfterDelay();
       },
       error => {
         this.errorMessage = error.error.error;
+        this.clearMessagesAfterDelay();
       }
     );
   }
@@ -105,9 +109,11 @@ export class CategoriesViewComponent implements OnInit{
           this.successMessage = response.message;
           this.cerrarModalEdit();
           this.obtenerCantidadMaterial();
+          this.clearMessagesAfterDelay();
         },
         (error: any) => {
           this.errorMessage = error.error.error;
+          this.clearMessagesAfterDelay();
         }
       );
     } else {
@@ -115,6 +121,14 @@ export class CategoriesViewComponent implements OnInit{
       console.error('Formulario inválido');
     }
   }
+
+  clearMessagesAfterDelay(): void {
+    setTimeout(() => {
+      this.successMessage = '';
+      this.errorMessage = '';
+    }, 2000); 
+  }
+
 
   mostrarModal() {
     this.mostrarModalAgregar = true;

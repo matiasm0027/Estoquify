@@ -178,6 +178,7 @@ export class EmployeeDetailsComponent implements OnInit {
     if (confirmacion) {
       this.router.navigate(['/employees_view']); 
       this.deleteEmployee(employee.employee_id);
+      alert(`El empleado ${employee.name} ha sido eliminado.`);
     }
   }
 

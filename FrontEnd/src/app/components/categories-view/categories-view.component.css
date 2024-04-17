@@ -10,3 +10,19 @@
     color: rgb(241, 99, 99);
     font-size: 15px;
 }
+
+.fade-in-out {
+    animation: fadeInOut 2s ease forwards;
+  }
+  
+  @keyframes fadeInOut {
+    0% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
