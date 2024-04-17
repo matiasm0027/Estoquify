@@ -13,7 +13,7 @@ export class EmployeesViewComponent implements OnInit {
   employees: any[] = [];
   empleadosFiltrados: any[] = [];
   mostrarModalAgregar: boolean = false;
-  filtroSeleccionado: string = 'quitar';
+  filtroSeleccionado: string = '';
   mostrarModalFiltros: boolean = false;
   formularioEmpleado: FormGroup;
   filtroDepartamento: string = '';
@@ -22,6 +22,10 @@ export class EmployeesViewComponent implements OnInit {
   sucursales: any[] = [];
   sidebarVisible: boolean = true;
   sidebarWidth: number = 250;
+  opcionesFiltro: { valor: string, etiqueta: string, seleccionado: boolean }[] = [
+    { valor: 'departamento', etiqueta: 'Departamento', seleccionado: false },
+    { valor: 'sucursal', etiqueta: 'Sucursal', seleccionado: false },
+];
 
   constructor(private fb: FormBuilder, private peticionesService: ApiRequestService) {
     this.formularioEmpleado = this.fb.group({
@@ -42,6 +46,9 @@ export class EmployeesViewComponent implements OnInit {
     this.obtenerSucursales();
   }
 
+  opcionSeleccionada(opcion: string): boolean {
+    return this.opcionesFiltro.find(item => item.valor === opcion)?.seleccionado ?? false;
+}
   toggleSidebar() {
     this.sidebarVisible = !this.sidebarVisible;
     if (this.sidebarVisible) {
@@ -96,17 +103,21 @@ export class EmployeesViewComponent implements OnInit {
 
   aplicarFiltro(): void {
     this.empleadosFiltrados = this.employees.filter(empleado => {
-      if (this.filtroSeleccionado === 'departamento') {
-        return empleado.department === this.filtroDepartamento;
-      } else if (this.filtroSeleccionado === 'sucursal') {
-        return empleado.branch_office === this.filtroSucursal;
-      } else if (this.filtroSeleccionado === 'ambos') {
+      const filtroDepartamentoSeleccionado = this.opcionSeleccionada('departamento');
+      const filtroSucursalSeleccionado = this.opcionSeleccionada('sucursal');
+  
+      if (filtroDepartamentoSeleccionado && filtroSucursalSeleccionado) {
         return empleado.department === this.filtroDepartamento && empleado.branch_office === this.filtroSucursal;
+      } else if (filtroDepartamentoSeleccionado) {
+        return empleado.department === this.filtroDepartamento;
+      } else if (filtroSucursalSeleccionado) {
+        return empleado.branch_office === this.filtroSucursal;
       } else {
         // Si no se selecciona ningún filtro, mostrar todos los empleados
         return true;
       }
     });
+    
   }
 
   obtenerEmpleados() {

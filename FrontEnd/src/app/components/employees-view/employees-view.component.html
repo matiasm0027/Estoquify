@@ -138,23 +138,23 @@
                 <!-- Formulario de filtros aquí -->
                 <form>
                     <div class="mb-4">
-                        <label for="filtro" class="block text-gray-700">Selecciona un filtro:</label>
-                        <select id="filtro" name="filtro" class="form-select mt-1 block w-full" [(ngModel)]="filtroSeleccionado">
-                            <option value="">Quitar Filtros</option>
-                            <option value="departamento">Departamento</option>
-                            <option value="sucursal">Sucursal</option>
-                            <option value="ambos">Sucursal y Departamento</option>
-                        </select>
+                        <label class="block text-gray-700">Selecciona un filtro:</label>
+                        <div *ngFor="let opcion of opcionesFiltro" class="mt-1">
+                            <input type="checkbox" id="{{ opcion.valor }}" name="{{ opcion.valor }}" [(ngModel)]="opcion.seleccionado" class="form-checkbox mr-2">
+                            <label for="{{ opcion.valor }}" class="text-sm">{{ opcion.etiqueta }}</label>
+                        </div>
                     </div>
+                    
                     <!-- Selector de departamento -->
-                    <div *ngIf="filtroSeleccionado === 'departamento' || filtroSeleccionado === 'ambos'" class="mb-4">
+                    <div *ngIf="opcionSeleccionada('departamento')" class="mb-4">
                         <label for="filtroDepartamento" class="block text-gray-700">Selecciona un departamento:</label>
                         <select id="filtroDepartamento" name="filtroDepartamento" class="form-select mt-1 block w-full" [(ngModel)]="filtroDepartamento">
                             <option *ngFor="let departamento of departamentos" [value]="departamento.name">{{ departamento.name }}</option>
                         </select>
                     </div>
+                    
                     <!-- Selector de sucursal -->
-                    <div *ngIf="filtroSeleccionado === 'sucursal' || filtroSeleccionado === 'ambos'" class="mb-4">
+                    <div *ngIf="opcionSeleccionada('sucursal')" class="mb-4">
                         <label for="filtroSucursal" class="block text-gray-700">Selecciona una sucursal:</label>
                         <select id="filtroSucursal" name="filtroSucursal" class="form-select mt-1 block w-full" [(ngModel)]="filtroSucursal">
                             <option *ngFor="let sucursal of sucursales" [value]="sucursal.name">{{ sucursal.name }}</option>
