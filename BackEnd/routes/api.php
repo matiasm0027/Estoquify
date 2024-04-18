@@ -10,6 +10,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\EmployeeMaterialController;
 use App\Http\Controllers\CategoriaMaterialController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\AttributeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,6 +58,8 @@ Route::group([
     Route::get('listReports', [ReportController::class, 'listReports']);
 
     Route::post('addMaterial', [MaterialController::class, 'addMaterial']);
+
+    Route::get('attributeName/{id}', [AttributeController::class, 'getAttributeName']);
 
 });
 

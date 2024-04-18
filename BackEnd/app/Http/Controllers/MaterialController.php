@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Material;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-
+use App\Models\Material;
+use App\Models\AttributeCategoryMaterial;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MaterialController extends Controller
 {
@@ -19,42 +19,43 @@ class MaterialController extends Controller
                 return response()->json(['error' => 'Usuario no autenticado'], 401);
             }
 
-            // Verificar si el usuario tiene el rol permitido (por ejemplo, rol de administrador)
+            // Verificar si el usuario tiene el rol permitido
             $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
 
             // Validar los datos de entrada del formulario
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string',
-                'high_date' => 'required|date',
-                'branch_office_id' => 'required|exists:branch_offices,id',
-                'state' => 'required',
-                'pivot.category_id' => 'required|exists:categories,id',
-                'pivot.atributo_id' => 'required|exists:atributos,id', 
-                'pivot.value' => 'required|string', 
+                'material.name' => 'required|string',
+                'material.high_date' => 'required|date',
+                'material.branch_office_id' => 'required|exists:branch_offices,id',
+                'material.state' => 'required',
+                'material.pivot.category_id' => 'required|exists:categories,id',
+                'material.pivot.attribute_id' => 'required|exists:attributes,id',
+                'material.pivot.value' => 'required|string',
             ]);
 
-            // Obtener el valor "value" del objeto "pivot"
-            $pivotData = $request->input('pivot');
-            $value = $pivotData['value'] ?? null; // Si no se encuentra "value", se asigna null
-            $category_id = $pivotData['category_id'] ?? null;
-            $atributo_id = $pivotData['atributo_id'] ?? null;
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 400);
+            }
+
             // Convertir la fecha al formato adecuado para la base de datos
-            $high_date = date('Y-m-d H:i:s', strtotime($request->input('high_date')));
+            $high_date = date('Y-m-d H:i:s', strtotime($request->input('material.high_date')));
 
             // Crear una nueva instancia del material y asignar los valores
             $material = new Material();
-            $material->name = $request->input('name');
+            $material->name = $request->input('material.name');
             $material->high_date = $high_date;
-            $material->branch_office_id = $request->input('branch_office_id');
-            $material->created_at = $high_date; // Usar la fecha de alta como la fecha de creación
-            $material->low_date = $request->input('low_date');
-            $material->state = $request->input('state');
+            $material->branch_office_id = $request->input('material.branch_office_id');
+            $material->state = $request->input('material.state');
 
             // Guardar el material en la base de datos
             $material->save();
 
-            
-            $material->category()->attach($category_id, ['value' => $value], $atributo_id);
+            // Obtener los valores de los atributos y asociarlos al material
+            $attribute_id = $request->input('material.pivot.attribute_id');
+            $category_id = $request->input('material.pivot.category_id');
+            $value = $request->input('material.pivot.value');
+
+            $material->category()->attach($category_id, ['attribute_id' => $attribute_id, 'value' => $value]);
 
             // Devolver una respuesta de éxito
             return response()->json(['message' => 'Material agregado con éxito'], 201);

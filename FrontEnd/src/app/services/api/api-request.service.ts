@@ -107,4 +107,7 @@ export class ApiRequestService {
   getCategoryName(categoryId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/auth/categoryName/${categoryId}`);
   }
+  getAttributeName(attributeId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/attributeName/${attributeId}`);
+  }
 }

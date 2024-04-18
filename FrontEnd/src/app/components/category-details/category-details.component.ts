@@ -111,40 +111,55 @@ export class CategoryDetailsComponent implements OnInit {
       // Crear el objeto del material con los valores proporcionados
       const nuevoMaterial = {
         material:{
-          id: null, // Este valor probablemente se generará automáticamente en el backend
           name: nombre,
           high_date: new Date().toISOString(), // Obtener la fecha actual
           branch_office_id: sucursal,
           pivot: {
             category_id: this.categoryId, // Supongo que necesitas el ID de la categoría
-            material_id: null, // Este valor probablemente se generará automáticamente en el backend
-            attribute_id: atributoId, // Agregar el ID del atributo seleccionado
+            attribute_id: atributoId,
             value: valor
           },
           state: "available"
         },
         category_id: this.categoryId,
-        category_name: "" // Dejar esto vacío por ahora
+        category_name: "",
+        attributes:{
+          name: "", //quiero el name del atributo que he elegido
+          pivot: {
+            category_id: this.categoryId, // Supongo que necesitas el ID de la categoría
+            attribute_id: atributoId, // Agregar el ID del atributo seleccionado
+            value: valor
+          },
+        } 
       };
   
-      // Llamar al servicio para obtener el nombre de la categoría
-      this.ApiRequestService.getCategoryName(this.categoryId).subscribe(
+      this.ApiRequestService.getAttributeName(atributoId).subscribe(
         (response: any) => {
-          nuevoMaterial.category_name = response.category_name;
-          // Llamar al servicio para agregar el material
-          this.ApiRequestService.agregarMaterial(nuevoMaterial).subscribe(
+          nuevoMaterial.attributes.name = response.name; // Asignar el nombre del atributo seleccionado
+          // Llamar al servicio para obtener el nombre de la categoría
+          this.ApiRequestService.getCategoryName(this.categoryId).subscribe(
             (response: any) => {
-              console.log('Material agregado:', response);
-              // Cerrar el modal y limpiar el formulario
-              this.cerrarModal();
+              nuevoMaterial.category_name = response.category_name;
+              // Llamar al servicio para agregar el material
+              console.log(nuevoMaterial)
+              this.ApiRequestService.agregarMaterial(nuevoMaterial).subscribe(
+                (response: any) => {
+                  console.log('Material agregado:', response);
+                  // Cerrar el modal y limpiar el formulario
+                  this.cerrarModal();
+                },
+                (error: any) => {
+                  console.error('Error al agregar el material:', error);
+                }
+              );
             },
             (error: any) => {
-              console.error('Error al agregar el material:', error);
+              console.error('Error al obtener el nombre de la categoría:', error);
             }
           );
         },
         (error: any) => {
-          console.error('Error al obtener el nombre de la categoría:', error);
+          console.error('Error al obtener el nombre del atributo:', error);
         }
       );
     } else {

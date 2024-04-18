@@ -146,6 +146,25 @@ class CategoryController extends Controller
         }
     }
 
+    public function getCategoryName($id)
+{
+    try {
+        // Buscar la categoría por ID
+        $category = Category::find($id);
+
+        // Verificar si la categoría existe
+        if (!$category) {
+            return response()->json(['error' => 'Categoria no encontrada'], 404);
+        }
+
+        // Devolver el nombre de la categoría
+        return response()->json(['category_name' => $category->name], 200);
+    } catch (\Exception $e) {
+        // Capturar y manejar cualquier excepción que pueda ocurrir
+        return response()->json(['error' => 'Error al obtener el nombre de la categoria: ' . $e->getMessage()], 500);
+    }
+}
+
     protected function checkUserRole($allowedRoles)
     {
         if (!Auth::check()) {
