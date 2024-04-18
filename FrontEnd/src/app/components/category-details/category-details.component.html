@@ -72,25 +72,30 @@
                         <!-- Cuerpo del modal (aquí va el formulario) -->
                         <div class="p-4">
                             <!-- Formulario aquí -->
-                            <form>
-                                <!-- <div class="mb-4">
-                                    <label for="nombreMaterial" class="block text-gray-700">Nombre</label>
-                                    <input type="text" id="nombreMaterial" name="nombreMaterial" class="form-input mt-1 block w-full" placeholder="Ingrese el nombre del material" [(ngModel)]="nombreMaterial">
+                            <form [formGroup]="formularioMaterial" (submit)="agregarMaterial()">
+                                <div class="mb-4">
+                                    <label for="nombre" class="block text-gray-700">Nombre</label>
+                                    <input type="text" id="nombre" name="nombre" class="form-input mt-1 block w-full" placeholder="Ingrese el nombre del material" formControlName="nombre">
+                                </div>
+                                <div class="mb-4">
+                                    <label for="atributo" class="block text-gray-700">Atributo</label>
+                                    <select formControlName="atributo" id="atributo" name="atributo" class="form-select mt-1 block w-full" required>
+                                        <option *ngFor="let atributo of categoryDetails.attributes" [value]="atributo.id">{{ atributo.name }}</option>
+                                    </select>
                                 </div>
                                 <div class="mb-4">
                                     <label for="valor" class="block text-gray-700">Valor</label>
-                                    <input type="text" id="valor" name="valor" class="form-input mt-1 block w-full" placeholder="Ingrese el valor" [(ngModel)]="valor">
-                                </div> -->
+                                    <input type="text" id="valor" name="valor" class="form-input mt-1 block w-full" placeholder="Ingrese el valor" formControlName="value">
+                                </div>
                                 <div class="mb-4">
-                                    <label for="estado" class="block text-gray-700">Estado</label>
-                                    <!-- <select id="estado" name="estado" class="form-select mt-1 block w-full" [(ngModel)]="estado">
-                                        <option value="available">Disponible</option>
-                                        <option value="inactive">Inactivo</option>
-                                    </select> -->
+                                    <label for="sucursal" class="block text-gray-700">Sucursal</label>
+                                    <select formControlName="sucursal" id="sucursal" name="sucursal" class="form-select mt-1 block w-full" required>
+                                        <option *ngFor="let suc of sucursales" [value]="suc.id">{{ suc.name }}</option>
+                                    </select>
                                 </div>
                                 <div class="flex justify-end">
-                                    <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar</button>
-                                    <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
+                                    <button (click)="agregarMaterial()" type="button" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar</button>
+                                    <button (click)="cerrarModal()" type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
                                 </div>
                             </form>
                         </div>

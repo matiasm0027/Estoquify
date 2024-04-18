@@ -92,8 +92,6 @@ export class EmployeesViewComponent implements OnInit {
 
   mostrarModalDeFiltros(): void {
     this.mostrarModalFiltros = true;
-    console.log(this.departamentos)
-    console.log(this.sucursales)
   }
 
   cerrarModalDeFiltros(): void {

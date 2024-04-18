@@ -100,4 +100,11 @@ export class ApiRequestService {
   MaterialDetails(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/auth/employeeInfoAssignments/$`);
   }
+
+  agregarMaterial(nuevoMaterial: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/addMaterial`, nuevoMaterial);
+  }
+  getCategoryName(categoryId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/categoryName/${categoryId}`);
+  }
 }

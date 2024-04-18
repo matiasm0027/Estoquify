@@ -11,17 +11,18 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 export class CategoryDetailsComponent implements OnInit {
   categoryId!: number;
   categoryDetails: any = {};
-  formularioCategoria!: FormGroup;
   sidebarVisible: boolean = true;
   sidebarWidth: number = 250;
   mostrarModalAgregar: boolean = false;
   mostrarModalFiltros: boolean = false;
   sucursales: any[] = [];
+  formularioMaterial!: FormGroup;
+  categories: any[] = [];
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
-    private categoryService: ApiRequestService,
+    private ApiRequestService: ApiRequestService,
     private router: Router
   ) {}
 
@@ -29,13 +30,15 @@ export class CategoryDetailsComponent implements OnInit {
     this.getCategoriaIdFromRoute();
     this.getCategoriaDetails();
     this.obtenerSucursales();
+    this.initForm();
   }
 
   initForm() {
-    this.formularioCategoria = this.fb.group({
-      nombre: [this.categoryDetails.name, Validators.required],
-      descripcion: [this.categoryDetails.description, Validators.required],
-      // Otros campos de formulario para la categoría
+    this.formularioMaterial = this.fb.group({
+      nombre: ['', Validators.required],
+      value: ['', Validators.required],
+      sucursal: ['', Validators.required],
+      atributo: ['', Validators.required]
     });
   }
 
@@ -45,9 +48,10 @@ export class CategoryDetailsComponent implements OnInit {
   }
 
   obtenerSucursales() {
-    this.categoryService.listBranchOffices().subscribe(
+    this.ApiRequestService.listBranchOffices().subscribe(
       (response: any[]) => {
         this.sucursales = response;
+        
       },
       error => {
         console.error('Error al obtener sucursales:', error);
@@ -67,7 +71,7 @@ export class CategoryDetailsComponent implements OnInit {
   }
 
   getCategoriaDetails(): void {
-    this.categoryService.getCategoriaDetails(this.categoryId)
+    this.ApiRequestService.getCategoriaDetails(this.categoryId)
       .subscribe(
         (categoria: any) => {
           console.log(categoria)
@@ -82,17 +86,87 @@ export class CategoryDetailsComponent implements OnInit {
   volver() {
     this.router.navigate(['/categories_view']);
   }
+
   mostrarModal() {
     this.mostrarModalAgregar = true;
   }
+
   mostrarModalDeFiltros(): void {
     this.mostrarModalFiltros = true;
-    
   }
 
- 
+  cerrarModal() {
+    this.mostrarModalAgregar = false;
+    this.getCategoriaDetails();
+    this.formularioMaterial.reset();
+  }
 
- 
+  agregarMaterial() {
+    if (this.formularioMaterial.valid) {
+      const nombre = this.formularioMaterial.value.nombre;
+      const valor = this.formularioMaterial.value.value;
+      const sucursal = this.formularioMaterial.value.sucursal;
+      const atributoId = this.formularioMaterial.value.atributo; // Obtener el ID del atributo seleccionado
+    
+      // Crear el objeto del material con los valores proporcionados
+      const nuevoMaterial = {
+        material:{
+          id: null, // Este valor probablemente se generará automáticamente en el backend
+          name: nombre,
+          high_date: new Date().toISOString(), // Obtener la fecha actual
+          branch_office_id: sucursal,
+          pivot: {
+            category_id: this.categoryId, // Supongo que necesitas el ID de la categoría
+            material_id: null, // Este valor probablemente se generará automáticamente en el backend
+            attribute_id: atributoId, // Agregar el ID del atributo seleccionado
+            value: valor
+          },
+          state: "available"
+        },
+        category_id: this.categoryId,
+        category_name: "" // Dejar esto vacío por ahora
+      };
+  
+      // Llamar al servicio para obtener el nombre de la categoría
+      this.ApiRequestService.getCategoryName(this.categoryId).subscribe(
+        (response: any) => {
+          nuevoMaterial.category_name = response.category_name;
+          // Llamar al servicio para agregar el material
+          this.ApiRequestService.agregarMaterial(nuevoMaterial).subscribe(
+            (response: any) => {
+              console.log('Material agregado:', response);
+              // Cerrar el modal y limpiar el formulario
+              this.cerrarModal();
+            },
+            (error: any) => {
+              console.error('Error al agregar el material:', error);
+            }
+          );
+        },
+        (error: any) => {
+          console.error('Error al obtener el nombre de la categoría:', error);
+        }
+      );
+    } else {
+      // Marcar los campos inválidos
+      this.formularioMaterial.markAllAsTouched();
+    }
+  }
+
+  obtenerCategorias(){
+    this.ApiRequestService.categoryMaterialInfo().subscribe(
+      (response: any[]) => {
+        this.categories = response.map(categori => ({
+          id: categori.category_id,
+          name: categori.category_name, // Cambiar a category_name
+          total_material: categori.total_materials, // Cambiar a total_materials
+          activeMaterial: categori.active_materials, // Cambiar a active_materials
+          availableMaterial: categori.available_materials, // Cambiar a available_materials
+          inactiveMaterial: categori.inactive_materials // Cambiar a inactive_materials
+        }));
+      }
+    );
+  }
 
   // Otras funciones como confirmar eliminación y eliminar categoría
 }

@@ -9,6 +9,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\EmployeeMaterialController;
 use App\Http\Controllers\CategoriaMaterialController;
+use App\Http\Controllers\MaterialController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,9 +52,11 @@ Route::group([
     Route::post('addCategory', [CategoryController::class, 'addCategory']);
     Route::put('editCategory/{id}', [CategoryController::class, 'editCategory']);
     Route::delete('deleteCategory/{id}', [CategoryController::class, 'deleteCategory']);
+    Route::get('categoryName/{id}', [CategoryController::class, 'getCategoryName']);
 
     Route::get('listReports', [ReportController::class, 'listReports']);
 
+    Route::post('addMaterial', [MaterialController::class, 'addMaterial']);
 
 });
 
