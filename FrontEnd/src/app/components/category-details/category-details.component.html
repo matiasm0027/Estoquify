@@ -39,7 +39,7 @@
                                 Valor
                             </th>
                             <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
-                                Departamento
+                                Sucursal
                             </th>
                             <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
                                 Estado
@@ -55,7 +55,7 @@
                             <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ material.pivot.value }}</td>
                             <td class="px-6 py-4">{{ getNombreSucursal(material.branch_office_id) }}</td>
                             <td class="px-6 py-4">
-                                <span [ngClass]="{'text-green-500 dark:text-green-800': material.state === 'available', 'text-red-500 dark:text-red-800': material.state === 'inactive'}">{{ material.state }}</span>
+                                <span [ngClass]="{'text-green-500 dark:text-green-800': material.state === 'available', 'text-red-500 dark:text-red-800': material.state === 'inactive', 'text-blue-500 dark:text-blue-800': material.state === 'active'}">{{ material.state }}</span>
                             </td>
                         </tr>
                     </tbody>
@@ -98,6 +98,48 @@
                                     <button (click)="cerrarModal()" type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
                                 </div>
                             </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="mostrarModalFiltros" class="fixed z-10 inset-0 overflow-y-auto">
+                <div class="flex items-center justify-center min-h-screen px-4">
+                    <!-- Contenido del modal -->
+                    <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full">
+                        <!-- Encabezado del modal -->
+                        <div class="px-4 py-2 bg-gray-200">
+                            <h3 class="text-lg font-bold">Filtrar por</h3>
+                        </div>
+                        <!-- Cuerpo del modal -->
+                        <div class="p-4">
+                            <!-- Selector de fecha de alta -->
+                            <div class="mb-4">
+                                <label class="block text-gray-700">Fecha de Alta</label>
+                                <input type="date" class="form-input mt-1 block w-full" [(ngModel)]="filtroFechaAlta">
+                            </div>
+                            <!-- Selector de estado -->
+                            <div class="mb-4">
+                                <label class="block text-gray-700">Estado</label>
+                                <select class="form-select mt-1 block w-full" [(ngModel)]="filtroEstado">
+                                    <option value="">Todos</option>
+                                    <option value="available">Available</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                            <!-- Selector de sucursal -->
+                            <div class="mb-4">
+                                <label class="block text-gray-700">Sucursal</label>
+                                <select class="form-select mt-1 block w-full" [(ngModel)]="filtroSucursal">
+                                    <option value="">Todas las sucursales</option>
+                                    <option *ngFor="let sucursal of sucursales" [value]="sucursal.id">{{ sucursal.name }}</option>
+                                </select>
+                            </div>
+                            <!-- Botones -->
+                            <div class="flex justify-end">
+                                <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2" (click)="aplicarFiltro()">Aplicar</button>
+                                <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" (click)="cerrarModalFiltros()">Cerrar</button>
+                            </div>
                         </div>
                     </div>
                 </div>

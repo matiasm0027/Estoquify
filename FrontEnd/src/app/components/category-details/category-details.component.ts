@@ -18,6 +18,10 @@ export class CategoryDetailsComponent implements OnInit {
   sucursales: any[] = [];
   formularioMaterial!: FormGroup;
   categories: any[] = [];
+  filtroFechaAlta: string = ''; 
+  filtroEstado: string = ''; 
+  filtroSucursal: string = '';
+  categoryDetails2: any = {};
 
   constructor(
     private fb: FormBuilder,
@@ -75,7 +79,9 @@ export class CategoryDetailsComponent implements OnInit {
       .subscribe(
         (categoria: any) => {
           console.log(categoria)
-          this.categoryDetails = categoria; // Convertir el objeto de categoría a una matriz
+          
+          this.categoryDetails2 = categoria; // Convertir el objeto de categoría a una matriz
+          this.aplicarFiltro();
         },
         (error: any) => {
           console.error('Error al obtener detalles de la categoría:', error);
@@ -93,6 +99,10 @@ export class CategoryDetailsComponent implements OnInit {
 
   mostrarModalDeFiltros(): void {
     this.mostrarModalFiltros = true;
+  }
+
+  cerrarModalFiltros(){
+    this.mostrarModalFiltros = false;
   }
 
   cerrarModal() {
@@ -168,20 +178,39 @@ export class CategoryDetailsComponent implements OnInit {
     }
   }
 
-  obtenerCategorias(){
-    this.ApiRequestService.categoryMaterialInfo().subscribe(
-      (response: any[]) => {
-        this.categories = response.map(categori => ({
-          id: categori.category_id,
-          name: categori.category_name, // Cambiar a category_name
-          total_material: categori.total_materials, // Cambiar a total_materials
-          activeMaterial: categori.active_materials, // Cambiar a active_materials
-          availableMaterial: categori.available_materials, // Cambiar a available_materials
-          inactiveMaterial: categori.inactive_materials // Cambiar a inactive_materials
-        }));
-      }
-    );
+  aplicarFiltro(): void {
+    // Obtener los filtros seleccionados
+    const filtroFechaAltaSeleccionado = this.filtroFechaAlta;
+    const filtroEstadoSeleccionado = this.filtroEstado;
+    const filtroSucursalSeleccionado = this.filtroSucursal;
+    console.log('Filtro Sucursal:', filtroSucursalSeleccionado);
+    console.log('Filtro Estado:', filtroEstadoSeleccionado);
+    
+    // Aplicar los filtros
+    this.categoryDetails.materials = this.categoryDetails2.materials.filter((material: any) => {
+        let cumpleFiltroFechaAlta = true;
+        let cumpleFiltroEstado = true;
+        let cumpleFiltroSucursal = true;
+        
+        // Filtrar por fecha de alta
+        if (filtroFechaAltaSeleccionado) {
+            cumpleFiltroFechaAlta = material.high_date === filtroFechaAltaSeleccionado;
+        }
+
+        // Filtrar por estado
+        if (filtroEstadoSeleccionado) {
+            cumpleFiltroEstado = material.state === filtroEstadoSeleccionado;
+        }
+
+        // Filtrar por sucursal
+        if (filtroSucursalSeleccionado) {
+            cumpleFiltroSucursal = material.branch_office_id === filtroSucursalSeleccionado;
+        }
+
+        // Devolver verdadero si el material cumple todos los filtros
+        return cumpleFiltroFechaAlta && cumpleFiltroEstado && cumpleFiltroSucursal;
+    });
+}
   }
 
-  // Otras funciones como confirmar eliminación y eliminar categoría
-}
+
