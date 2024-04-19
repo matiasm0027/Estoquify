@@ -18,7 +18,8 @@ export class CategoryDetailsComponent implements OnInit {
   sucursales: any[] = [];
   formularioMaterial!: FormGroup;
   categories: any[] = [];
-  filtroFechaAlta: string = ''; 
+  fechaInicio: string = ''; 
+  fechaFin: string = ''; 
   filtroEstado: string = ''; 
   filtroSucursal: string = '';
   categoryDetails2: any = {};
@@ -78,9 +79,8 @@ export class CategoryDetailsComponent implements OnInit {
     this.ApiRequestService.getCategoriaDetails(this.categoryId)
       .subscribe(
         (categoria: any) => {
-          console.log(categoria)
-          
           this.categoryDetails2 = categoria; // Convertir el objeto de categoría a una matriz
+          console.log(this.categoryDetails2)
           this.aplicarFiltro();
         },
         (error: any) => {
@@ -180,21 +180,28 @@ export class CategoryDetailsComponent implements OnInit {
 
   aplicarFiltro(): void {
     // Obtener los filtros seleccionados
-    const filtroFechaAltaSeleccionado = this.filtroFechaAlta;
+    const filtroFechaInicio = this.fechaInicio;
+    const filtroFechaFin = this.fechaFin;
     const filtroEstadoSeleccionado = this.filtroEstado;
-    const filtroSucursalSeleccionado = this.filtroSucursal;
-    console.log('Filtro Sucursal:', filtroSucursalSeleccionado);
-    console.log('Filtro Estado:', filtroEstadoSeleccionado);
-    
+    const filtroSucursalSeleccionado = parseInt(this.filtroSucursal, 10); // Convertir a entero
+
     // Aplicar los filtros
     this.categoryDetails.materials = this.categoryDetails2.materials.filter((material: any) => {
-        let cumpleFiltroFechaAlta = true;
+        let cumpleFiltroFecha = true;
         let cumpleFiltroEstado = true;
         let cumpleFiltroSucursal = true;
-        
+
         // Filtrar por fecha de alta
-        if (filtroFechaAltaSeleccionado) {
-            cumpleFiltroFechaAlta = material.high_date === filtroFechaAltaSeleccionado;
+        if (filtroFechaInicio && filtroFechaFin) {
+            const fechaMaterial = new Date(material.high_date).getTime();
+            const fechaInicio = new Date(filtroFechaInicio).getTime();
+            const fechaFin = new Date(filtroFechaFin).getTime();
+
+            if (isNaN(fechaMaterial) || isNaN(fechaInicio) || isNaN(fechaFin)) {
+                throw new Error('Error al convertir las fechas');
+            }
+
+            cumpleFiltroFecha = fechaMaterial >= fechaInicio && fechaMaterial <= fechaFin;
         }
 
         // Filtrar por estado
@@ -203,14 +210,16 @@ export class CategoryDetailsComponent implements OnInit {
         }
 
         // Filtrar por sucursal
-        if (filtroSucursalSeleccionado) {
+        if (filtroSucursalSeleccionado) { // Verificar si el filtro es un número válido
+  
             cumpleFiltroSucursal = material.branch_office_id === filtroSucursalSeleccionado;
         }
 
         // Devolver verdadero si el material cumple todos los filtros
-        return cumpleFiltroFechaAlta && cumpleFiltroEstado && cumpleFiltroSucursal;
+        return cumpleFiltroFecha && cumpleFiltroEstado && cumpleFiltroSucursal;
     });
 }
+
   }
 
 
