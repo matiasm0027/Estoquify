@@ -19,6 +19,7 @@ import { ChangePasswordComponent } from './components/change-password/change-pas
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { CategoryDetailsComponent } from './components/category-details/category-details.component';
+import { MaterialDetailsComponent } from './components/material-details/material-details.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { CategoryDetailsComponent } from './components/category-details/category
     CategoryDetailsComponent,
     ChangePasswordComponent,
     ForgotPasswordComponent,
-    ResetPasswordComponent
+    ResetPasswordComponent,
+    MaterialDetailsComponent
     
   ],
   imports: [

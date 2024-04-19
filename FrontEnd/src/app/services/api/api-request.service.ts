@@ -104,10 +104,24 @@ export class ApiRequestService {
   agregarMaterial(nuevoMaterial: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/addMaterial`, nuevoMaterial);
   }
+  
   getCategoryName(categoryId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/auth/categoryName/${categoryId}`);
   }
+
   getAttributeName(attributeId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/auth/attributeName/${attributeId}`);
+  }
+
+  deleteMaterial(materialId: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/auth/deleteMaterial/${materialId}`);
+  }
+
+  editMaterial(materialId: number, materialData: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/auth/editMaterial/${materialId}`, materialData);
+  }
+
+  getMaterialDetails(materialId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/materialDetails/${materialId}`);
   }
 }

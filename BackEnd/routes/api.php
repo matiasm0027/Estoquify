@@ -58,6 +58,9 @@ Route::group([
     Route::get('listReports', [ReportController::class, 'listReports']);
 
     Route::post('addMaterial', [MaterialController::class, 'addMaterial']);
+    Route::delete('deleteMaterial/{id}', [MaterialController::class, 'deleteMaterial']);
+    Route::put('editMaterial/{id}', [MaterialController::class, 'editMaterial']);
+    Route::get('materialDetails/{id}', [MaterialController::class, 'getMaterialDetails']);
 
     Route::get('attributeName/{id}', [AttributeController::class, 'getAttributeName']);
 

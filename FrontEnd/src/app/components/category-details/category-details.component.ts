@@ -9,6 +9,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   styleUrls: ['./category-details.component.css']
 })
 export class CategoryDetailsComponent implements OnInit {
+  page: number = 1;
   categoryId!: number;
   categoryDetails: any = {};
   sidebarVisible: boolean = true;
@@ -22,7 +23,7 @@ export class CategoryDetailsComponent implements OnInit {
   fechaFin: string = ''; 
   filtroEstado: string = ''; 
   filtroSucursal: string = '';
-  categoryDetails2: any = {};
+  detallesMaterial: any = {};
 
   constructor(
     private fb: FormBuilder,
@@ -79,8 +80,8 @@ export class CategoryDetailsComponent implements OnInit {
     this.ApiRequestService.getCategoriaDetails(this.categoryId)
       .subscribe(
         (categoria: any) => {
-          this.categoryDetails2 = categoria; // Convertir el objeto de categoría a una matriz
-          console.log(this.categoryDetails2)
+          this.detallesMaterial = categoria; // Convertir el objeto de categoría a una matriz
+          console.log(this.detallesMaterial.attributes)
           this.aplicarFiltro();
         },
         (error: any) => {
@@ -186,7 +187,7 @@ export class CategoryDetailsComponent implements OnInit {
     const filtroSucursalSeleccionado = parseInt(this.filtroSucursal, 10); // Convertir a entero
 
     // Aplicar los filtros
-    this.categoryDetails.materials = this.categoryDetails2.materials.filter((material: any) => {
+    this.categoryDetails.materials = this.detallesMaterial.materials.filter((material: any) => {
         let cumpleFiltroFecha = true;
         let cumpleFiltroEstado = true;
         let cumpleFiltroSucursal = true;
@@ -211,7 +212,6 @@ export class CategoryDetailsComponent implements OnInit {
 
         // Filtrar por sucursal
         if (filtroSucursalSeleccionado) { // Verificar si el filtro es un número válido
-  
             cumpleFiltroSucursal = material.branch_office_id === filtroSucursalSeleccionado;
         }
 

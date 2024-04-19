@@ -47,9 +47,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let material of categoryDetails.materials" >
+                        <tr *ngFor="let material of categoryDetails.materials | paginate: { itemsPerPage: 10, currentPage: page }" >
                             <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ material.id }}</td>
-                            <td class="px-6 py-4 text-gray-700"><strong>{{ material.name }}</strong></td>
+                            <td class="px-6 py-4 text-gray-700">
+                                <a [routerLink]="['/material_details', material.id]"><strong>{{ material.name }}</strong></a>
+                            </td>
                             <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ material.high_date }}</td>
                             <td class="px-6 py-4">{{ material.low_date }}</td>
                             <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ material.pivot.value }}</td>
@@ -60,6 +62,7 @@
                         </tr>
                     </tbody>
                 </table>
+                <pagination-controls (pageChange)="page = $event"></pagination-controls>
             </div>
             <div *ngIf="mostrarModalAgregar" class="fixed z-10 inset-0 overflow-y-auto">
                 <div class="flex items-center justify-center min-h-screen px-4">
@@ -80,7 +83,7 @@
                                 <div class="mb-4">
                                     <label for="atributo" class="block text-gray-700">Atributo</label>
                                     <select formControlName="atributo" id="atributo" name="atributo" class="form-select mt-1 block w-full" required>
-                                        <option *ngFor="let atributo of categoryDetails.attributes" [value]="atributo.id">{{ atributo.name }}</option>
+                                        <option *ngFor="let atributo of detallesMaterial.attributes" [value]="atributo.id">{{ atributo.name }}</option>
                                     </select>
                                 </div>
                                 <div class="mb-4">

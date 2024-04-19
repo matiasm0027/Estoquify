@@ -79,4 +79,31 @@ class MaterialController extends Controller
             abort(403, 'Access denied');
         }
     }
+    
+    public function getMaterialDetails($id)
+{
+    try {
+        // Verificar si el usuario está autenticado
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['error' => 'Usuario no autenticado'], 401);
+        }
+
+        // Verificar si el usuario tiene el rol permitido
+        $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
+
+        // Buscar el material por su ID
+        $material = Material::with('category', 'category.attributes')->find($id);
+
+        if (!$material) {
+            return response()->json(['error' => 'Material no encontrado'], 404);
+        }
+
+        // Devolver los detalles del material
+        return response()->json(['material' => $material], 200);
+    } catch (\Exception $e) {
+        // Capturar y manejar cualquier excepción que pueda ocurrir
+        return response()->json(['error' => 'Error al obtener detalles del material: ' . $e->getMessage()], 500);
+    }
+}
 }

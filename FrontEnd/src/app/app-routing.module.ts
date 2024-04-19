@@ -12,6 +12,7 @@ import { ChangePasswordGuard } from './changePassword/change-password.guard';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { CategoryDetailsComponent } from './components/category-details/category-details.component';
+import { MaterialDetailsComponent } from './components/material-details/material-details.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -25,6 +26,7 @@ const routes: Routes = [
   { path: 'categories_details', component: CategoryDetailsComponent, canActivate: [MyGuardGuard, ChangePasswordGuard ]},
   { path: 'categories_details/:id', component: CategoryDetailsComponent, canActivate: [MyGuardGuard, ChangePasswordGuard ]},
   { path: 'change_password', component: ChangePasswordComponent, canActivate: [MyGuardGuard, ]},
+  { path: 'material_details/:id', component: MaterialDetailsComponent, canActivate: [MyGuardGuard, ]},
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', component: NotFoundComponent }
 
