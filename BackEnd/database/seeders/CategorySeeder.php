@@ -11,11 +11,11 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        Category::create(['name' => 'Monitor']);
-        Category::create(['name' => 'Mobile']);
-        Category::create(['name' => 'Laptop']);
+        Category::create(['name' => 'Monitors']);
+        Category::create(['name' => 'Mobiles']);
+        Category::create(['name' => 'Laptops']);
         Category::create(['name' => 'Headphones']);
         Category::create(['name' => 'Mouse']);
-        Category::create(['name' => 'Keyboard']);
+        Category::create(['name' => 'Keyboards']);
     }
 }

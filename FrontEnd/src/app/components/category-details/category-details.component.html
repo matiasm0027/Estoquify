@@ -9,7 +9,7 @@
         <!-- Contenido de la vista de detalles del material -->
         <div class="bg-white p-6 rounded shadow" *ngIf="categoryDetails">
             <div class="flex justify-between items-center mb-4">
-                <h1 class="text-2xl font-bold">Detalles del Material</h1>
+                <h1 class="text-2xl font-bold">{{this.detallesMaterial.category_name}}</h1>
                 <div class="space-x-4">
                     <button (click)="mostrarModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-4">
                         Añadir Material
@@ -36,9 +36,6 @@
                                 Fecha Baja
                             </th>
                             <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
-                                Valor
-                            </th>
-                            <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
                                 Sucursal
                             </th>
                             <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
@@ -53,9 +50,8 @@
                                 <a [routerLink]="['/material_details', material.id]"><strong>{{ material.name }}</strong></a>
                             </td>
                             <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ material.high_date }}</td>
-                            <td class="px-6 py-4">{{ material.low_date }}</td>
-                            <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ material.pivot.value }}</td>
-                            <td class="px-6 py-4">{{ getNombreSucursal(material.branch_office_id) }}</td>
+                            <td class="px-6 py-4">{{ material.low_date ?? 'N/D'}}</td>
+                            <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ getNombreSucursal(material.branch_office_id) }}</td>
                             <td class="px-6 py-4">
                                 <span [ngClass]="{'text-green-500 dark:text-green-800': material.state === 'available', 'text-red-500 dark:text-red-800': material.state === 'inactive', 'text-blue-500 dark:text-blue-800': material.state === 'active'}">{{ material.state }}</span>
                             </td>

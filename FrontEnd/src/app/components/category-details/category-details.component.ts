@@ -81,7 +81,7 @@ export class CategoryDetailsComponent implements OnInit {
       .subscribe(
         (categoria: any) => {
           this.detallesMaterial = categoria; // Convertir el objeto de categoría a una matriz
-          console.log(this.detallesMaterial.attributes)
+          console.log(this.detallesMaterial)
           this.aplicarFiltro();
         },
         (error: any) => {

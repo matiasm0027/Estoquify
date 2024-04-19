@@ -28,31 +28,33 @@
                 <tbody>
                     <tr>
                         <td class="py-2"><strong>ID:</strong></td>
-                        <td class="py-2">{{ materialDetails?.id }}</td>
+                        <td class="py-2">{{ materialDetails.material?.id }}</td>
                     </tr>
                     <tr>
                         <td class="py-2"><strong>Nombre:</strong></td>
-                        <td class="py-2">{{ materialDetails?.name }}</td>
+                        <td class="py-2">{{ materialDetails.material?.name }}</td>
                     </tr>
                     <tr>
                         <td class="py-2"><strong>Fecha Alta:</strong></td>
-                        <td class="py-2">{{ materialDetails?.high_date }}</td>
+                        <td class="py-2">{{ materialDetails.material?.high_date }}</td>
                     </tr>
                     <tr>
                         <td class="py-2"><strong>Fecha Baja:</strong></td>
-                        <td class="py-2">{{ materialDetails?.low_date }}</td>
+                        <td class="py-2">{{ materialDetails.material?.low_date ?? 'Sigue operativo' }}</td>
                     </tr>
-                    <tr>
-                        <td class="py-2"><strong>Valor:</strong></td>
-                        <td class="py-2">{{ materialDetails?.pivot.value }}</td>
+                    <tr *ngFor="let attribute of materialDetails.material?.attribute; let i = index">
+                        <td class="py-2"><strong>Atributo {{ i + 1 }}:</strong></td>
+                        <td class="py-2">{{ attribute.name }} -- > {{ attribute.pivot.value }}</td>
                     </tr>
                     <tr>
                         <td class="py-2"><strong>Sucursal:</strong></td>
-                        <td class="py-2">{{ materialDetails?.branch_office }}</td>
+                        <td class="py-2">{{ getNombreSucursal(materialDetails.material?.branch_office_id) }}</td>
                     </tr>
                     <tr>
                         <td class="py-2"><strong>Estado:</strong></td>
-                        <td class="py-2">{{ materialDetails?.state }}</td>
+                        <td class="py-2" [ngStyle]="{ 'color': getColor(materialDetails.material?.state) }">
+                            {{ materialDetails.material?.state }}
+                        </td>
                     </tr>
                 </tbody>
             </table>

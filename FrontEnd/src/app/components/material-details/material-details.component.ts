@@ -17,6 +17,7 @@ export class MaterialDetailsComponent implements OnInit {
   sucursales: any[] = [];
   mostrarModalEditar: boolean = false;
   formularioMaterial!: FormGroup;
+  attributeNames: string[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -60,7 +61,8 @@ export class MaterialDetailsComponent implements OnInit {
       .subscribe(
         (material: any) => {
           this.materialDetails = material;
-          console.log(this.materialDetails)
+          this.attributeNames = this.materialDetails.material.attribute.map((attribute: any) => attribute.name);
+          console.log("Muestra " , this.materialDetails.material.attribute)
         },
         (error: any) => {
           console.error('Error al obtener detalles del material:', error);
@@ -131,6 +133,11 @@ export class MaterialDetailsComponent implements OnInit {
     );
   }
 
+  getNombreSucursal(branch_office_id: number): string {
+    const sucursal = this.sucursales.find(suc => suc.id === branch_office_id);
+    return sucursal ? sucursal.name : 'N/A';
+  }
+
   confirmDelete(material: any): void {
     const confirmacion = confirm(`¿Estás seguro de que quieres eliminar el material ${material.name}?`);
     if (confirmacion) {
@@ -155,4 +162,15 @@ export class MaterialDetailsComponent implements OnInit {
       }
     );
   }
+  getColor(state: string | undefined): string {
+    if (state === 'available') {
+        return 'green'; // verde para estado 'available'
+    } else if (state === 'inactive') {
+        return 'red'; // rojo para estado 'inactive'
+    } else if (state === 'active') {
+        return 'blue'; // azul para estado 'active'
+    } else {
+        return 'black'; // color por defecto
+    }
+}
 }

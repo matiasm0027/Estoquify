@@ -79,7 +79,7 @@ class MaterialController extends Controller
             abort(403, 'Access denied');
         }
     }
-    
+
     public function getMaterialDetails($id)
 {
     try {
@@ -93,7 +93,7 @@ class MaterialController extends Controller
         $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
 
         // Buscar el material por su ID
-        $material = Material::with('category', 'category.attributes')->find($id);
+        $material = Material::with('category', 'attribute')->find($id);
 
         if (!$material) {
             return response()->json(['error' => 'Material no encontrado'], 404);
