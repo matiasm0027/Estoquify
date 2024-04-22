@@ -47,7 +47,12 @@
                         <tr *ngFor="let material of categoryDetails.materials | paginate: { itemsPerPage: 10, currentPage: page }" >
                             <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ material.id }}</td>
                             <td class="px-6 py-4 text-gray-700">
+                                <span class="flex items-center ">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-4 w-4 mr-1 ">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
                                 <a [routerLink]="['/material_details', material.id]"><strong>{{ material.name }}</strong></a>
+                            </span>
                             </td>
                             <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ material.high_date }}</td>
                             <td class="px-6 py-4">{{ material.low_date ?? 'N/D'}}</td>
@@ -113,12 +118,11 @@
                         <div class="p-4">
                             <!-- Selector de fecha de alta -->
                             <div class="mb-4">
-                                <label class="block text-gray-700">Fecha de Inicio</label>
+                                <label class="block text-gray-700">Rango por Fecha de alta</label>
                                 <input type="date" class="form-input mt-1 block w-full" [(ngModel)]="fechaInicio">
                             </div>
                             
                             <div class="mb-4">
-                                <label class="block text-gray-700">Fecha de Fin</label>
                                 <input type="date" class="form-input mt-1 block w-full" [(ngModel)]="fechaFin">
                             </div>
                             <!-- Selector de estado -->
