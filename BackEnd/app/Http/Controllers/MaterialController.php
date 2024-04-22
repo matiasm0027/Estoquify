@@ -106,4 +106,71 @@ class MaterialController extends Controller
         return response()->json(['error' => 'Error al obtener detalles del material: ' . $e->getMessage()], 500);
     }
 }
+
+public function editMaterial(Request $request, $id)
+    {
+        try {
+            // Verificar si el usuario está autenticado
+            $user = $request->user();
+            //dd($user->role_id);
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no autenticado'], 401);
+            }
+
+            // Verificar si el usuario tiene el rol permitido para editar material (rol '1' para administrador)
+            $this->checkUserRole(['1']);
+
+            // Validar los datos de entrada del formulario utilizando validate
+            $validatedData = $request->validate([
+                'name' => 'required',
+            ]);
+
+            // Buscar al empleado por ID
+            $material = Material::find($id);
+
+            if (!$material) {
+                return response()->json(['error' => 'Material no encontrado'], 404);
+            }
+
+            $material->name = $validatedData['name'];
+            $material->save();
+
+            // Devolver una respuesta de éxito
+            return response()->json(['message' => 'Material editado con éxito'], 200);
+        } catch (\Exception $e) {
+            // Capturar y manejar cualquier excepción que pueda ocurrir
+            return response()->json(['error' => 'Error al editar el material: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function deleteMaterial(Request $request, $id)
+    {
+        try {
+            // Verificar si el usuario está autenticado
+            $user = $request->user();
+            //dd($user->role_id);
+            if (!$user) {
+                return response()->json(['error' => 'Empleado no autenticado'], 401);
+            }
+
+            // Verificar si el usuario tiene el rol permitido para editar empleados (rol '1' para administrador)
+            $this->checkUserRole(['1']);
+
+            // Buscar al usuario por su ID
+            $material = Material::find($id);
+
+            // Si no se encuentra al usuario devuelve un error 404
+            if (!$material) {
+                return response()->json(['error' => 'Material no encontrado'], 404);
+            }
+
+            // Eliminar al usuario
+            $material->delete();
+
+            return response()->json(['message' => 'Material eliminado correctamente'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
+        }
+    }
 }
