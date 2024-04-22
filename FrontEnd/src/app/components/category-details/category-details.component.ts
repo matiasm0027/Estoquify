@@ -205,12 +205,11 @@ export class CategoryDetailsComponent implements OnInit {
       const nombreAtributoExtra = this.atributos.find(atributo => atributo.id === atributoExtraId)?.name;
   
       const atributoExtra = {
-        name: nombreAtributoExtra,
-        pivot: {
+
           category_id: this.categoryId,
           attribute_id: atributoExtraId,
           value: valorExtra
-        }
+        
       };
   
       atributosExtras.push(atributoExtra);
@@ -226,12 +225,19 @@ export class CategoryDetailsComponent implements OnInit {
         name: nombre,
         high_date: new Date().toISOString(), // Obtener la fecha actual
         branch_office_id: sucursal,
-        pivot: atributoPrincipal.pivot,
+        pivot: [
+          { ...atributoPrincipal.pivot },
+          ...atributosExtras.map(atributoExtra => ({
+            category_id: atributoExtra.category_id,
+            attribute_id: atributoExtra.attribute_id,
+            value: atributoExtra.value
+          }))
+        ],
         state: "available"
       },
       category_id: this.categoryId,
       category_name: "",
-      attributes: atributosExtras
+      
     };
   }
 

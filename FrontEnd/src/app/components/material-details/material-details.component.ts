@@ -28,7 +28,7 @@ export class MaterialDetailsComponent implements OnInit {
     private fb: FormBuilder,
     private controlUsuario: UsuariosControlService
   ) {
-    this.categoria_id = this.controlUsuario.getNumero();
+    
   }
 
   ngOnInit(): void {
@@ -37,6 +37,11 @@ export class MaterialDetailsComponent implements OnInit {
     this.obtenerSucursales();
     this.getMaterialDetails();
     this.initForm();
+    this.getCategoriaID();
+  }
+
+  getCategoriaID(){
+    this.categoria_id = this.controlUsuario.getNumero();
   }
 
   initForm() {
