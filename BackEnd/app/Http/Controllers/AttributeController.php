@@ -31,4 +31,11 @@ class AttributeController extends Controller
             return response()->json(['error' => 'Error interno del servidor'], 500);
         }
     }
+
+    public function listAtributos()
+    {
+        $attributos = Attribute::all();
+
+        return response()->json($attributos);
+    }
 }

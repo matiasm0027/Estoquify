@@ -79,7 +79,7 @@
                                 <div class="mb-4">
                                     <label for="atributo" class="block text-gray-700">Atributo</label>
                                     <select formControlName="atributo" id="atributo" name="atributo" class="form-select mt-1 block w-full" required>
-                                        <option *ngFor="let atributo of detallesMaterial.attributes" [value]="atributo.id">{{ atributo.name }}</option>
+                                        <option *ngFor="let atributo of atributos" [value]="atributo.id">{{ atributo.name }}</option>
                                     </select>
                                 </div>
                                 <div class="mb-4">

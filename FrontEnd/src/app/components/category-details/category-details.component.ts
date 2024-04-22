@@ -17,6 +17,7 @@ export class CategoryDetailsComponent implements OnInit {
   mostrarModalAgregar: boolean = false;
   mostrarModalFiltros: boolean = false;
   sucursales: any[] = [];
+  atributos: any[] = [];
   formularioMaterial!: FormGroup;
   categories: any[] = [];
   fechaInicio: string = ''; 
@@ -36,6 +37,7 @@ export class CategoryDetailsComponent implements OnInit {
     this.getCategoriaIdFromRoute();
     this.getCategoriaDetails();
     this.obtenerSucursales();
+    this.obtenerAtributos();
     this.initForm();
   }
 
@@ -65,6 +67,18 @@ export class CategoryDetailsComponent implements OnInit {
     );
   }
 
+  obtenerAtributos() {
+    this.ApiRequestService.listAtributos().subscribe(
+      (response: any[]) => {
+        this.atributos = response;
+        
+      },
+      error => {
+        console.error('Error al obtener sucursales:', error);
+      }
+    );
+  }
+
   getNombreSucursal(branch_office_id: number): string {
     const sucursal = this.sucursales.find(suc => suc.id === branch_office_id);
     return sucursal ? sucursal.name : 'N/A';
@@ -81,7 +95,7 @@ export class CategoryDetailsComponent implements OnInit {
       .subscribe(
         (categoria: any) => {
           this.detallesMaterial = categoria; // Convertir el objeto de categoría a una matriz
-          console.log(this.detallesMaterial)
+          console.log(this.detallesMaterial.attributes)
           this.aplicarFiltro();
         },
         (error: any) => {

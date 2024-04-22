@@ -46,6 +46,7 @@ Route::group([
 
     Route::get('listDepartments', [DepartmentController::class, 'listDepartments']);
     Route::get('listBranchOffices', [BranchOfficeController::class, 'listBranchOffices']);
+    Route::get('listAtributos', [AttributeController::class, 'listAtributos']);
 
 
     Route::get('categoryInfoAssignments/{id}', [CategoriaMaterialController::class, 'categoryInfoAssignments']);
