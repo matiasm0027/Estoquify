@@ -14,12 +14,21 @@ export class UsuariosControlService {
   private usuarioSubject: BehaviorSubject<any>;
   public usuario: Observable<any>;
   usuarioSeleccionado: any;
+  private numero!: number;
 
   constructor() {
     //this.checkLocalStorage();
     this.usuarioSubject = new BehaviorSubject<any>(localStorage.getItem('token')); //comprueba el localStorage de token
     this.usuario = this.usuarioSubject.asObservable();
 
+  }
+
+  setNumero(valor: number) {
+    this.numero = valor;
+  }
+
+  getNumero(): number {
+    return this.numero;
   }
 
   logout(): void {

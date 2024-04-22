@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 
 @Component({
   selector: 'app-material-details',
@@ -18,13 +19,17 @@ export class MaterialDetailsComponent implements OnInit {
   mostrarModalEditar: boolean = false;
   formularioMaterial!: FormGroup;
   attributeNames: string[] = [];
+  categoria_id!: number;
 
   constructor(
     private route: ActivatedRoute,
     private materialService: ApiRequestService,
     private router: Router,
-    private fb: FormBuilder
-  ) {}
+    private fb: FormBuilder,
+    private controlUsuario: UsuariosControlService
+  ) {
+    this.categoria_id = this.controlUsuario.getNumero();
+  }
 
   ngOnInit(): void {
     this.getMaterialIdFromRoute();
@@ -71,7 +76,7 @@ export class MaterialDetailsComponent implements OnInit {
   }
 
   volver() {
-    this.router.navigate(['/materials_view']);
+    this.router.navigate(['/categories_details/' + this.categoria_id]);
   }
 
   mostrarModal() {

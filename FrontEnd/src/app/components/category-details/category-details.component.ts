@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 
 @Component({
   selector: 'app-category-details',
@@ -32,7 +33,8 @@ export class CategoryDetailsComponent implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private ApiRequestService: ApiRequestService,
-    private router: Router
+    private router: Router,
+    private controlUsuario: UsuariosControlService
   ) {}
 
   ngOnInit(): void {
@@ -89,6 +91,7 @@ export class CategoryDetailsComponent implements OnInit {
   getCategoriaIdFromRoute(): void {
     this.route.params.subscribe(params => {
       this.categoryId = +params['id'];
+      this.controlUsuario.setNumero(this.categoryId)
     });
   }
 
