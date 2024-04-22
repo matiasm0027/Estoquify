@@ -54,7 +54,7 @@ Route::group([
     Route::post('addCategory', [CategoryController::class, 'addCategory']);
     Route::put('editCategory/{id}', [CategoryController::class, 'editCategory']);
     Route::delete('deleteCategory/{id}', [CategoryController::class, 'deleteCategory']);
-    Route::get('categoryName/{id}', [CategoryController::class, 'getCategoryName']);
+    
 
     Route::get('listReports', [ReportController::class, 'listReports']);
 
@@ -63,7 +63,7 @@ Route::group([
     Route::put('editMaterial/{id}', [MaterialController::class, 'editMaterial']);
     Route::get('materialDetails/{id}', [MaterialController::class, 'getMaterialDetails']);
 
-    Route::get('attributeName/{id}', [AttributeController::class, 'getAttributeName']);
+    
 
 });
 
