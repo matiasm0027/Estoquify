@@ -25,6 +25,8 @@ export class CategoryDetailsComponent implements OnInit {
   filtroEstado: string = ''; 
   filtroSucursal: string = '';
   detallesMaterial: any = {};
+  atributosAdicionales: any[] = [];
+
 
   constructor(
     private fb: FormBuilder,
@@ -95,7 +97,7 @@ export class CategoryDetailsComponent implements OnInit {
       .subscribe(
         (categoria: any) => {
           this.detallesMaterial = categoria; // Convertir el objeto de categoría a una matriz
-          console.log(this.detallesMaterial.attributes)
+          console.log(this.detallesMaterial)
           this.aplicarFiltro();
         },
         (error: any) => {
@@ -103,6 +105,23 @@ export class CategoryDetailsComponent implements OnInit {
         }
       );
   }
+
+  agregarAtributo() {
+    // Agregar un nuevo conjunto de campos para atributo y valor
+    this.atributosAdicionales.push({});
+    const controlNameAtributo = `atributo${this.atributosAdicionales.length + 1}`;
+    const controlNameValor = `valor${this.atributosAdicionales.length + 1}`;
+    this.formularioMaterial.addControl(controlNameAtributo, this.fb.control('', Validators.required));
+    this.formularioMaterial.addControl(controlNameValor, this.fb.control('', Validators.required));
+  }
+
+  eliminarAtributo(index: number) {
+    this.atributosAdicionales.splice(index, 1);
+    const controlNameAtributo = `atributo${index + 2}`;
+    const controlNameValor = `valor${index + 2}`;
+    this.formularioMaterial.removeControl(controlNameAtributo);
+    this.formularioMaterial.removeControl(controlNameValor);
+}
 
   volver() {
     this.router.navigate(['/categories_view']);
@@ -129,68 +148,88 @@ export class CategoryDetailsComponent implements OnInit {
   agregarMaterial() {
     if (this.formularioMaterial.valid) {
       const nombre = this.formularioMaterial.value.nombre;
-      const valor = this.formularioMaterial.value.value;
       const sucursal = this.formularioMaterial.value.sucursal;
       const atributoId = this.formularioMaterial.value.atributo; // Obtener el ID del atributo seleccionado
-    
-      // Crear el objeto del material con los valores proporcionados
-      const nuevoMaterial = {
-        material:{
-          name: nombre,
-          high_date: new Date().toISOString(), // Obtener la fecha actual
-          branch_office_id: sucursal,
-          pivot: {
-            category_id: this.categoryId, // Supongo que necesitas el ID de la categoría
-            attribute_id: atributoId,
-            value: valor
-          },
-          state: "available"
-        },
-        category_id: this.categoryId,
-        category_name: "",
-        attributes:{
-          name: "", //quiero el name del atributo que he elegido
-          pivot: {
-            category_id: this.categoryId, // Supongo que necesitas el ID de la categoría
-            attribute_id: atributoId, // Agregar el ID del atributo seleccionado
-            value: valor
-          },
-        } 
-      };
   
-      this.ApiRequestService.getAttributeName(atributoId).subscribe(
+      // Obtener el nombre del atributo seleccionado
+      const nombreAtributo = this.atributos.find(atributo => atributo.id === atributoId)?.name;
+  
+      // Construir el atributo principal
+      const atributoPrincipal = this.construirAtributoPrincipal(atributoId, nombreAtributo);
+  
+      // Construir los atributos extras
+      const atributosExtras = this.construirAtributosExtras();
+  
+      // Crear el objeto del material con los valores proporcionados
+      const nuevoMaterial = this.construirObjetoMaterial(nombre, sucursal, atributoPrincipal, atributosExtras);
+  
+      // Llamar al servicio para agregar el material
+      this.ApiRequestService.agregarMaterial(nuevoMaterial).subscribe(
         (response: any) => {
-          nuevoMaterial.attributes.name = response.name; // Asignar el nombre del atributo seleccionado
-          // Llamar al servicio para obtener el nombre de la categoría
-          this.ApiRequestService.getCategoryName(this.categoryId).subscribe(
-            (response: any) => {
-              nuevoMaterial.category_name = response.category_name;
-              // Llamar al servicio para agregar el material
-              console.log(nuevoMaterial)
-              this.ApiRequestService.agregarMaterial(nuevoMaterial).subscribe(
-                (response: any) => {
-                  console.log('Material agregado:', response);
-                  // Cerrar el modal y limpiar el formulario
-                  this.cerrarModal();
-                },
-                (error: any) => {
-                  console.error('Error al agregar el material:', error);
-                }
-              );
-            },
-            (error: any) => {
-              console.error('Error al obtener el nombre de la categoría:', error);
-            }
-          );
+          console.log('Material agregado:', response);
+          // Cerrar el modal y limpiar el formulario
+          this.cerrarModal();
         },
         (error: any) => {
-          console.error('Error al obtener el nombre del atributo:', error);
+          console.error('Error al agregar el material:', error);
         }
       );
     } else {
       // Marcar los campos inválidos
       this.formularioMaterial.markAllAsTouched();
     }
+  }
+  
+  // Función para construir el atributo principal
+  construirAtributoPrincipal(atributoId: number, nombreAtributo: string): any {
+    return {
+      name: nombreAtributo,
+      pivot: {
+        category_id: this.categoryId,
+        attribute_id: atributoId,
+        value: this.formularioMaterial.value.value
+      }
+    };
+  }
+  
+  // Función para construir los atributos extras
+  construirAtributosExtras(): any[] {
+    const atributosExtras = [];
+  
+    for (let i = 0; i < this.atributosAdicionales.length; i++) {
+      const atributoExtraId = this.formularioMaterial.value[`atributo${i + 2}`];
+      const valorExtra = this.formularioMaterial.value[`valor${i + 2}`];
+      const nombreAtributoExtra = this.atributos.find(atributo => atributo.id === atributoExtraId)?.name;
+  
+      const atributoExtra = {
+        name: nombreAtributoExtra,
+        pivot: {
+          category_id: this.categoryId,
+          attribute_id: atributoExtraId,
+          value: valorExtra
+        }
+      };
+  
+      atributosExtras.push(atributoExtra);
+    }
+  
+    return atributosExtras;
+  }
+  
+  // Función para construir el objeto del material
+  construirObjetoMaterial(nombre: string, sucursal: number, atributoPrincipal: any, atributosExtras: any[]): any {
+    return {
+      material: {
+        name: nombre,
+        high_date: new Date().toISOString(), // Obtener la fecha actual
+        branch_office_id: sucursal,
+        pivot: atributoPrincipal.pivot,
+        state: "available"
+      },
+      category_id: this.categoryId,
+      category_name: "",
+      attributes: atributosExtras
+    };
   }
 
   aplicarFiltro(): void {

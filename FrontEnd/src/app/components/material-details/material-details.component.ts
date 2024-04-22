@@ -62,7 +62,7 @@ export class MaterialDetailsComponent implements OnInit {
         (material: any) => {
           this.materialDetails = material;
           this.attributeNames = this.materialDetails.material.attribute.map((attribute: any) => attribute.name);
-          console.log("Muestra " , this.materialDetails.material.attribute)
+          console.log("Muestra " , this.materialDetails)
         },
         (error: any) => {
           console.error('Error al obtener detalles del material:', error);
