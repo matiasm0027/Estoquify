@@ -247,9 +247,17 @@ export class CategoryDetailsComponent implements OnInit {
     const filtroFechaFin = this.fechaFin;
     const filtroEstadoSeleccionado = this.filtroEstado;
     const filtroSucursalSeleccionado = parseInt(this.filtroSucursal, 10); // Convertir a entero
+     // Eliminar duplicados de materiales basados en material.id
+     const uniqueMaterials = this.detallesMaterial.materials.reduce((acc: any[], current: any) => {
+      const found = acc.some((item: any) => item.id === current.id);
+      if (!found) {
+          acc.push(current);
+      }
+      return acc;
+  }, []);
 
     // Aplicar los filtros
-    this.categoryDetails.materials = this.detallesMaterial.materials.filter((material: any) => {
+    this.categoryDetails.materials = uniqueMaterials.filter((material: any) => {
         let cumpleFiltroFecha = true;
         let cumpleFiltroEstado = true;
         let cumpleFiltroSucursal = true;
