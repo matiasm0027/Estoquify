@@ -30,11 +30,9 @@ export class ChangePasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    customfunction();
     if (!localStorage.getItem('first_login')) {
        this.router.navigate(['/home']);
     }
-
   }
 
  
@@ -62,7 +60,5 @@ export class ChangePasswordComponent implements OnInit {
     }
   }
 }
-function customfunction() {
-  throw new Error('Function not implemented.');
-}
+
 
