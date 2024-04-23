@@ -82,7 +82,9 @@
                             </div>
                             <div class="mb-4">
                                 <input type="checkbox" id="fechaActual" name="fechaActual" (change)="setFechaActual(true)">
-                                <label for="fechaActual" class="block text-gray-700">Establecer fecha de baja como hoy, IMPORTANTE cambiar el estado si se da de baja</label>
+                                <label for="fechaActual" class="block text-gray-700">
+                                    Establecer fecha de baja como hoy,<br><span class="text-red-500">IMPORTANTE</span> una vez dado de baja no se podrá dar de alta
+                                  </label>
                             </div>
                             <div class="mb-4">
                                 <label for="sucursal" class="block text-gray-700">Sucursal</label>
@@ -95,7 +97,7 @@
                                 <label for="estado" class="block text-gray-700">Estado</label>
                                 <!-- Lista de estados -->
                                 <select formControlName="estado" id="estado" name="estado" class="form-select mt-1 block w-full">
-                                    <option *ngFor="let estado of estados" [value]="estado.value" [selected]="estado.label === materialDetails.material.state" >{{ estado.label }}</option>
+                                    <option *ngFor="let estado of estados" [value]="estado.value" [selected]="estado.value === materialDetails.material.state" >{{ estado.label }}</option>
                                 </select>
                             </div>
                             <!-- Botones -->
