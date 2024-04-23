@@ -152,7 +152,7 @@ export class MaterialDetailsComponent implements OnInit {
   confirmDelete(material: any): void {
     const confirmacion = confirm(`¿Estás seguro de que quieres eliminar el: ${ material.material.name }?`);
     if (confirmacion) {
-      this.router.navigate(['/categories_details/' + this.categoria_id]); 
+      this.router.navigate(['/categories_details/' + this.materialDetails.material.category[0].id]); 
       this.deleteMaterial(material.material.id);
       alert(`El material: ${material.material.name} ha sido eliminado.`);
     }

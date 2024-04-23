@@ -20,6 +20,7 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { CategoryDetailsComponent } from './components/category-details/category-details.component';
 import { MaterialDetailsComponent } from './components/material-details/material-details.component';
+import { ReportsComponent } from './components/reports/reports.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { MaterialDetailsComponent } from './components/material-details/material
     ChangePasswordComponent,
     ForgotPasswordComponent,
     ResetPasswordComponent,
-    MaterialDetailsComponent
+    MaterialDetailsComponent,
+    ReportsComponent
     
   ],
   imports: [
