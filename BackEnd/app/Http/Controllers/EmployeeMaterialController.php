@@ -45,5 +45,121 @@ class EmployeeMaterialController extends Controller
         ];
         return response()->json($assignments);
     }
+
+    public function materialAssignedEmployees($materialId)
+{
+    // Obtener el material específico con los empleados asignados activos
+    $material = Material::with('employee')->find($materialId);
+
+    if (!$material) {
+        return response()->json(['message' => 'Material no encontrado'], 404);
+    }
+
+    if ($material->employee->isEmpty()) {
+        // Si no hay empleados asignados al material, obtener todos los empleados de la misma sucursal
+        $branchOfficeId = $material->branch_office_id;
+
+        $allEmployees = Employee::where('branch_office_id', $branchOfficeId)
+            ->get();
+
+        if ($allEmployees->isEmpty()) {
+            return response()->json(['message' => 'No hay empleados asignados a este material ni en la sucursal'], 200);
+        }
+
+        $assignedEmployees = [
+            'material_id' => $material->id,
+            'material_name' => $material->name,
+            'category_name' => $material->category->first()->name ?? null,
+            'assigned_employees' => $allEmployees->map(function ($employee) {
+                return [
+                    'employee_id' => $employee->id,
+                    'name' => $employee->name,
+                    'last_name' => $employee->last_name,
+                    'email' => $employee->email,
+                    // No hay fecha de asignación o devolución en este contexto
+                    'assignment_date' => null,
+                    'return_date' => null,
+                ];
+            }),
+        ];
+
+        return response()->json($assignedEmployees, 200);
+    }
+
+    // Si hay empleados asignados, devolver la información de los empleados asignados
+    $assignedEmployees = [
+        'material_id' => $material->id,
+        'material_name' => $material->name,
+        'category_name' => $material->category->first()->name ?? null,
+        'assigned_employees' => $material->employee->map(function ($employee) {
+            return [
+                'employee_id' => $employee->id,
+                'name' => $employee->name,
+                'last_name' => $employee->last_name,
+                'email' => $employee->email,
+                'assignment_date' => $employee->pivot->assignment_date,
+                'return_date' => $employee->pivot->return_date,
+            ];
+        }),
+    ];
+
+    return response()->json($assignedEmployees, 200);
 }
 
+
+public function employeesWithoutCategoryMaterial()
+{
+        // Obtener todos los empleados de la sucursal dada
+        $employees = Employee::where('branch_office_id', $branchOfficeId)
+        ->with(['role', 'department', 'branchOffice', 'material'])
+        ->get();
+
+
+    // Verificar si no hay empleados en la sucursal
+    if ($employees->isEmpty()) {
+        return response()->json(['message' => 'No se encontraron empleados en la sucursal dada'], 404);
+    }
+
+
+    // Obtener los materiales de la categoría especificada y sucursal
+    $categoryMaterials = Material::where('category_id', $categoriaId)
+        ->where('branch_office_id', $branchOfficeId)
+        ->pluck('id');
+
+
+    // Obtener los empleados que no tienen asignado ningún material de la categoría especificada
+    $unassignedEmployees = $employees->reject(function ($employee) use ($categoryMaterials) {
+        return $employee->material->pluck('id')->intersect($categoryMaterials)->isNotEmpty();
+    });
+
+
+    // Crear un array para almacenar la información de los empleados sin materiales asignados
+    $assignments = [];
+
+
+    foreach ($unassignedEmployees as $employee) {
+        // Recopilar la información del empleado
+        $assignment = [
+            'employee_id' => $employee->id,
+            'name' => $employee->name,
+            'last_name' => $employee->last_name,
+            'email' => $employee->email,
+            'phone_number' => $employee->phone_number,
+            'role' => $employee->role ? $employee->role->name : null,
+            'department' => $employee->department ? $employee->department->name : null,
+            'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
+            'role_id' => $employee->role ? $employee->role->id : null,
+            'department_id' => $employee->department ? $employee->department->id : null,
+            'branch_office_id' => $employee->branchOffice ? $employee->branchOffice->id : null,
+        ];
+
+
+        // Agregar la información del empleado al array de asignaciones
+        $assignments[] = $assignment;
+    }
+
+
+    return response()->json($assignments);
+}
+
+}
