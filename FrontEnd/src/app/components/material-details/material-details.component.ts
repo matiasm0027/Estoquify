@@ -73,6 +73,7 @@ export class MaterialDetailsComponent implements OnInit {
           this.materialDetails = material;
           this.attributeNames = this.materialDetails.material.attribute.map((attribute: any) => attribute.name);
           console.log("Muestra " , this.materialDetails)
+          console.log("prueba2 " , this.materialDetails.material.category[0].id)
         },
         (error: any) => {
           console.error('Error al obtener detalles del material:', error);
@@ -81,7 +82,7 @@ export class MaterialDetailsComponent implements OnInit {
   }
 
   volver() {
-    this.router.navigate(['/categories_details/' + this.categoria_id]);
+    this.router.navigate(['/categories_details/' + this.materialDetails.material.category[0].id]);
   }
 
   mostrarModal() {
