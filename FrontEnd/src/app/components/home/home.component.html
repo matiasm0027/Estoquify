@@ -81,9 +81,9 @@
                                     <td class="px-6 py-4 whitespace-nowrap">{{ reporte.id }}</td>
                                     <td class="px-6 py-4">{{ reporte.solicitud }}</td>
                                     <td [ngClass]="{
-                                        'text-yellow-600 dark:text-yellow-400': reporte.prioridad === 'medium',
-                                        'text-red-500 dark:text-red-300': reporte.prioridad === 'high',
-                                        'text-green-500 dark:text-green-300': reporte.prioridad === 'low'
+                                        'text-yellow-600 dark:text-yellow-400': reporte.prioridad === 'Medium',
+                                        'text-red-500 dark:text-red-300': reporte.prioridad === 'High',
+                                        'text-green-500 dark:text-green-300': reporte.prioridad === 'Low'
                                     }" class="px-6 py-4">{{ reporte.prioridad }}</td>
                                     <td class="px-6 py-4">{{ reporte.estado }}</td>
                                     <td class="px-6 py-4">{{ reporte.nameempleado }}</td>
