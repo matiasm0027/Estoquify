@@ -66,6 +66,7 @@ export class EmployeeDetailsComponent implements OnInit {
       .subscribe(
         (employee: any) => {
           this.employeeDetails = employee;
+          console.log(this.employeeDetails)
           this.initForm(); // Initialize form after employee details are fetched
         },
         (error: any) => {

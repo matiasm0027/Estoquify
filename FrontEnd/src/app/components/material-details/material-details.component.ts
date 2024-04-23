@@ -132,11 +132,17 @@ export class MaterialDetailsComponent implements OnInit {
 
   editarMaterial(): void {
     if (this.formularioMaterial.valid) {
+      let bajaFecha = ' ';
+      if(this.materialDetails.material.low_date!==null){
+         bajaFecha = this.materialDetails.material.low_date
+      }else{
+         bajaFecha = this.formularioMaterial.value.lowDate
+      }
         const materialEditado = {
           material: {
             name: this.formularioMaterial.value.nombre,
             high_date: this.materialDetails.material.high_date,
-            low_date: this.formularioMaterial.value.lowDate,
+            low_date: bajaFecha,
             branch_office_id: this.formularioMaterial.value.sucursal,
             state: this.formularioMaterial.value.estado,
             pivot: {} as { [key: string]: any } // Especificar el tipo de las claves como string
