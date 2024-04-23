@@ -15,7 +15,7 @@ class Category extends Model
 
     public function material()
     {
-        return $this->belongsToMany(Material::class, 'attribute_category_material', 'category_id', 'material_id')
+        return $this->belongsToMany(Material::class, 'attribute_category_material')
             ->withPivot('value');
     }
 
