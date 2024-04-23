@@ -20,6 +20,12 @@ export class MaterialDetailsComponent implements OnInit {
   formularioMaterial!: FormGroup;
   attributeNames: string[] = [];
   categoria_id!: number;
+  atributos: any[] = [];
+  estados: any[] = [
+    { value: 'available', label: 'Avaliable' },
+    { value: 'active', label: 'Activo' },
+    { value: 'inactive', label: 'Inactivo' }
+  ];
 
   constructor(
     private route: ActivatedRoute,
@@ -36,8 +42,8 @@ export class MaterialDetailsComponent implements OnInit {
     this.obtenerDepartamento();
     this.obtenerSucursales();
     this.getMaterialDetails();
-    this.initForm();
     this.getCategoriaID();
+    this.obtenerAtributos();
   }
 
   getCategoriaID(){
@@ -45,14 +51,32 @@ export class MaterialDetailsComponent implements OnInit {
   }
 
   initForm() {
-    this.formularioMaterial = this.fb.group({
-      nombre: ['', Validators.required],
-      fechaAlta: ['', Validators.required],
-      fechaBaja: [''],
-      valor: ['', Validators.required],
-      sucursal: ['', Validators.required],
-      estado: ['', Validators.required]
+    const formControls: { [key: string]: any } = {
+        nombre: [this.materialDetails.material.name, Validators.required],
+        valor: [this.materialDetails.material.attribute[0].pivot.value, Validators.required],
+        sucursal: [this.materialDetails.material.branch_office_id, Validators.required],
+        estado: [this.materialDetails.material.state, Validators.required],
+        lowDate: [' ']
+    };
+
+    this.materialDetails.material.attribute.forEach((attribute: any, index: number) => {
+        formControls['atributo' + index] = [attribute.pivot.value, Validators.required];
     });
+
+    this.formularioMaterial = this.fb.group(formControls);
+}
+  
+
+  obtenerAtributos() {
+    this.materialService.listAtributos().subscribe(
+      (response: any[]) => {
+        this.atributos = response;
+        
+      },
+      error => {
+        console.error('Error al obtener atributos:', error);
+      }
+    );
   }
 
   toggleSidebar() {
@@ -66,12 +90,25 @@ export class MaterialDetailsComponent implements OnInit {
     });
   }
 
+  setFechaActual(checked: boolean) {
+    if (checked) {
+        // Obtiene la fecha actual y la formatea como yyyy-mm-dd
+        const today = new Date().toISOString().slice(0, 10);
+        // Establece la fecha actual como fecha de baja
+        this.formularioMaterial.patchValue({
+            lowDate: today
+        });
+    }
+}
+
   getMaterialDetails(): void {
     this.materialService.getMaterialDetails(this.materialId)
       .subscribe(
         (material: any) => {
           this.materialDetails = material;
+          //console.log(this.materialDetails.material.attribute[0])
           this.attributeNames = this.materialDetails.material.attribute.map((attribute: any) => attribute.name);
+          this.initForm();
         },
         (error: any) => {
           console.error('Error al obtener detalles del material:', error);
@@ -95,30 +132,51 @@ export class MaterialDetailsComponent implements OnInit {
 
   editarMaterial(): void {
     if (this.formularioMaterial.valid) {
-      const materialEditado = {
-        id: this.materialId,
-        nombre: this.formularioMaterial.value.nombre,
-        fechaAlta: this.formularioMaterial.value.fechaAlta,
-        fechaBaja: this.formularioMaterial.value.fechaBaja,
-        valor: this.formularioMaterial.value.valor,
-        sucursal: this.formularioMaterial.value.sucursal,
-        estado: this.formularioMaterial.value.estado
-      };
+      let bajaFecha = ' ';
+      if(this.materialDetails.material.low_date!==null){
+         bajaFecha = this.materialDetails.material.low_date
+      }else{
+         bajaFecha = this.formularioMaterial.value.lowDate
+      }
+        const materialEditado = {
+          material: {
+            name: this.formularioMaterial.value.nombre,
+            high_date: this.materialDetails.material.high_date,
+            low_date: bajaFecha,
+            branch_office_id: this.formularioMaterial.value.sucursal,
+            state: this.formularioMaterial.value.estado,
+            pivot: {} as { [key: string]: any } // Especificar el tipo de las claves como string
+          }
+            
+        };
 
-      this.materialService.editMaterial(this.materialId, materialEditado).subscribe(
-        (response: any) => {
-          console.log('Material editado correctamente', response);
-          this.cerrarModal();
-          this.getMaterialDetails();
-        },
-        (error: any) => {
-          console.error('Error al editar material:', error);
-        }
-      );
+
+        // Agregar los valores de los atributos al objeto pivot
+        this.materialDetails.material.attribute.forEach((attribute: any, index: number) => {
+         
+            materialEditado.material.pivot[index] = {
+                attribute_id: attribute.id,
+                category_id: this.materialDetails.material.category[0].id,
+                value: this.formularioMaterial.value[`atributo${index}`]
+            };
+        });
+
+        console.log(materialEditado);
+
+        this.materialService.editMaterial(this.materialId, materialEditado).subscribe(
+            (response: any) => {
+                console.log('Material editado correctamente', response);
+                this.cerrarModal();
+                this.getMaterialDetails();
+            },
+            (error: any) => {
+                console.error('Error al editar material:', error);
+            }
+        );
     } else {
-      console.error('Formulario inválido');
+        console.error('Formulario inválido');
     }
-  }
+}
 
   obtenerDepartamento() {
     this.materialService.listDepartments().subscribe(

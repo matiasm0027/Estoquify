@@ -59,5 +59,56 @@
                 </tbody>
             </table>
         </div>
-    </div>
+        <div *ngIf="mostrarModalEditar" class="fixed z-10 inset-0 overflow-y-auto">
+            <div class="flex items-center justify-center min-h-screen px-4">
+                <!-- Contenido del modal -->
+                <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full">
+                    <!-- Encabezado del modal -->
+                    <div class="px-4 py-2 bg-gray-200">
+                        <h3 class="text-lg font-bold">Editar Material</h3>
+                    </div>
+                    <!-- Cuerpo del modal (aquí va el formulario) -->
+                    <div class="p-4">
+                        <!-- Formulario de edición -->
+                        <form [formGroup]="formularioMaterial" (submit)="editarMaterial()">
+                            <div class="mb-4">
+                                <label for="nombre" class="block text-gray-700">Nombre</label>
+                                <input formControlName="nombre" type="text" id="nombre" name="nombre" class="form-input mt-1 block w-full"
+                                    placeholder="Ingrese el nombre" required>
+                            </div>
+                            <div class="mb-4" *ngFor="let attribute of materialDetails.material?.attribute; let i = index">
+                                <label [for]="'atributo' + i" class="block text-gray-700">Atributo {{ i + 1 }}: {{ attribute.name }}</label>
+                                <input formControlName="{{ 'atributo' + i }}" type="text" [id]="'atributo' + i" [name]="'atributo' + i" class="form-input mt-1 block w-full" [placeholder]="'Ingrese el valor del atributo ' + attribute.name" required>
+                            </div>
+                            <div class="mb-4">
+                                <input type="checkbox" id="fechaActual" name="fechaActual" (change)="setFechaActual(true)">
+                                <label for="fechaActual" class="block text-gray-700">Establecer fecha de baja como hoy, IMPORTANTE cambiar el estado si se da de baja</label>
+                            </div>
+                            <div class="mb-4">
+                                <label for="sucursal" class="block text-gray-700">Sucursal</label>
+                                <!-- Lista de sucursales -->
+                                <select formControlName="sucursal" id="sucursal" name="sucursal" class="form-select mt-1 block w-full">
+                                    <option *ngFor="let sucursal of sucursales" [value]="sucursal.id" [selected]="sucursal.id === materialDetails.material.branch_office_id">{{ sucursal.name }}</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label for="estado" class="block text-gray-700">Estado</label>
+                                <!-- Lista de estados -->
+                                <select formControlName="estado" id="estado" name="estado" class="form-select mt-1 block w-full">
+                                    <option *ngFor="let estado of estados" [value]="estado.value" [selected]="estado.label === materialDetails.material.state" >{{ estado.label }}</option>
+                                </select>
+                            </div>
+                            <!-- Botones -->
+                            <div class="flex justify-end">
+                                <button type="submit"
+                                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar
+                                    Cambios</button>
+                                <button (click)="cerrarModal()"
+                                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 </div>

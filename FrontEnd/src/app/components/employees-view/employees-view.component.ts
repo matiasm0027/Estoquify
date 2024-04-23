@@ -122,6 +122,7 @@ export class EmployeesViewComponent implements OnInit {
     this.peticionesService.listEmployees().subscribe(
       (response: any[]) => {
         this.employees = response;
+        console.log(this.employees)
         this.aplicarFiltro(); // Aplicar filtro cada vez que se obtienen nuevos datos
       },
       error => {
