@@ -21,6 +21,7 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
 import { CategoryDetailsComponent } from './components/category-details/category-details.component';
 import { MaterialDetailsComponent } from './components/material-details/material-details.component';
 import { ReportsComponent } from './components/reports/reports.component';
+import { ReportesViewComponent } from './components/reportes-view/reportes-view.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { ReportsComponent } from './components/reports/reports.component';
     ForgotPasswordComponent,
     ResetPasswordComponent,
     MaterialDetailsComponent,
-    ReportsComponent
+    ReportsComponent,
+    ReportesViewComponent
     
   ],
   imports: [

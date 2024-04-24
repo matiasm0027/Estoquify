@@ -116,7 +116,7 @@
                             <div class="mb-4">
                                 <input type="checkbox" id="fechaActual" name="fechaActual" (change)="setFechaActual(true)">
                                 <label for="fechaActual" class="block text-gray-700">
-                                    Establecer fecha de baja como hoy,<br><span class="text-red-500">IMPORTANTE</span> una vez dado de baja no se podrá dar de alta
+                                    Establecer fecha de baja como hoy <br><span class="text-red-500">IMPORTANTE</span> una vez dado de baja no se podrá dar de alta
                                   </label>
                             </div>
                             <div class="mb-4">
@@ -132,6 +132,9 @@
                                 <select formControlName="estado" id="estado" name="estado" class="form-select mt-1 block w-full">
                                     <option *ngFor="let estado of estados" [value]="estado.value" [selected]="estado.value === materialDetails.material.state" >{{ estado.label }}</option>
                                 </select>
+                                <label for="fechaActual" class="block text-gray-700">
+                                    Recuerda canviar el estado si asignas fecha de baja
+                                  </label>
                             </div>
                             <!-- Botones -->
                             <div class="flex justify-end">
