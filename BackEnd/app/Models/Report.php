@@ -11,7 +11,7 @@ class Report extends Model
 
     protected $table = 'reports';
 
-    protected $fillable = ['date', 'petition', 'state', 'priority', 'employee_id'];
+    protected $fillable = ['date', 'petition', 'state', 'priority', 'type', 'employee_id'];
 
     public function employee()
     {
@@ -20,7 +20,7 @@ class Report extends Model
 
     public function category()
     {
-        return $this->belongsToMany(Category::class, CategoryReport::class)
-                    ->withPivot('category_id');;
+        return $this->belongsToMany(Category::class, 'category_reports', 'report_id', 'category_id')
+                    ->withTimestamps(); // Si la tabla pivot tiene campos de marca de tiempo, agrega esto
     }
 }

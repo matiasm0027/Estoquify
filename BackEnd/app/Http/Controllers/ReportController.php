@@ -4,32 +4,53 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Report;
+use Illuminate\Support\Facades\Validator;
+use App\Models\Category;
+use App\Models\CategoryReport;
+use Illuminate\Support\Facades\Auth;
 
 
 class ReportController extends Controller{
 
-    private $reports = [];
-
-
-    public function sendReports($reports){
+    public function sendReports(Request $request){
         
-        //Son los requisitos
-        $request->validate([
+         // Define las reglas de validación
+         $rules = [
             'petition' => 'required|string',
             'priority' => 'required|string',
             'type' => 'required|string',
-        ]); 
+        ];
+
+        // Si el tipo de reporte es "Solicitud Material", requerir la presencia de categorías
+        if ($request->input('type') === 'Solicitud Material') {
+            $rules['category'] = 'required|array';
+        }
+
+        // Validar la solicitud
+        $validator = Validator::make($request->all(), $rules);
+
+        // Comprobar si hay errores de validación
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
         //Estos son los datos que recogera de la bbdd para generar el reporte
-
-        $report = new Report([
-            'id' => Str::uuid(),
-            'date' => now(),
+        $reportData = [
+            'date' => $request->date,
             'petition' => $request->petition,
             'priority' => $request->priority,
             'state' => 'pending',
-            'employee_id' => $employeeManagerId->id,
-        ]);
+            'type' => $request->type,
+            'employee_id' => $request->employee_id,
+        ];
+
+        //Si el reporte es una alta no adjuntara las categorias, si es una solicitud 
+        if ($request->type === 'Empleado Alta') {
+            $report = new Report($reportData);
+        } else {
+            $report = new Report($reportData);
+            $report->category()->attach($request->category);
+        }
 
         //Guardamos el reporte en la bbdd
         $report->save();
@@ -40,13 +61,13 @@ class ReportController extends Controller{
 
 
 
-    //Generamos función para mostrar los reportes
-    public function listReports(){
-        $report = Report::with('employee')
+    public function listReports()
+    {
+        $reports = Report::all();
+         // Obtener todos los reportes con los datos del empleado asociado
+        $reports = Report::with('employee')
         ->get()
         ->map(function ($report) {
-            $estadoIncidencia = $report->state;
-            $prioridad = $report->priority;
             return [
                 'id' => $report->id,
                 'date' => $report->date,
@@ -55,8 +76,6 @@ class ReportController extends Controller{
                 'priority' => $report->priority,
                 'type' => $report->type,
                 'employee_name' => $report->employee->name . ' ' . $report->employee->last_name,
-                'assigned_state' => asignarEstado($estadoIncidencia),
-                'assigned_priority' => asignarPrioridad($prioridad),
             ];
         });
         return response()->json($reports);
