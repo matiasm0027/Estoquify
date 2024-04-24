@@ -46,6 +46,7 @@ export class HomeComponent implements OnInit {
           solicitud: reporte.petition,
           prioridad: reporte.priority,
           estado: reporte.state,
+          type: reporte.type,
           empleado: reporte.employee_id,
           nameempleado: reporte.employee_name
           
