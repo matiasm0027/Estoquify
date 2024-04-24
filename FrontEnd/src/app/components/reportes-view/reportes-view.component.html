@@ -10,7 +10,7 @@
             <div class="mb-4">
                 <label class="block mb-2 font-bold">Tipo de Reporte:</label>
                 <div class="flex items-center">
-                    <input type="checkbox" class="mr-2" id="altaEmpleado" [(ngModel)]="altaEmpleado"
+                    <input type="checkbox" class="mr-2 ml-4" id="altaEmpleado" [(ngModel)]="altaEmpleado"
                         (change)="toggleCheckbox('altaEmpleado')">
                     <label for="altaEmpleado" class="mr-4">Alta Empleado</label>
                     <input type="checkbox" class="mr-2" id="solicitudMaterial" [(ngModel)]="solicitudMaterial"
@@ -24,7 +24,7 @@
                 <label class="block mb-2 font-bold">Categorías:</label>
                 <div class="flex flex-wrap">
                     <div *ngFor="let categoria of categories" class="mr-4 mb-2">
-                        <input type="checkbox" [id]="categoria.name" [(ngModel)]="categoriasSeleccionadas[categoria.name]">
+                        <input type="checkbox" class="ml-4" [id]="categoria.name" [(ngModel)]="categoriasSeleccionadas[categoria.name]">
                         <label [for]="categoria.name" class="ml-2">{{ categoria.name }}</label> <!-- Agrega margen a la izquierda -->
                     </div>
                 </div>
@@ -34,7 +34,7 @@
             <div class="mb-4">
                 <label class="block mb-2 font-bold">Prioridad del Reporte:</label>
                 <div class="flex items-center">
-                    <input type="checkbox" class="mr-2" id="prioridadLow" [(ngModel)]="prioridadLow" (change)="togglePriority('prioridadLow')">
+                    <input type="checkbox" class="mr-2 ml-4" id="prioridadLow" [(ngModel)]="prioridadLow" (change)="togglePriority('prioridadLow')">
                     <label for="prioridadLow" class="mr-4" [class.text-green-500]="prioridadLow">Low</label>
                     <input type="checkbox" class="mr-2" id="prioridadMedium" [(ngModel)]="prioridadMedium" (change)="togglePriority('prioridadMedium')">
                     <label for="prioridadMedium" class="mr-4" [class.text-yellow-500]="prioridadMedium">Medium</label>
@@ -45,15 +45,14 @@
 
             <!-- Campo de Texto -->
             <div class="mb-4">
-                <label class="block mb-2 font-bold">{{ altaEmpleado ? 'Datos del Empleado' : 'Datos del Reporte'
-                    }}:</label>
-                <textarea class="w-full h-32 px-3 py-2 border rounded"
+                <label class="block mb-2 font-bold">{{ altaEmpleado ? 'Datos del Empleado' : 'Datos del Reporte' }}:</label>
+                <textarea class="w-full h-32 px-3 py-2 border rounded w-1/3 ml-4"
                     placeholder="Ingrese los detalles aquí"  [(ngModel)]="petition"></textarea>
             </div>
 
             <!-- Botón Enviar -->
             <div>
-                <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Enviar</button>
+                <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" (click)="agregarReporte()">Enviar</button>
             </div>
         </div>
     </div>

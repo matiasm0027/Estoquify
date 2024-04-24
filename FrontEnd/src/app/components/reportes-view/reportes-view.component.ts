@@ -28,6 +28,7 @@ export class ReportesViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.obtenerNombreCategoria();
+    this.getLoggedUser();
   }
 
   toggleSidebar() {
@@ -80,21 +81,40 @@ getLoggedUser(): void {
 }
 
 agregarReporte() {
-  const date = new Date();
+  const date = new Date().toISOString().slice(0, 10);
   const type = this.altaEmpleado ? 'Alta Empleado' : 'Solicitud Material'; // Determina el tipo según la selección del usuario
-  console.log(type)
   try {
-      const reporte = {
-          date: date,
-          type: type,
-          petition: this.petition,
-          state: 'pending',
-          priority: this.getPriority(),
-          employee_id: this.employeeId,
-          category: this.getCategoriasSeleccionadas()
-      };
+      let reporte;
+      if (type === 'Alta Empleado') {
+          reporte = {
+              date: date,
+              type: type,
+              petition: this.petition,
+              state: 'pending',
+              priority: this.getPriority(),
+              employee_id: this.employeeId
+          };
+      } else {
+          reporte = {
+              date: date,
+              type: type,
+              petition: this.petition,
+              state: 'pending',
+              priority: this.getPriority(),
+              employee_id: this.employeeId,
+              category: this.getCategoriasSeleccionadas()
+          };
+      }
       console.log("Reporte a enviar:", reporte);
-      // Aquí puedes enviar el reporte a través de tu servicio API
+      this.apiRequestService.agregarReporte(reporte).subscribe(
+        (response: any) => {
+          console.log('Reporte agregado:', response);
+        },
+        (error: any) => {
+          console.error('Error al agregar el reporte:', error);
+        }
+      );
+    
   } catch (error) {
       console.error("Error al agregar el reporte:", error);
       // Maneja el error de acuerdo a tus necesidades, por ejemplo, mostrar un mensaje al usuario

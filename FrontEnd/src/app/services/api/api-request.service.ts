@@ -134,4 +134,8 @@ export class ApiRequestService {
     const requestBody = { employee_id: employee_id };
     return this.http.post<any>(`${this.apiUrl}/auth/asignarMaterial/${materialId}`, requestBody);
   }
+
+  agregarReporte(reporte: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/agregarReporte`, reporte);
+  }
 }
