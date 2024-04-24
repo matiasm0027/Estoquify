@@ -27,6 +27,7 @@ export class MaterialDetailsComponent implements OnInit {
     { value: 'inactive', label: 'Inactivo' }
   ];
   asignado: any; 
+  successMessage!: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -266,6 +267,8 @@ export class MaterialDetailsComponent implements OnInit {
       (response) => {
         // Actualiza la vista después de desasignar el material
         this.obtenerEmpleadoAsignado(materialId);
+        this.successMessage = response.message;
+        this.clearMessagesAfterDelay();
       },
       (error) => {
         console.error('Error al desasignar el material:', error);
@@ -281,10 +284,19 @@ export class MaterialDetailsComponent implements OnInit {
       (response) => {
         // Actualiza la vista después de asignar el material
         this.obtenerEmpleadoAsignado(materialId);
+        this.successMessage = response.message;
+        this.clearMessagesAfterDelay();
       },
       (error) => {
         console.error('Error al asignar el material:', error);
       }
     );
+  }
+
+  clearMessagesAfterDelay(): void {
+    setTimeout(() => {
+      this.successMessage = '';
+      //this.errorMessage = '';
+    }, 2000); 
   }
 }

@@ -64,34 +64,37 @@
             <div *ngIf="asignado.assigned_employees && asignado.assigned_employees.length < 2">
                 <!-- Mostrar información del empleado asignado -->
                 <div class="bg-white p-4 rounded shadow">
-                    <p><strong>Empleado Asignado:</strong> {{ asignado.assigned_employees[0].name }} {{ asignado.assigned_employees[0].last_name }}</p>
+                    <p><strong>Empleado Asignado:</strong> {{ asignado.assigned_employees[0].name }} {{
+                        asignado.assigned_employees[0].last_name }}</p>
                     <!-- Botón para desasignar el material -->
                     <button (click)="desasignarMaterial(asignado.assigned_employees[0].employee_id)"
-        class="bg-white hover:bg-red-200 text-red-500 py-1 px-3 rounded border mt-2">
-    Desasignar
-</button>
+                        class="bg-white hover:bg-red-200 text-red-500 py-1 px-3 rounded border mt-2">
+                        Desasignar
+                    </button>
                 </div>
+                <div *ngIf="successMessage" class="mensaje_exitoso fade-in-out mt-1 mb-3">{{ successMessage }}</div>
             </div>
-        
+            
             <div *ngIf="asignado.assigned_employees && asignado.assigned_employees.length > 2">
                 <!-- Mostrar mensaje si no hay empleados asignados -->
                 <p>No hay empleados asignados a este material.</p>
-
+                <div *ngIf="successMessage" class="mensaje_exitoso fade-in-out mt-3 mb-3">{{ successMessage }}</div>
                 <h2 class="text-2xl font-bold my-4">Empleados Disponibles para Asignar</h2>
-            <div class="grid grid-cols-3 gap-4">
-                <ng-container *ngFor="let employee of asignado.assigned_employees">
-                    <div class="bg-white p-4 rounded shadow">
+                <div class="grid grid-cols-3 gap-4">
+                    <ng-container *ngFor="let employee of asignado.assigned_employees">
+                        <div class="bg-white p-4 rounded shadow">
 
-                        <!-- Botón para asignar este empleado -->
-                        <button (click)="asignarMaterial(employee.employee_id)">{{ employee.name }} {{ employee.last_name }}</button>
-                    </div>
-                </ng-container>
-            </div>
+                            <!-- Botón para asignar este empleado -->
+                            <button (click)="asignarMaterial(employee.employee_id)">{{ employee.name }} {{
+                                employee.last_name }}</button>
+                        </div>
+                    </ng-container>
+                </div>
             </div>
         </div>
-        
-        
-        
+
+
+
         <div *ngIf="mostrarModalEditar" class="fixed z-10 inset-0 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen px-4">
                 <!-- Contenido del modal -->
@@ -106,35 +109,47 @@
                         <form [formGroup]="formularioMaterial" (submit)="editarMaterial()">
                             <div class="mb-4">
                                 <label for="nombre" class="block text-gray-700">Nombre</label>
-                                <input formControlName="nombre" type="text" id="nombre" name="nombre" class="form-input mt-1 block w-full"
-                                    placeholder="Ingrese el nombre" required>
+                                <input formControlName="nombre" type="text" id="nombre" name="nombre"
+                                    class="form-input mt-1 block w-full" placeholder="Ingrese el nombre" required>
                             </div>
-                            <div class="mb-4" *ngFor="let attribute of materialDetails.material?.attribute; let i = index">
-                                <label [for]="'atributo' + i" class="block text-gray-700">Atributo {{ i + 1 }}: {{ attribute.name }}</label>
-                                <input formControlName="{{ 'atributo' + i }}" type="text" [id]="'atributo' + i" [name]="'atributo' + i" class="form-input mt-1 block w-full" [placeholder]="'Ingrese el valor del atributo ' + attribute.name" required>
+                            <div class="mb-4"
+                                *ngFor="let attribute of materialDetails.material?.attribute; let i = index">
+                                <label [for]="'atributo' + i" class="block text-gray-700">Atributo {{ i + 1 }}: {{
+                                    attribute.name }}</label>
+                                <input formControlName="{{ 'atributo' + i }}" type="text" [id]="'atributo' + i"
+                                    [name]="'atributo' + i" class="form-input mt-1 block w-full"
+                                    [placeholder]="'Ingrese el valor del atributo ' + attribute.name" required>
                             </div>
                             <div class="mb-4">
-                                <input type="checkbox" id="fechaActual" name="fechaActual" (change)="setFechaActual(true)">
+                                <input type="checkbox" id="fechaActual" name="fechaActual"
+                                    (change)="setFechaActual(true)">
                                 <label for="fechaActual" class="block text-gray-700">
-                                    Establecer fecha de baja como hoy <br><span class="text-red-500">IMPORTANTE</span> una vez dado de baja no se podrá dar de alta
-                                  </label>
+                                    Establecer fecha de baja como hoy <br><span class="text-red-500">IMPORTANTE</span>
+                                    una vez dado de baja no se podrá dar de alta
+                                </label>
                             </div>
                             <div class="mb-4">
                                 <label for="sucursal" class="block text-gray-700">Sucursal</label>
                                 <!-- Lista de sucursales -->
-                                <select formControlName="sucursal" id="sucursal" name="sucursal" class="form-select mt-1 block w-full">
-                                    <option *ngFor="let sucursal of sucursales" [value]="sucursal.id" [selected]="sucursal.id === materialDetails.material.branch_office_id">{{ sucursal.name }}</option>
+                                <select formControlName="sucursal" id="sucursal" name="sucursal"
+                                    class="form-select mt-1 block w-full">
+                                    <option *ngFor="let sucursal of sucursales" [value]="sucursal.id"
+                                        [selected]="sucursal.id === materialDetails.material.branch_office_id">{{
+                                        sucursal.name }}</option>
                                 </select>
                             </div>
                             <div class="mb-4">
                                 <label for="estado" class="block text-gray-700">Estado</label>
                                 <!-- Lista de estados -->
-                                <select formControlName="estado" id="estado" name="estado" class="form-select mt-1 block w-full">
-                                    <option *ngFor="let estado of estados" [value]="estado.value" [selected]="estado.value === materialDetails.material.state" >{{ estado.label }}</option>
+                                <select formControlName="estado" id="estado" name="estado"
+                                    class="form-select mt-1 block w-full">
+                                    <option *ngFor="let estado of estados" [value]="estado.value"
+                                        [selected]="estado.value === materialDetails.material.state">{{ estado.label }}
+                                    </option>
                                 </select>
                                 <label for="fechaActual" class="block text-gray-700">
                                     Recuerda canviar el estado si asignas fecha de baja
-                                  </label>
+                                </label>
                             </div>
                             <!-- Botones -->
                             <div class="flex justify-end">
@@ -149,4 +164,6 @@
                 </div>
             </div>
         </div>
-</div>
+
+
+    </div>
