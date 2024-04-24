@@ -109,6 +109,7 @@ agregarReporte() {
       this.apiRequestService.agregarReporte(reporte).subscribe(
         (response: any) => {
           console.log('Reporte agregado:', response);
+          this.resetForm();
         },
         (error: any) => {
           console.error('Error al agregar el reporte:', error);
@@ -141,5 +142,17 @@ getCategoriasSeleccionadas(): string[] {
       }
   }
   return categoriasSeleccionadas;
+}
+
+resetForm() {
+  // Reiniciar los valores de los campos del formulario
+  this.petition = ''; 
+  this.altaEmpleado = false; 
+  this.solicitudMaterial = false; 
+  this.prioridadLow = false; 
+  this.prioridadMedium = false; 
+  this.prioridadHigh = false; 
+  this.categoriasSeleccionadas = {}; 
+
 }
 }
