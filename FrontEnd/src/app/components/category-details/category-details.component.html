@@ -92,36 +92,44 @@
                                     <input type="text" id="nombre" name="nombre" class="form-input mt-1 block w-full"
                                         placeholder="Ingrese el nombre del material" formControlName="nombre">
                                 </div>
-                                <div class="mb-4">
+                                <div style="display: flex; align-items: center;"  class="mb-5">
+                                    <div style="flex: 1;margin-right: 14px;">
                                     <label for="atributo" class="block text-gray-700">Atributo</label>
-                                    <select formControlName="atributo" id="atributo" name="atributo"
-                                        class="form-select mt-1 block w-full" required>
-                                        <option *ngFor="let atributo of atributos" [value]="atributo.id">{{
-                                            atributo.name }}</option>
-                                    </select>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="valor" class="block text-gray-700">Valor</label>
-                                    <input type="text" id="valor" name="valor" class="form-input mt-1 block w-full"
-                                        placeholder="Ingrese el valor" formControlName="value">
+                                        <select formControlName="atributo" id="atributo" name="atributo"
+                                            class="form-select mt-1 block w-full" required>
+                                            <option *ngFor="let atributo of atributos" [value]="atributo.id">{{
+                                                atributo.name }}</option>
+                                        </select>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <label for="valor" class="block text-gray-700">Valor</label>
+                                        <input type="text" id="valor" name="valor" class="form-input mt-1 block w-full"
+                                            placeholder="Ingrese el valor" formControlName="value">
+                                    </div>
                                 </div>
                                 <!-- Campos adicionales para atributos y valores -->
-                                <div *ngFor="let i of atributosAdicionales; let index = index" class="mb-4">
-                                    <label for="atributo{{index + 2}}" class="block text-gray-700">Atributo {{index +
-                                        2}}</label>
-                                    <select formControlName="atributo{{index + 2}}" id="atributo{{index + 2}}"
-                                        name="atributo{{index + 2}}" class="form-select mt-1 block w-full" required>
-                                        <option *ngFor="let atributo of atributos" [value]="atributo.id">{{
-                                            atributo.name }}</option>
-                                    </select>
-                                </div>
-                                <div *ngFor="let i of atributosAdicionales; let index = index" class="mb-4">
-                                    <label for="valor{{index + 2}}" class="block text-gray-700">Valor {{index +
-                                        2}}</label>
-                                    <input type="text" id="valor{{index + 2}}" name="valor{{index + 2}}"
-                                        class="form-input mt-1 block w-full" placeholder="Ingrese el valor"
-                                        formControlName="valor{{index + 2}}">
-                                        <button type="button" (click)="eliminarAtributo(index)" class="text-red-500 hover:text-red-700 ml-2">Eliminar</button>
+                                <div *ngFor="let i of atributosAdicionales; let index = index" class="mb-5">
+                                    <div style="display: flex; align-items: center;">
+                                        <!-- Campo de Atributo -->
+                                        <div style="flex: 1;margin-right: 14px;">
+                                            <label for="atributo{{index + 2}}" class="block text-gray-700">Atributo {{index + 2}}</label>
+                                            <select formControlName="atributo{{index + 2}}" id="atributo{{index + 2}}" name="atributo{{index + 2}}"
+                                                class="form-select mt-1 block w-full" required>
+                                                <option *ngFor="let atributo of atributos" [value]="atributo.id">{{ atributo.name }}</option>
+                                            </select>
+                                        </div>
+                                        <!-- Campo de Valor -->
+                                        <div style="flex: 1;">
+                                            <label for="valor{{index + 2}}" class="block text-gray-700">Valor {{index + 2}}</label>
+                                            <div class="flex items-center"> <!-- Contenedor para alinear los elementos -->
+                                                <input type="text" id="valor{{index + 2}}" name="valor{{index + 2}}"
+                                                    class="form-input mt-1 block w-full mr-2" placeholder="Ingrese el valor"
+                                                    formControlName="valor{{index + 2}}">
+                                                <button type="button" (click)="eliminarAtributo(index)"
+                                                    class="text-red-500 hover:text-red-700">Eliminar</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Botón para agregar más atributos y valores -->
@@ -130,6 +138,7 @@
                                         class="text-blue-500 hover:text-blue-700 focus:outline-none focus:underline">+
                                         Agregar Atributo</button>
                                 </div>
+
                                 <div class="mb-4">
                                     <label for="sucursal" class="block text-gray-700">Sucursal</label>
                                     <select formControlName="sucursal" id="sucursal" name="sucursal"
