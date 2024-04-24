@@ -44,8 +44,8 @@ Route::group([
 
     Route::get('employeeInfoAssignments/{id}', [EmployeeMaterialController::class, 'employeeInfoAssignments']);
     Route::get('materialAssignedEmployees/{id}', [EmployeeMaterialController::class, 'materialAssignedEmployees']);
-    //Route::get('employeesWithoutCategoryMaterial', [EmployeeMaterialController::class, 'employeesWithoutCategoryMaterial']);
-    Route::get('employeesWithoutCategoryMaterial', [EmployeeMaterialController::class, 'employeesWithoutCategoryMaterial']);
+    Route::post('asignarMaterial/{materialId}', [EmployeeMaterialController::class, 'asignarMaterial']);
+    Route::post('desasignarMaterial/{materialId}', [EmployeeMaterialController::class, 'desasignarMaterial']);
 
     Route::get('listDepartments', [DepartmentController::class, 'listDepartments']);
     Route::get('listBranchOffices', [BranchOfficeController::class, 'listBranchOffices']);

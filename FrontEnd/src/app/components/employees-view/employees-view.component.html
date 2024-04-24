@@ -42,7 +42,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let employee of empleadosFiltrados  | paginate: { itemsPerPage: 10, currentPage: page }">
+                    <tr *ngFor="let employee of empleadosFiltrados  | paginate: { itemsPerPage: 8, currentPage: page }">
                         <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
                             <a [routerLink]="['/employees_details', employee.id]">{{ employee.name }}</a>
                         </td>

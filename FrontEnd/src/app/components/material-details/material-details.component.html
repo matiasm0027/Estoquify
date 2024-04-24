@@ -59,6 +59,39 @@
                 </tbody>
             </table>
         </div>
+        <div class="bg-white p-6 rounded shadow" *ngIf="asignado">
+            <h2 class="text-2xl font-bold my-4">Empleado Asignado</h2>
+            <div *ngIf="asignado.assigned_employees && asignado.assigned_employees.length < 2">
+                <!-- Mostrar información del empleado asignado -->
+                <div class="bg-white p-4 rounded shadow">
+                    <p><strong>Empleado Asignado:</strong> {{ asignado.assigned_employees[0].name }} {{ asignado.assigned_employees[0].last_name }}</p>
+                    <!-- Botón para desasignar el material -->
+                    <button (click)="desasignarMaterial(asignado.assigned_employees[0].employee_id)"
+        class="bg-white hover:bg-red-200 text-red-500 py-1 px-3 rounded border mt-2">
+    Desasignar
+</button>
+                </div>
+            </div>
+        
+            <div *ngIf="asignado.assigned_employees && asignado.assigned_employees.length > 2">
+                <!-- Mostrar mensaje si no hay empleados asignados -->
+                <p>No hay empleados asignados a este material.</p>
+
+                <h2 class="text-2xl font-bold my-4">Empleados Disponibles para Asignar</h2>
+            <div class="grid grid-cols-3 gap-4">
+                <ng-container *ngFor="let employee of asignado.assigned_employees">
+                    <div class="bg-white p-4 rounded shadow">
+
+                        <!-- Botón para asignar este empleado -->
+                        <button (click)="asignarMaterial(employee.employee_id)">{{ employee.name }} {{ employee.last_name }}</button>
+                    </div>
+                </ng-container>
+            </div>
+            </div>
+        </div>
+        
+        
+        
         <div *ngIf="mostrarModalEditar" class="fixed z-10 inset-0 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen px-4">
                 <!-- Contenido del modal -->

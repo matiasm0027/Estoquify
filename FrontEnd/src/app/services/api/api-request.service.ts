@@ -102,7 +102,7 @@ export class ApiRequestService {
   }
 
   MaterialDetails(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/auth/employeeInfoAssignments/$`);
+    return this.http.get<any>(`${this.apiUrl}/auth/employeeInfoAssignments`);
   }
 
   agregarMaterial(nuevoMaterial: any): Observable<any> {
@@ -121,7 +121,17 @@ export class ApiRequestService {
     return this.http.get<any>(`${this.apiUrl}/auth/materialDetails/${materialId}`);
   }
 
-  editEmployee(employeeData: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/auth/addEmployee`, employeeData);
+  materialAsignado(materialId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/materialAssignedEmployees/${materialId}`);
+  }
+
+  desasignarMaterial(materialId: number, employee_id: number): Observable<any> {
+    const requestBody = { employee_id: employee_id };
+    return this.http.post<any>(`${this.apiUrl}/auth/desasignarMaterial/${materialId}`, requestBody);
+  }
+
+  asignarMaterial(materialId: number, employee_id: number): Observable<any> {
+    const requestBody = { employee_id: employee_id };
+    return this.http.post<any>(`${this.apiUrl}/auth/asignarMaterial/${materialId}`, requestBody);
   }
 }

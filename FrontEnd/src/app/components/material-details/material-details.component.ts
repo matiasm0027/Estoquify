@@ -26,6 +26,7 @@ export class MaterialDetailsComponent implements OnInit {
     { value: 'active', label: 'Activo' },
     { value: 'inactive', label: 'Inactivo' }
   ];
+  asignado: any; 
 
   constructor(
     private route: ActivatedRoute,
@@ -44,6 +45,7 @@ export class MaterialDetailsComponent implements OnInit {
     this.getMaterialDetails();
     this.getCategoriaID();
     this.obtenerAtributos();
+    this.obtenerEmpleadoAsignado(this.materialId);
   }
 
   getCategoriaID(){
@@ -242,5 +244,47 @@ export class MaterialDetailsComponent implements OnInit {
     } else {
         return 'black'; // color por defecto
     }
-}
+  }
+
+  obtenerEmpleadoAsignado(id: number) {
+    this.materialService.materialAsignado(id).subscribe(
+      (response) => {
+        this.asignado = response;
+        console.log(this.asignado); // Verifica la estructura de la respuesta en la consola
+      },
+      error => {
+        console.error('Error al obtener la asignación:', error);
+      }
+    );
+  }
+
+  desasignarMaterial(employeeId: number) {
+    // Lógica para desasignar el material del empleado actualmente asignado
+    const materialId = this.asignado.material_id;
+    // Llama al servicio para desasignar el material
+    this.materialService.desasignarMaterial(materialId, employeeId).subscribe(
+      (response) => {
+        // Actualiza la vista después de desasignar el material
+        this.obtenerEmpleadoAsignado(materialId);
+      },
+      (error) => {
+        console.error('Error al desasignar el material:', error);
+      }
+    );
+  }
+
+  asignarMaterial(employeeId: number) {
+    // Lógica para asignar el material al empleado con el ID proporcionado
+    const materialId = this.asignado.material_id;
+    // Llama al servicio para asignar el material al empleado
+    this.materialService.asignarMaterial(materialId, employeeId).subscribe(
+      (response) => {
+        // Actualiza la vista después de asignar el material
+        this.obtenerEmpleadoAsignado(materialId);
+      },
+      (error) => {
+        console.error('Error al asignar el material:', error);
+      }
+    );
+  }
 }
