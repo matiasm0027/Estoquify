@@ -81,16 +81,24 @@ getLoggedUser(): void {
 
 agregarReporte() {
   const date = new Date();
-  const reporte = {
-      date: date,
-      petition: this.petition,
-      state: 'pending',
-      priority: this.getPriority(),
-      employee_id: this.employeeId,
-      category: this.getCategoriasSeleccionadas()
-  };
-  console.log("Reporte a enviar:", reporte);
-  // Aquí puedes enviar el reporte a través de tu servicio API
+  const type = this.altaEmpleado ? 'Alta Empleado' : 'Solicitud Material'; // Determina el tipo según la selección del usuario
+  console.log(type)
+  try {
+      const reporte = {
+          date: date,
+          type: type,
+          petition: this.petition,
+          state: 'pending',
+          priority: this.getPriority(),
+          employee_id: this.employeeId,
+          category: this.getCategoriasSeleccionadas()
+      };
+      console.log("Reporte a enviar:", reporte);
+      // Aquí puedes enviar el reporte a través de tu servicio API
+  } catch (error) {
+      console.error("Error al agregar el reporte:", error);
+      // Maneja el error de acuerdo a tus necesidades, por ejemplo, mostrar un mensaje al usuario
+  }
 }
 
 getPriority(): string {

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('petition');
             $table->string('state');
             $table->string('priority');
-            $table->strng('type');
+            $table->string('type');
             $table->foreignId('employee_id')->constrained('employees')->onDelete('cascade');
             $table->timestamps();
         });

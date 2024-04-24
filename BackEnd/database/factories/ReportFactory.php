@@ -19,6 +19,7 @@ class ReportFactory extends Factory
         $employeeManagerId = Employee::where('role_id', 2)->inRandomOrder()->first();
         $priorities = ['High', 'Medium', 'Low'];
         $states = ['pending', 'accepted', 'denied']; 
+        $type = ['Alta Empleado', 'Solicitud Material'];
 
         return [
             'date' => $this->faker->dateTimeBetween('-1 year', 'now'),
