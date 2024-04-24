@@ -48,7 +48,9 @@ export class HomeComponent implements OnInit {
           estado: reporte.state,
           empleado: reporte.employee_id,
           nameempleado: reporte.employee_name
+          
         }));
+        console.log(this.reportes);
       },
       error => {
         console.error('Error al obtener reportes:', error);

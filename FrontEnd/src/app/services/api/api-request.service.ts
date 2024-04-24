@@ -120,4 +120,8 @@ export class ApiRequestService {
   getMaterialDetails(materialId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/auth/materialDetails/${materialId}`);
   }
+
+  editEmployee(employeeData: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/addEmployee`, employeeData);
+  }
 }

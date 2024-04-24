@@ -24,6 +24,7 @@ class ReportFactory extends Factory
             'date' => $this->faker->dateTimeBetween('-1 year', 'now'),
             'petition' => $this->faker->sentence(),
             'priority' => $this->faker->randomElement($priorities),
+            'type' => $this->faker->randomElement($type),
             'state' => $this->faker->randomElement($states),
             'employee_id' => $employeeManagerId,
         ];
