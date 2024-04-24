@@ -53,6 +53,7 @@ class ReportController extends Controller{
                 'petition' => $report->petition,
                 'state' => $report->state,
                 'priority' => $report->priority,
+                'type' => $report->type,
                 'employee_name' => $report->employee->name . ' ' . $report->employee->last_name,
             ];
         });
