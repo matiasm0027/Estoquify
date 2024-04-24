@@ -44,7 +44,7 @@ class ReportController extends Controller{
     {
         $reports = Report::all();
          // Obtener todos los reportes con los datos del empleado asociado
-        $reports = Report::with('employee')
+        $reports = Report::with('employee', 'categories')
         ->get()
         ->map(function ($report) {
             return [
@@ -53,10 +53,10 @@ class ReportController extends Controller{
                 'petition' => $report->petition,
                 'state' => $report->state,
                 'priority' => $report->priority,
+                'category_id' => $report->categories->pluck('pivot.category_id')->toArray(),
                 'employee_name' => $report->employee->name . ' ' . $report->employee->last_name,
             ];
         });
-
         return response()->json($reports);
     }
 }
