@@ -47,6 +47,7 @@ export class CategoriesViewComponent implements OnInit{
   obtenerCantidadMaterial(){
     this.ApiRequestService.categoryMaterialInfo().subscribe(
       (response: any[]) => {
+        console.log(response);
         this.materials = response.map(material => ({
           id: material.category_id,
           name: material.category_name, // Cambiar a category_name
@@ -54,7 +55,9 @@ export class CategoriesViewComponent implements OnInit{
           activeMaterial: material.active_materials, // Cambiar a active_materials
           availableMaterial: material.available_materials, // Cambiar a available_materials
           inactiveMaterial: material.inactive_materials // Cambiar a inactive_materials
+          
         }));
+        
       }
     );
   }
