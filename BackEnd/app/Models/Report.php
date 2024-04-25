@@ -20,7 +20,7 @@ class Report extends Model
 
     public function category()
     {
-        return $this->belongsToMany(Category::class, 'category_reports', 'report_id', 'category_id')
+        return $this->belongsToMany(Category::class, 'category_report', 'report_id', 'category_id')
                     ->withTimestamps(); // Si la tabla pivot tiene campos de marca de tiempo, agrega esto
     }
 }
