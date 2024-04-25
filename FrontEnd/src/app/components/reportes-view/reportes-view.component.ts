@@ -19,6 +19,9 @@ export class ReportesViewComponent implements OnInit {
   prioridadHigh: boolean = false;
   employeeId!: number;
   petition: string = '';
+  employeeRole!: string;
+  reportes: any[] = [];
+  sucursales: any[] = [];
 
 
   constructor(
@@ -30,6 +33,8 @@ export class ReportesViewComponent implements OnInit {
   ngOnInit(): void {
     this.obtenerNombreCategoria();
     this.getLoggedUser();
+    this.obtenerSucursales();
+    this.obtenerReportes()
   }
 
   toggleSidebar() {
@@ -76,6 +81,14 @@ getLoggedUser(): void {
   this.apiRequestService.me().subscribe(
     (response: any) => {
       this.employeeId = response.id;
+      const roleId = response.role_id;
+     
+      
+      if (roleId === 1) {
+        this.employeeRole = 'admin';
+      } else if (roleId === 2){
+        this.employeeRole = 'usuario';
+      }
     },
     error => {
       console.error('Error when obtaining data from the logged in user:', error);
@@ -188,5 +201,43 @@ resetForm() {
   this.prioridadHigh = false; 
   this.categoriasSeleccionadas = {}; 
 
+}
+
+obtenerReportes() {
+  this.apiRequestService.listReportes().subscribe(
+    (response: any[]) => {
+      console.log(response)
+      this.reportes = response.filter(reporte => reporte.state === 'pending')
+      .map(reporte => ({
+        id: reporte.id,
+        solicitud: reporte.petition,
+        prioridad: reporte.priority,
+        estado: reporte.state,
+        type: reporte.type,
+        nameempleado: reporte.employee_name,        
+        sucursalid: reporte.employee_id_sucursal,  
+      }));
+      console.log(this.reportes);
+    },
+    error => {
+      console.error('Error al obtener reportes:', error);
+    }
+  );
+}
+
+obtenerNombreSucursal(sucursalId: number): string {
+  const sucursal = this.sucursales.find(sucursal => sucursal.id === sucursalId);
+  return sucursal ? sucursal.name : ''; // Devuelve el nombre de la sucursal si se encuentra, de lo contrario devuelve una cadena vacía
+}
+
+obtenerSucursales() {
+  this.apiRequestService.listBranchOffices().subscribe(
+    (response: any[]) => {
+      this.sucursales = response;
+    },
+    error => {
+      console.error('Error al obtener sucursales:', error);
+    }
+  );
 }
 }
