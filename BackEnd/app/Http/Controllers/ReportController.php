@@ -80,6 +80,7 @@ class ReportController extends Controller{
                 'priority' => $report->priority,
                 'type' => $report->type,
                 'employee_name' => $report->employee->name . ' ' . $report->employee->last_name,
+                'employee_id_sucursal' => $report->employee->branch_office_id ,
             ];
         });
         return response()->json($reports);
