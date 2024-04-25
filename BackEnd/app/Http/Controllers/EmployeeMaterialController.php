@@ -61,8 +61,9 @@ class EmployeeMaterialController extends Controller
             'material_id' => $material->id,
             'material_name' => $material->name,
             'category_name' => $material->category->isNotEmpty() ? $material->category->first()->name : null,
+            $category_id = $material->category->isNotEmpty() ? $material->category->first()->id : null,
             'assigned_employees' => $material->employee->isEmpty() ? 
-                $this->getAllEmployeesInBranch($material->branch_office_id) :
+                $this->getAllEmployeesInBranch($material->branch_office_id, $category_id) :
                 $material->employee->map(function ($employee) {
                     return [
                         'employee_id' => $employee->id,
@@ -78,21 +79,40 @@ class EmployeeMaterialController extends Controller
         return response()->json($assignedEmployees, 200);
     }
 
-    private function getAllEmployeesInBranch($branchOfficeId)
-    {
-        $allEmployees = Employee::where('branch_office_id', $branchOfficeId)->get();
-
-        return $allEmployees->map(function ($employee) {
-            return [
-                'employee_id' => $employee->id,
-                'name' => $employee->name,
-                'last_name' => $employee->last_name,
-                'email' => $employee->email,
-                'assignment_date' => null,
-                'return_date' => null,
-            ];
+    private function getAllEmployeesInBranch($branchOfficeId, $categoryId)
+{
+    // Obtener los IDs de empleados que tienen al menos un material asignado con la categoría deseada
+    $assignedEmployeeIds = Employee::whereDoesntHave('material', function ($query) use ($categoryId) {
+        $query->whereHas('category', function ($subquery) use ($categoryId) {
+            $subquery->where('category_id', $categoryId);
         });
-    }
+    })
+    ->pluck('id')
+    ->toArray();
+
+
+    // Obtener todos los empleados en la sucursal especificada
+    
+    $allEmployees = Employee::whereIn('id', $assignedEmployeeIds) // Filtrar por IDs de empleados
+    ->where('branch_office_id', $branchOfficeId) // Filtrar por ID de sucursal
+    ->get();
+
+    // Mapear los empleados filtrados a un formato adecuado para respuesta
+    $filteredEmployeesFormatted = $allEmployees->map(function ($employee) {
+        return [
+            'employee_id' => $employee->id,
+            'name' => $employee->name,
+            'last_name' => $employee->last_name,
+            'email' => $employee->email,
+            'assignment_date' => null,
+            'return_date' => null,
+        ];
+    });
+
+    return $filteredEmployeesFormatted;
+}
+
+
 
     public function asignarMaterial(Request $request, $materialId)
     {

@@ -86,7 +86,10 @@
 
                             <!-- Botón para asignar este empleado -->
                             <button (click)="asignarMaterial(employee.employee_id)">{{ employee.name }} {{
-                                employee.last_name }}</button>
+                                employee.last_name }}
+                               <span style="font-size: 16px; line-height: 1;" class="ml-2">&#9650;</span> <!-- Utiliza el código Unicode para una flecha hacia arriba -->
+                            </button>
+                                
                         </div>
                     </ng-container>
                 </div>
