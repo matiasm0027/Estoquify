@@ -19,17 +19,15 @@
                 </div>
             </div>
 
-            <!-- Categorías (aparecen si es Solicitud Material) -->
             <div *ngIf="solicitudMaterial" class="mb-4">
                 <label class="block mb-2 font-bold">Categorías:</label>
                 <div class="flex flex-wrap">
                     <div *ngFor="let categoria of categories" class="mr-4 mb-2">
-                        <input type="checkbox" class="ml-4" [id]="categoria.name" [(ngModel)]="categoriasSeleccionadas[categoria.name]">
-                        <label [for]="categoria.name" class="ml-2">{{ categoria.name }}</label> <!-- Agrega margen a la izquierda -->
+                        <input type="checkbox" class="ml-4" [id]="categoria.id" [value]="categoria.id" [(ngModel)]="categoriasSeleccionadas[categoria.id]" (ngModelChange)="onCategoriaChange()">
+                        <label [for]="categoria.id" class="ml-2">{{ categoria.name }}</label>
                     </div>
                 </div>
             </div>
-
             <!-- Prioridad del Reporte -->
             <div class="mb-4">
                 <label class="block mb-2 font-bold">Prioridad del Reporte:</label>
@@ -43,11 +41,11 @@
                 </div>
             </div>
 
-            <!-- Campo de Texto -->
-            <div class="mb-4">
-                <label class="block mb-2 font-bold">{{ altaEmpleado ? 'Datos del Empleado' : 'Datos del Reporte' }}:</label>
-                <textarea class="w-full h-32 px-3 py-2 border rounded w-1/3 ml-4"
-                    placeholder="Ingrese los detalles aquí"  [(ngModel)]="petition"></textarea>
+           <!-- Campo de Texto -->
+           <div class="mb-4">
+            <label class="block mb-2 font-bold">{{ altaEmpleado ? 'Datos del Empleado' : 'Datos del Reporte' }}:</label>
+            <textarea class="w-full h-48 px-3 py-2 border rounded w-1/2 ml-4"
+                placeholder="Ingrese los detalles aquí" [(ngModel)]="petition">{{ formatSelectedCategories() }}</textarea>
             </div>
 
             <!-- Botón Enviar -->

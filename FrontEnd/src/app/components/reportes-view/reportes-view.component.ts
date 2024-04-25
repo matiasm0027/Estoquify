@@ -20,6 +20,7 @@ export class ReportesViewComponent implements OnInit {
   employeeId!: number;
   petition: string = '';
 
+
   constructor(
     private apiRequestService: ApiRequestService,
     private fb: FormBuilder,
@@ -43,16 +44,18 @@ export class ReportesViewComponent implements OnInit {
           id: material.category_id,
           name: material.category_name, // Cambiar a category_name
         }));
-        console.log(this.categories)
       }
     );
   }
 
   toggleCheckbox(selectedCheckbox: string) {
+    this.petition = '';
     if (selectedCheckbox === 'altaEmpleado' && this.altaEmpleado) {
         this.solicitudMaterial = false; // Desselecciona Solicitud Material si se selecciona Alta Empleado
+        this.onAltaEmpleado();
     } else if (selectedCheckbox === 'solicitudMaterial' && this.solicitudMaterial) {
         this.altaEmpleado = false; // Desselecciona Alta Empleado si se selecciona Solicitud Material
+        this.onCategoriaChange()
     }
 }
 
@@ -102,10 +105,9 @@ agregarReporte() {
               state: 'pending',
               priority: this.getPriority(),
               employee_id: this.employeeId,
-              category: this.getCategoriasSeleccionadas()
+              category: this.getCategoriasSeleccionadasIds()
           };
       }
-      console.log("Reporte a enviar:", reporte);
       this.apiRequestService.agregarReporte(reporte).subscribe(
         (response: any) => {
           console.log('Reporte agregado:', response);
@@ -134,14 +136,46 @@ getPriority(): string {
   }
 }
 
-getCategoriasSeleccionadas(): string[] {
-  const categoriasSeleccionadas = [];
-  for (const categoria in this.categoriasSeleccionadas) {
-      if (this.categoriasSeleccionadas[categoria]) {
-          categoriasSeleccionadas.push(categoria);
+getCategoriasSeleccionadasIds(): number[] {
+  const categoriasSeleccionadasIds: number[] = [];
+  for (const categoriaId in this.categoriasSeleccionadas) {
+    if (this.categoriasSeleccionadas[categoriaId]) {
+      categoriasSeleccionadasIds.push(parseInt(categoriaId));
+    }
+  }
+  return categoriasSeleccionadasIds;
+}
+
+getCategoriasSeleccionadas(): { id: number, name: string }[] {
+  const categoriasSeleccionadas: { id: number, name: string }[] = [];
+  for (const categoriaId in this.categoriasSeleccionadas) {
+    if (this.categoriasSeleccionadas[categoriaId]) {
+      const categoria = this.categories.find(cat => cat.id === parseInt(categoriaId));
+      if (categoria) {
+        categoriasSeleccionadas.push({ id: parseInt(categoriaId), name: categoria.name });
       }
+    }
   }
   return categoriasSeleccionadas;
+}
+
+onAltaEmpleado() {
+  const datos = ['Nombre:', 'Apellido:', 'Email:', 'Teléfono Móvil:', 'Departamento:', 'Sucursal:', 'Rol:'];
+  this.petition = datos.join('\n');
+}
+
+onCategoriaChange() {
+  this.petition = this.formatSelectedCategories();
+}
+
+formatSelectedCategories() {
+  if (this.solicitudMaterial) {
+    const selectedCategories = this.getCategoriasSeleccionadas();
+    let formattedCategories = selectedCategories.map(c => c.name + ':'); // Agregar ":" después de cada nombre de categoría
+    return formattedCategories.join('\n'); // Unir las categorías con saltos de línea
+  } else {
+    return '';
+  }
 }
 
 resetForm() {

@@ -47,13 +47,17 @@ class ReportController extends Controller{
         //Si el reporte es una alta no adjuntara las categorias, si es una solicitud 
         if ($request->type === 'Empleado Alta') {
             $report = new Report($reportData);
+             //Guardamos el reporte en la bbdd
+            $report->save();
         } else {
             $report = new Report($reportData);
-            $report->category()->attach($request->category);
+            //Guardamos el reporte en la bbdd
+            $report->save();
+            $reportId = $report->id;
+            $report->category()->attach($request->category, ['report_id' => $reportId]);
         }
 
-        //Guardamos el reporte en la bbdd
-        $report->save();
+       
 
         //Mensaje de que se ha  generado correcatemente la incidencia
         return response()->json(['message' => 'Reporte generado correctamente'], 201);
