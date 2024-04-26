@@ -27,6 +27,8 @@ export class CategoryDetailsComponent implements OnInit {
   filtroSucursal: string = '';
   detallesMaterial: any = {};
   atributosAdicionales: any[] = [];
+  employeeId!: number;
+  employeeRole!: string;
 
 
   constructor(
@@ -43,6 +45,7 @@ export class CategoryDetailsComponent implements OnInit {
     this.obtenerSucursales();
     this.obtenerAtributos();
     this.initForm();
+    this.getLoggedUser();
   }
 
   initForm() {
@@ -239,6 +242,25 @@ export class CategoryDetailsComponent implements OnInit {
       category_name: "",
       
     };
+  }
+
+  getLoggedUser(): void {
+    this.ApiRequestService.me().subscribe(
+      (response: any) => {
+        this.employeeId = response.id;
+        const roleId = response.role_id;
+       
+        
+        if (roleId === 1) {
+          this.employeeRole = 'admin';
+        } else if (roleId === 2){
+          this.employeeRole = 'manager';
+        }
+      },
+      error => {
+        console.error('Error when obtaining data from the logged in user:', error);
+      }
+    );
   }
 
   aplicarFiltro(): void {
