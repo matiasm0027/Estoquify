@@ -22,6 +22,8 @@ export class ReportesViewComponent implements OnInit {
   employeeRole!: string;
   reportes: any[] = [];
   sucursales: any[] = [];
+  envioExitoso: boolean = false;
+  mensajeNotificacion: string = '';
 
 
   constructor(
@@ -96,6 +98,15 @@ getLoggedUser(): void {
   );
 }
 
+mostrarNotificacion(mensaje: string, duracion: number = 4000) {
+  this.envioExitoso = true;
+  this.mensajeNotificacion = mensaje;
+  setTimeout(() => {
+    this.envioExitoso = false;
+    this.mensajeNotificacion = '';
+  }, duracion);
+}
+
 agregarReporte() {
   const date = new Date().toISOString().slice(0, 10);
   const type = this.altaEmpleado ? 'Alta Empleado' : 'Solicitud Material'; // Determina el tipo según la selección del usuario
@@ -125,6 +136,7 @@ agregarReporte() {
         (response: any) => {
           console.log('Reporte agregado:', response);
           this.resetForm();
+          this.mostrarNotificacion('El reporte se ha enviado correctamente', 4000);
         },
         (error: any) => {
           console.error('Error al agregar el reporte:', error);
@@ -135,6 +147,8 @@ agregarReporte() {
       console.error("Error al agregar el reporte:", error);
       // Maneja el error de acuerdo a tus necesidades, por ejemplo, mostrar un mensaje al usuario
   }
+
+  
 }
 
 getPriority(): string {
