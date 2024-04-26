@@ -51,7 +51,6 @@ export class HomeComponent implements OnInit {
           nameempleado: reporte.employee_name
           
         }));
-        console.log(this.reportes);
       },
       error => {
         console.error('Error al obtener reportes:', error);
@@ -63,7 +62,7 @@ export class HomeComponent implements OnInit {
     this.ApiRequestService.categoryMaterialInfo().subscribe(
       (response: any[]) => {
         this.materials = response.map(material => ({
-          name: material.category_name, // Cambiar a category_name
+          name: material.name, // Cambiar a category_name
           total_material: material.total_materials, // Cambiar a total_materials
           activeMaterial: material.active_materials, // Cambiar a active_materials
           availableMaterial: material.available_materials, // Cambiar a available_materials

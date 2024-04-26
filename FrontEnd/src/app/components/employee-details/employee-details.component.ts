@@ -23,6 +23,7 @@ export class EmployeeDetailsComponent implements OnInit {
     { id: 2, name: 'Manager' },
     { id: 3, name: 'User' }
   ];
+  successMessage!: string;
 
   constructor(
     private fb: FormBuilder,
@@ -66,7 +67,6 @@ export class EmployeeDetailsComponent implements OnInit {
       .subscribe(
         (employee: any) => {
           this.employeeDetails = employee;
-          console.log(this.employeeDetails)
           this.initForm(); // Initialize form after employee details are fetched
         },
         (error: any) => {
@@ -197,5 +197,28 @@ export class EmployeeDetailsComponent implements OnInit {
         // Manejar errores en caso de que la eliminación falle
       }
     );
-}
+  }
+
+  desasignarMaterial(employeeId: number, materialId: number){
+    // Lógica para desasignar el material del empleado actualmente asignado
+
+    // Llama al servicio para desasignar el material
+    this.employeeService.desasignarMaterial(materialId, employeeId).subscribe(
+      (response) => {
+        // Actualiza la vista después de desasignar el material
+        this.getEmployeeDetails();
+        this.successMessage = response.message;
+        this.clearMessagesAfterDelay();
+      },
+      (error) => {
+        console.error('Error al desasignar el material:', error);
+      }
+    );
+  }
+  clearMessagesAfterDelay(): void {
+    setTimeout(() => {
+      this.successMessage = '';
+      //this.errorMessage = '';
+    }, 2000); 
+  }
 }

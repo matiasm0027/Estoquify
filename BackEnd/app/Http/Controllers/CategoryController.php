@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Material;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 
 class CategoryController extends Controller
@@ -15,38 +16,31 @@ class CategoryController extends Controller
     public function categoryMaterialInfo()
 {
     // Obtener todas las categorías con sus materiales asociados y atributos
-    $categories = Category::withCount([
-            'material as total_materials',
-            'material as active_materials' => function ($query) {
-                $query->where('state', 'active')->distinct('material_id');
-            },
-            'material as available_materials' => function ($query) {
-                $query->where('state', 'available')->distinct('material_id');
-            },
-            'material as inactive_materials' => function ($query) {
-                $query->where('state', 'inactive')->distinct('material_id');
-            }
+    $categories = Category::select([
+            'categories.id',
+            'categories.name',
+            DB::raw('(SELECT COUNT(DISTINCT(materials.id)) FROM materials 
+                      JOIN attribute_category_material ON materials.id = attribute_category_material.material_id 
+                      WHERE attribute_category_material.category_id = categories.id) as total_materials'),
+            DB::raw('(SELECT COUNT(DISTINCT(materials.id)) FROM materials
+                      JOIN attribute_category_material ON materials.id = attribute_category_material.material_id 
+                      WHERE attribute_category_material.category_id = categories.id AND materials.state = "active") as active_materials'),
+            DB::raw('(SELECT COUNT(DISTINCT(materials.id)) FROM materials
+                      JOIN attribute_category_material ON materials.id = attribute_category_material.material_id 
+                      WHERE attribute_category_material.category_id = categories.id AND materials.state = "available") as available_materials'),
+            DB::raw('(SELECT COUNT(DISTINCT(materials.id)) FROM materials
+                      JOIN attribute_category_material ON materials.id = attribute_category_material.material_id 
+                      WHERE attribute_category_material.category_id = categories.id AND materials.state = "inactive") as inactive_materials'),
         ])
         ->get();
 
-    // Transformar la estructura de datos para el resultado final
-    $categoryMaterialInfo = [];
-
-    foreach ($categories as $category) {
-        $categoryInfo = [
-            'category_id' => $category->id,
-            'category_name' => $category->name,
-            'total_materials' => $category->total_materials,
-            'active_materials' => $category->active_materials,
-            'available_materials' => $category->available_materials,
-            'inactive_materials' => $category->inactive_materials,
-        ];
-
-        $categoryMaterialInfo[] = $categoryInfo;
-    }
-
-    return response()->json($categoryMaterialInfo);
+    return response()->json($categories);
 }
+
+
+
+
+
 
     public function addCategory(Request $request)
     {
@@ -120,7 +114,6 @@ class CategoryController extends Controller
         try {
             // Verificar si el usuario está autenticado
             $user = $request->user();
-            //dd($user->role_id);
             if (!$user) {
                 return response()->json(['error' => 'Empleado no autenticado'], 401);
             }
@@ -128,24 +121,28 @@ class CategoryController extends Controller
             // Verificar si el usuario tiene el rol permitido para editar empleados (rol '1' para administrador)
             $this->checkUserRole(['1']);
 
-            // Buscar al usuario por su ID
+            // Buscar la categoría por su ID
             $category = Category::find($id);
 
-            // Si no se encuentra al usuario devuelve un error 404
+            // Si no se encuentra la categoría devuelve un error 404
             if (!$category) {
                 return response()->json(['error' => 'Categoria no encontrada'], 404);
             }
 
-            // Eliminar al usuario
+            // Eliminar todos los materiales asociados a la categoría
+            foreach ($category->material as $mate) {
+                $mate->delete();
+            }
+
+            // Eliminar la categoría
             $category->delete();
 
-            return response()->json(['message' => 'Categoria eliminada correctamente'], 200);
+            return response()->json(['message' => 'Categoria y materiales eliminados correctamente'], 200);
 
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error interno del servidor'], 500);
         }
     }
-
 
     protected function checkUserRole($allowedRoles)
     {

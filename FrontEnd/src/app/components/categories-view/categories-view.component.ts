@@ -49,8 +49,8 @@ export class CategoriesViewComponent implements OnInit{
       (response: any[]) => {
         console.log(response);
         this.materials = response.map(material => ({
-          id: material.category_id,
-          name: material.category_name, // Cambiar a category_name
+          id: material.id,
+          name: material.name, // Cambiar a category_name
           total_material: material.total_materials, // Cambiar a total_materials
           activeMaterial: material.active_materials, // Cambiar a active_materials
           availableMaterial: material.available_materials, // Cambiar a available_materials
@@ -81,7 +81,7 @@ export class CategoriesViewComponent implements OnInit{
 
   confirmDelete(category: any): void {
     console.log(category)
-    const confirmacion = confirm(`¿Estás seguro de que quieres eliminar la cateogria ${category.name}?`);
+    const confirmacion = confirm(`¿Al eliminar la categoria se eliminaran TODOS LOS MATERIALES, estás seguro de que quieres eliminar la categoria ${category.name}?`);
     if (confirmacion) {
       this.deleteCategory(category.id);
     }

@@ -64,13 +64,21 @@
             <h2 class="text-2xl font-bold my-4">Materiales Asignados</h2>
             <div class="grid grid-cols-3 gap-4">
                 <!-- Iterar sobre las categorías y sus materiales asignados -->
-                <ng-container *ngFor="let material of employeeDetails.materials">
-                    <div class="bg-white p-4 rounded shadow">
-                        <p><strong>Categoría:</strong> {{ material.category_name }}</p>
-                        <p><strong>Material:</strong> {{ material.material_name ? material.material_name : 'Material no
-                            asignado' }}</p>
-                    </div>
-                </ng-container>
+                <div *ngIf="employeeDetails.materials && employeeDetails.materials.length > 0">
+                    <ng-container *ngFor="let material of employeeDetails.materials">
+                        <div class="bg-white p-4 rounded shadow">
+                            <p><strong>Categoría:</strong> {{ material.category_name }}</p>
+                            <p><strong>Material:</strong> {{ material.material_name ? material.material_name : 'Material no asignado' }}</p>
+                            <button (click)="desasignarMaterial(employeeDetails.employee_id, material.material_id)"
+                                class="bg-white hover:bg-red-200 text-red-500 py-1 px-3 rounded border mt-2">
+                                Desasignar
+                            </button>
+                        </div>
+                    </ng-container>
+                </div>
+                <div *ngIf="!employeeDetails.materials || employeeDetails.materials.length === 0">
+                    <p>No hay materiales asignados.</p>
+                </div>                
             </div>
         </div>
         <div *ngIf="mostrarModalEditar" class="fixed z-10 inset-0 overflow-y-auto">
