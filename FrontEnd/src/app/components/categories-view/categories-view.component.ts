@@ -18,6 +18,9 @@ export class CategoriesViewComponent implements OnInit{
   categoryID: string = "" ;
   errorMessage!: string;
   successMessage!: string;
+  employeeRole!: string;
+  employeeId!: number;
+
 
   constructor(
     private ApiRequestService: ApiRequestService,
@@ -31,6 +34,7 @@ export class CategoriesViewComponent implements OnInit{
   
   ngOnInit(): void {
     this.obtenerCantidadMaterial();
+    this.getLoggedUser();
   }
 
   
@@ -153,6 +157,25 @@ export class CategoriesViewComponent implements OnInit{
     this.mostrarModalAgregar = false;
     this.obtenerCantidadMaterial();
     this.categoryForm.reset();
+  }
+
+  getLoggedUser(): void {
+    this.ApiRequestService.me().subscribe(
+      (response: any) => {
+        this.employeeId = response.id;
+        const roleId = response.role_id;
+       
+        
+        if (roleId === 1) {
+          this.employeeRole = 'admin';
+        } else if (roleId === 2){
+          this.employeeRole = 'manager';
+        }
+      },
+      error => {
+        console.error('Error when obtaining data from the logged in user:', error);
+      }
+    );
   }
 
 }
