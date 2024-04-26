@@ -23,7 +23,7 @@
  <div id="logo-sidebar" class="sidebar fixed top-0 left-0 z-40 w-64 h-screen pt-20 bg-gray-200 border-r border-gray-200 sm:translate-x-0 dark:bg-gray-100 dark:border-gray-700" aria-label="Sidebar">
    <div class="h-full px-3 pb-4 overflow-y-auto dark:bg-gray-100">
       <ul class="space-y-2 font-medium">
-         <li>
+         <li [routerLinkActive]="['active']">
             <a routerLink="/home"
                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                <svg
@@ -37,7 +37,7 @@
                <span class="ms-3">Panel de control</span>
             </a>
          </li>
-         <li>
+         <li [routerLinkActive]="['active']">
             <a routerLink="/categories_view"
                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                <svg
@@ -50,7 +50,7 @@
 
             </a>
          </li>
-         <li>
+         <li [routerLinkActive]="['active']" *ngIf="employeeRole === 'admin'|| employeeRole === 'manager'">
             <a routerLink="/reportes_view"
                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                <svg
@@ -63,9 +63,9 @@
 
             </a>
          </li>
-         <li>
+         <li [routerLinkActive]="['active']">
             <a routerLink="/employees_view"
-               class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+               class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group" >
                <svg
                   class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                   aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">

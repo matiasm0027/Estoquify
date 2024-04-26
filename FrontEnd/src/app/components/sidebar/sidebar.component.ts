@@ -11,6 +11,8 @@ export class SidebarComponent implements OnInit{
 
   message!: string;
   employeeName!: string;
+  roleId!:string;
+  employeeRole!:string;
 
   constructor(
     private authControlService: UsuariosControlService,
@@ -38,6 +40,16 @@ export class SidebarComponent implements OnInit{
       this.apiRequest.me().subscribe(
         (response: any) => {
           this.employeeName = response.name + ' ' + response.last_name;
+          const roleId = response.role_id;
+     
+
+          if (roleId === 1) {
+            this.employeeRole = 'admin';
+          } else if (roleId === 2){
+            this.employeeRole = 'manager';
+          } else if (roleId === 3){
+            this.employeeRole=== 'usuario';
+          }
         },
         error => {
           console.error('Error when obtaining data from the logged in user:', error);

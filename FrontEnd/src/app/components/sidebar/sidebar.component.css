@@ -3,3 +3,8 @@
       display: none;
     }
   }
+
+  li.active {
+    background-color: whitesmoke
+  }
+    
