@@ -87,7 +87,7 @@ getLoggedUser(): void {
       if (roleId === 1) {
         this.employeeRole = 'admin';
       } else if (roleId === 2){
-        this.employeeRole = 'usuario';
+        this.employeeRole = 'manager';
       }
     },
     error => {
