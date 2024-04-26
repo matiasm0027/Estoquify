@@ -13,6 +13,7 @@ export class SidebarComponent implements OnInit{
   employeeName!: string;
   roleId!:string;
   employeeRole!:string;
+  isAdminManager: boolean = true;
 
   constructor(
     private authControlService: UsuariosControlService,
@@ -44,11 +45,11 @@ export class SidebarComponent implements OnInit{
      
 
           if (roleId === 1) {
-            this.employeeRole = 'admin';
+            this.isAdminManager = true;
           } else if (roleId === 2){
-            this.employeeRole = 'manager';
+            this.isAdminManager = true;
           } else if (roleId === 3){
-            this.employeeRole=== 'usuario';
+            this.isAdminManager = false;
           }
         },
         error => {

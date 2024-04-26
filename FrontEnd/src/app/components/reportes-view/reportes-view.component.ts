@@ -137,7 +137,6 @@ agregarReporte() {
       }
       this.apiRequestService.agregarReporte(reporte).subscribe(
         (response: any) => {
-          console.log('Reporte agregado:', response);
           this.resetForm();
           this.mostrarNotificacion('El reporte se ha enviado correctamente', 4000);
         },
@@ -223,7 +222,6 @@ resetForm() {
 obtenerReportes() {
   this.apiRequestService.listReportes().subscribe(
     (response: any[]) => {
-      console.log(response)
       this.reportes = response.filter(reporte => reporte.state === 'pending')
       .map(reporte => ({
         id: reporte.id,
@@ -234,7 +232,6 @@ obtenerReportes() {
         nameempleado: reporte.employee_name,        
         sucursalid: reporte.employee_id_sucursal,  
       }));
-      console.log(this.reportes);
     },
     error => {
       console.error('Error al obtener reportes:', error);
