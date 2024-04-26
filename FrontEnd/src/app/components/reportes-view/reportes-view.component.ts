@@ -265,4 +265,36 @@ mostrarDetalle(reporte: any) {
 cerrarModal() {
   this.reporteSeleccionado = null;
 }
+
+cambiarEstadoReporte(idReporte: number, estado: string, event: any) {
+  const target = event.target as HTMLInputElement; // Convertir el objetivo del evento a tipo HTMLInputElement
+  if (target) {
+    const isChecked = target.checked; // Acceder a la propiedad checked de manera segura
+
+    // Lógica para enviar el estado del reporte según la selección del checkbox
+    let nuevoEstado = '';
+    if (isChecked) {
+      nuevoEstado = estado === 'aceptado' ? 'accepted' : 'rejected'; // Cambia el estado según la selección del checkbox
+    }
+
+    // Lógica para enviar el estado vacío si el checkbox se desmarca
+    if (!isChecked) {
+      nuevoEstado = ''; // Envía un estado vacío si el checkbox se desmarca
+    }
+
+    // Aquí debes llamar a tu servicio API para cambiar el estado del reporte con el nuevoEstado
+    this.apiRequestService.cambiarEstadoReporte(idReporte, nuevoEstado).subscribe(
+      (response: any) => {
+        // Manejar la respuesta del servicio si es necesario
+        console.log('Estado del reporte cambiado:', response);
+      },
+      (error: any) => {
+        console.error('Error al cambiar el estado del reporte:', error);
+      }
+    );
+
+    console.log('ID del reporte:', idReporte);
+    console.log('Nuevo estado:', nuevoEstado);
+  }
+}
 }

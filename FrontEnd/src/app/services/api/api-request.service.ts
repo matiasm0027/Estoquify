@@ -138,4 +138,8 @@ export class ApiRequestService {
   agregarReporte(reporte: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/agregarReporte`, reporte);
   }
+  cambiarEstadoReporte(idReporte: number, nuevoEstado: string): Observable<any> {
+    const requestBody = { estado: nuevoEstado };
+    return this.http.put<any>(`${this.apiUrl}/auth/reportes/${idReporte}/estado`, requestBody);
+  }
 }
