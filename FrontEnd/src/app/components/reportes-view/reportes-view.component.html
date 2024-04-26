@@ -56,24 +56,25 @@
                   </div>
             </div>
         </ng-container>
-        <ng-container *ngIf="employeeRole === 'admin'">
-            <div class="bg-gray-100 p-6 rounded shadow">
-              <h1 class="text-2xl font-bold mb-4">Reportes recibidos</h1>
-              <div class="grid grid-cols-4 gap-4">
-                <div class="border border-gray-300 p-2">ID</div>
-                <div class="border border-gray-300 p-2">Type</div>
-                <div class="border border-gray-300 p-2">Sucursal</div>
-                <div class="border border-gray-300 p-2">Prioridad</div>
-                <!-- Aquí iteramos sobre los reportes -->
+        <div *ngIf="employeeRole === 'admin'" class="bg-gray-100 p-6 rounded shadow">
+            <h1 class="text-2xl font-bold mb-4">Reportes recibidos</h1>
+            <div class="grid grid-cols-4 gap-4">
+                <!-- Iterar sobre los reportes -->
                 <ng-container *ngFor="let reporte of reportes">
-                  <div class="border border-gray-300 p-2">{{ reporte.id }}</div>
-                  <div class="border border-gray-300 p-2">{{ reporte.type }}</div>
-                  <div class="border border-gray-300 p-2">{{ this.obtenerNombreSucursal(reporte.sucursalid) }}</div>
-                  <div class="border border-gray-300 p-2">{{ reporte.prioridad }}</div>
+                    <div [ngClass]="{
+                        'bg-green-200': reporte.prioridad === 'Low',
+                        'bg-yellow-200': reporte.prioridad === 'Medium',
+                        'bg-red-200': reporte.prioridad === 'High'
+                    }" class="rounded border border-gray-300 p-2">
+                        <div>ID: {{ reporte.id }}</div>
+                        <div>Tipo: {{ reporte.type }}</div>
+                        <div>Sucursal: {{ this.obtenerNombreSucursal(reporte.sucursalid) }}</div>
+                        <div>Prioridad: {{ reporte.prioridad }}</div>
+                    </div>
                 </ng-container>
-              </div>
             </div>
-          </ng-container>
+        </div>
+        
           
     </div>
 </div>
