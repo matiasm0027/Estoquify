@@ -24,6 +24,9 @@ export class ReportesViewComponent implements OnInit {
   sucursales: any[] = [];
   envioExitoso: boolean = false;
   mensajeNotificacion: string = '';
+  reporteSeleccionado: any = null;
+
+  
 
 
   constructor(
@@ -187,7 +190,7 @@ getCategoriasSeleccionadas(): { id: number, name: string }[] {
 }
 
 onAltaEmpleado() {
-  const datos = ['Nombre:', 'Apellido:', 'Email:', 'Teléfono Móvil:', 'Departamento:', 'Sucursal:', 'Rol:'];
+  const datos = ['Nombre: ', 'Apellido: ', 'Email: ', 'Teléfono Móvil: ', 'Departamento: ', 'Sucursal:', 'Rol:'];
   this.petition = datos.join('\n');
 }
 
@@ -198,7 +201,7 @@ onCategoriaChange() {
 formatSelectedCategories() {
   if (this.solicitudMaterial) {
     const selectedCategories = this.getCategoriasSeleccionadas();
-    let formattedCategories = selectedCategories.map(c => c.name + ':'); // Agregar ":" después de cada nombre de categoría
+    let formattedCategories = selectedCategories.map(c => c.name + ': '); // Agregar ":" después de cada nombre de categoría
     return formattedCategories.join('\n'); // Unir las categorías con saltos de línea
   } else {
     return '';
@@ -253,5 +256,13 @@ obtenerSucursales() {
       console.error('Error al obtener sucursales:', error);
     }
   );
+}
+
+mostrarDetalle(reporte: any) {
+  this.reporteSeleccionado = reporte;
+}
+
+cerrarModal() {
+  this.reporteSeleccionado = null;
 }
 }

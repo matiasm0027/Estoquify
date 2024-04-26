@@ -11,9 +11,11 @@
                 <div class="mb-4">
                     <label class="block mb-2 font-bold">Tipo de Reporte:</label>
                     <div class="flex items-center">
-                        <input type="checkbox" class="mr-2 ml-4" id="altaEmpleado" [(ngModel)]="altaEmpleado" (change)="toggleCheckbox('altaEmpleado')">
+                        <input type="checkbox" class="mr-2 ml-4" id="altaEmpleado" [(ngModel)]="altaEmpleado"
+                            (change)="toggleCheckbox('altaEmpleado')">
                         <label for="altaEmpleado" class="mr-4">Alta Empleado</label>
-                        <input type="checkbox" class="mr-2" id="solicitudMaterial" [(ngModel)]="solicitudMaterial" (change)="toggleCheckbox('solicitudMaterial')">
+                        <input type="checkbox" class="mr-2" id="solicitudMaterial" [(ngModel)]="solicitudMaterial"
+                            (change)="toggleCheckbox('solicitudMaterial')">
                         <label for="solicitudMaterial">Solicitud Material</label>
                     </div>
                 </div>
@@ -22,7 +24,9 @@
                     <label class="block mb-2 font-bold">Categorías:</label>
                     <div class="flex flex-wrap">
                         <div *ngFor="let categoria of categories" class="mr-4 mb-2">
-                            <input type="checkbox" class="ml-4" [id]="categoria.id" [value]="categoria.id" [(ngModel)]="categoriasSeleccionadas[categoria.id]" (ngModelChange)="onCategoriaChange()">
+                            <input type="checkbox" class="ml-4" [id]="categoria.id" [value]="categoria.id"
+                                [(ngModel)]="categoriasSeleccionadas[categoria.id]"
+                                (ngModelChange)="onCategoriaChange()">
                             <label [for]="categoria.id" class="ml-2">{{ categoria.name }}</label>
                         </div>
                     </div>
@@ -32,11 +36,15 @@
                 <div class="mb-4">
                     <label class="block mb-2 font-bold">Prioridad del Reporte:</label>
                     <div class="flex items-center">
-                        <input type="checkbox" class="mr-2 ml-4" id="prioridadLow" [(ngModel)]="prioridadLow" (change)="togglePriority('prioridadLow')">
+                        <input type="checkbox" class="mr-2 ml-4" id="prioridadLow" [(ngModel)]="prioridadLow"
+                            (change)="togglePriority('prioridadLow')">
                         <label for="prioridadLow" class="mr-4" [class.text-green-500]="prioridadLow">Low</label>
-                        <input type="checkbox" class="mr-2" id="prioridadMedium" [(ngModel)]="prioridadMedium" (change)="togglePriority('prioridadMedium')">
-                        <label for="prioridadMedium" class="mr-4" [class.text-yellow-500]="prioridadMedium">Medium</label>
-                        <input type="checkbox" class="mr-2" id="prioridadHigh" [(ngModel)]="prioridadHigh" (change)="togglePriority('prioridadHigh')">
+                        <input type="checkbox" class="mr-2" id="prioridadMedium" [(ngModel)]="prioridadMedium"
+                            (change)="togglePriority('prioridadMedium')">
+                        <label for="prioridadMedium" class="mr-4"
+                            [class.text-yellow-500]="prioridadMedium">Medium</label>
+                        <input type="checkbox" class="mr-2" id="prioridadHigh" [(ngModel)]="prioridadHigh"
+                            (change)="togglePriority('prioridadHigh')">
                         <label for="prioridadHigh" [class.text-red-500]="prioridadHigh">High</label>
                     </div>
                 </div>
@@ -44,16 +52,17 @@
                 <!-- Campo de Texto -->
                 <div class="mb-4">
                     <label class="block mb-2 font-bold">{{ altaEmpleado ? 'Datos del Empleado' : 'Datos del Reporte' }}:</label>
-                    <textarea class="w-full h-48 px-3 py-2 border rounded w-2/4 ml-4" placeholder="Ingrese los detalles aquí" [(ngModel)]="petition">{{ formatSelectedCategories() }}</textarea>
+                    <textarea class="w-full h-48 px-3 py-2 border rounded w-1/2 ml-4" placeholder="Ingrese los detalles aquí" [(ngModel)]="petition">{{ formatSelectedCategories() }}</textarea>
                 </div>
 
                 <!-- Botón Enviar -->
                 <div>
-                    <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" (click)="agregarReporte()">Enviar</button>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                        (click)="agregarReporte()">Enviar</button>
                 </div>
                 <div *ngIf="envioExitoso" class="text-green-800 mt-2 rounded">
                     {{ mensajeNotificacion }}
-                  </div>
+                </div>
             </div>
         </ng-container>
         <div *ngIf="employeeRole === 'admin'" class="bg-gray-100 p-6 rounded shadow">
@@ -65,16 +74,44 @@
                         'bg-green-200': reporte.prioridad === 'Low',
                         'bg-yellow-200': reporte.prioridad === 'Medium',
                         'bg-red-200': reporte.prioridad === 'High'
-                    }" class="rounded border border-gray-300 p-2">
+                    }" class="rounded border border-gray-300 p-2 relative">
                         <div>ID: {{ reporte.id }}</div>
                         <div>Tipo: {{ reporte.type }}</div>
                         <div>Sucursal: {{ this.obtenerNombreSucursal(reporte.sucursalid) }}</div>
                         <div>Prioridad: {{ reporte.prioridad }}</div>
+                        <button (click)="mostrarDetalle(reporte)" class="absolute top-0 right-0 mt-2 mr-2">
+                            <span class="text-blue-900 opacity-75 rounded">Ver detalles</span>
+                        </button>
                     </div>
                 </ng-container>
             </div>
+            <!-- Modal para mostrar los detalles del reporte seleccionado -->
+            <div *ngIf="reporteSeleccionado" class="fixed z-10 inset-0 overflow-y-auto">
+                <div class="flex items-center justify-center min-h-screen px-4">
+                    <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full">
+                        <div class="px-4 py-2 bg-gray-200">
+                            <h3 class="text-lg font-bold">Detalles del reporte</h3>
+                        </div>
+                        <div class="p-4">
+                            <p>ID: {{ reporteSeleccionado.id }}</p>
+                            <p class="mb-4">Tipo: {{ reporteSeleccionado.type }}</p> <!-- Agregar un espacio aquí -->
+                            <!-- Si es "Alta Empleado" o "Solicitud Material", mostrar la información de la solicitud con saltos de línea -->
+                            <ng-container *ngIf="reporteSeleccionado.type === 'Alta Empleado' || reporteSeleccionado.type === 'Solicitud Material'">
+                                <p>
+                                    <!-- Utilizar ngFor para mostrar dinámicamente los campos de la solicitud -->
+                                    <ng-container *ngFor="let linea of reporteSeleccionado.solicitud.split('\n')">
+                                        <!-- Mostrar cada línea -->
+                                        <p>{{ linea }}</p>
+                                    </ng-container>
+                                </p>
+                            </ng-container>
+                            <div class="flex justify-end">
+                                <button (click)="cerrarModal()"
+                                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-          
     </div>
-</div>
