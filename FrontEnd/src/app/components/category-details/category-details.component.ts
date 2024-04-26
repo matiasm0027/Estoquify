@@ -103,7 +103,6 @@ export class CategoryDetailsComponent implements OnInit {
       .subscribe(
         (categoria: any) => {
           this.detallesMaterial = categoria; // Convertir el objeto de categoría a una matriz
-          console.log(this.detallesMaterial)
           this.aplicarFiltro();
         },
         (error: any) => {
@@ -172,7 +171,6 @@ export class CategoryDetailsComponent implements OnInit {
       // Llamar al servicio para agregar el material
       this.ApiRequestService.agregarMaterial(nuevoMaterial).subscribe(
         (response: any) => {
-          console.log('Material agregado:', response);
           // Cerrar el modal y limpiar el formulario
           this.cerrarModal();
         },

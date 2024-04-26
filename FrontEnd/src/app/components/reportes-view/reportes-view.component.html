@@ -5,11 +5,11 @@
     <div class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 box-fl container">
         <ng-container *ngIf="employeeRole === 'manager'">
             <div class="bg-white p-6 rounded shadow">
-                <h1 class="text-2xl font-bold mb-4">Formulario de Reporte</h1>
+                <h1 class="text-2xl font-bold mb-4">Formulario de Incidencias</h1>
 
                 <!-- Tipo de Reporte: Alta Empleado / Solicitud Material -->
                 <div class="mb-4">
-                    <label class="block mb-2 font-bold">Tipo de Reporte:</label>
+                    <label class="block mb-2 font-bold">Tipo de Incidencia:</label>
                     <div class="flex items-center">
                         <input type="checkbox" class="mr-2 ml-4" id="altaEmpleado" [(ngModel)]="altaEmpleado"
                             (change)="toggleCheckbox('altaEmpleado')">
@@ -34,7 +34,7 @@
 
                 <!-- Prioridad del Reporte -->
                 <div class="mb-4">
-                    <label class="block mb-2 font-bold">Prioridad del Reporte:</label>
+                    <label class="block mb-2 font-bold">Prioridad de la Incidencia</label>
                     <div class="flex items-center">
                         <input type="checkbox" class="mr-2 ml-4" id="prioridadLow" [(ngModel)]="prioridadLow"
                             (change)="togglePriority('prioridadLow')">
@@ -69,7 +69,7 @@
             </div>
         </ng-container>
         <div *ngIf="employeeRole === 'admin'" class="bg-gray-100 p-6 rounded shadow">
-            <h1 class="text-2xl font-bold mb-4">Reportes recibidos</h1>
+            <h1 class="text-2xl font-bold mb-4">Incidencias recibidas</h1>
             <div class="grid grid-cols-4 gap-4">
                 <!-- Iterar sobre los reportes -->
                 <ng-container *ngFor="let reporte of reportes">
@@ -95,7 +95,7 @@
                         <!-- Cambiado a relative -->
 
                         <div class="px-4 py-2 bg-gray-200">
-                            <h3 class="text-lg font-bold">Detalles del reporte</h3>
+                            <h3 class="text-lg font-bold">Detalles de la incidencia</h3>
                         </div>
                         <div class="p-4">
 

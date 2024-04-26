@@ -122,7 +122,6 @@ export class EmployeesViewComponent implements OnInit {
     this.peticionesService.listEmployees().subscribe(
       (response: any[]) => {
         this.employees = response;
-        console.log(this.employees)
         this.aplicarFiltro(); // Aplicar filtro cada vez que se obtienen nuevos datos
       },
       error => {
@@ -136,7 +135,6 @@ export class EmployeesViewComponent implements OnInit {
       const nuevoEmpleado = this.formularioEmpleado.value;
       this.peticionesService.addEmployee(nuevoEmpleado).subscribe(
         (response: any) => {
-          console.log('Empleado añadido con éxito:', response);
           this.cerrarModal();
         },
         (error: any) => {

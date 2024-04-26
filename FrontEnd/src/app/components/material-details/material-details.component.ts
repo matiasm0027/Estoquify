@@ -109,10 +109,7 @@ export class MaterialDetailsComponent implements OnInit {
       .subscribe(
         (material: any) => {
           this.materialDetails = material;
-          //console.log(this.materialDetails.material.attribute[0])
           this.attributeNames = this.materialDetails.material.attribute.map((attribute: any) => attribute.name);
-          console.log("Muestra " , this.materialDetails)
-          console.log("prueba2 " , this.materialDetails.material.category[0].id)
           this.initForm();
         },
         (error: any) => {
@@ -166,11 +163,8 @@ export class MaterialDetailsComponent implements OnInit {
             };
         });
 
-        console.log(materialEditado);
-
         this.materialService.editMaterial(this.materialId, materialEditado).subscribe(
             (response: any) => {
-                console.log('Material editado correctamente', response);
                 this.cerrarModal();
                 this.getMaterialDetails();
             },
@@ -220,12 +214,10 @@ export class MaterialDetailsComponent implements OnInit {
   }
 
   deleteMaterial(id: number): void {
-    console.log('ID del material a eliminar:', id);
 
     // Llamar al servicio para eliminar el material
     this.materialService.deleteMaterial(id).subscribe(
       (response) => {
-        console.log('Material eliminado correctamente', response);
         // Navegar a la vista de materiales después de eliminar con éxito
       },
       error => {
@@ -251,7 +243,6 @@ export class MaterialDetailsComponent implements OnInit {
     this.materialService.materialAsignado(id).subscribe(
       (response) => {
         this.asignado = response;
-        console.log(this.asignado); // Verifica la estructura de la respuesta en la consola
       },
       error => {
         console.error('Error al obtener la asignación:', error);

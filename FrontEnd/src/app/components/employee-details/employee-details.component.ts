@@ -139,7 +139,6 @@ export class EmployeeDetailsComponent implements OnInit {
 
         this.employeeService.editEmployee(this.employeeId, empleadoEditado).subscribe(
           (response: any) => {
-            console.log('Empleado editado correctamente', response);
             this.cerrarModal();
             this.getEmployeeDetails();
           },
@@ -184,12 +183,10 @@ export class EmployeeDetailsComponent implements OnInit {
   }
 
   deleteEmployee(id: number): void {
-    console.log('ID del empleado a eliminar:', id);
 
     // Llamar al servicio para eliminar al empleado
     this.employeeService.deleteEmployees(id).subscribe(
       (response) => {
-        console.log('Empleado eliminado correctamente', response);
         // Navegar a la vista de empleados después de eliminar con éxito
       },
       error => {

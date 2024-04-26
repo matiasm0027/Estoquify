@@ -51,7 +51,6 @@ export class CategoriesViewComponent implements OnInit{
   obtenerCantidadMaterial(){
     this.ApiRequestService.categoryMaterialInfo().subscribe(
       (response: any[]) => {
-        console.log(response);
         this.materials = response.map(material => ({
           id: material.id,
           name: material.name, // Cambiar a category_name
@@ -84,7 +83,6 @@ export class CategoriesViewComponent implements OnInit{
   }
 
   confirmDelete(category: any): void {
-    console.log(category)
     const confirmacion = confirm(`¿Al eliminar la categoria se eliminaran TODOS LOS MATERIALES, estás seguro de que quieres eliminar la categoria ${category.name}?`);
     if (confirmacion) {
       this.deleteCategory(category.id);
