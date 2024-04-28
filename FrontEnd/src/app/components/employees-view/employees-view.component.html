@@ -6,8 +6,8 @@
         <!-- Contenido de la vista principal -->
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-2xl font-bold">Empleados</h1>
-            <div>
-                <button (click)="mostrarModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-4">
+            <div >
+                <button (click)="mostrarModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-4" *ngIf="employeeRole === 'admin'">
                     Añadir Empleado
                 </button>
                 <button (click)="mostrarModalDeFiltros()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">

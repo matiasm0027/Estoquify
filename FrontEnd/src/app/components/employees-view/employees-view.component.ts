@@ -22,10 +22,16 @@ export class EmployeesViewComponent implements OnInit {
   sucursales: any[] = [];
   sidebarVisible: boolean = true;
   sidebarWidth: number = 250;
+  employeeId!:number;
+  employeeRole!:string;
+
   opcionesFiltro: { valor: string, etiqueta: string, seleccionado: boolean }[] = [
     { valor: 'departamento', etiqueta: 'Departamento', seleccionado: false },
     { valor: 'sucursal', etiqueta: 'Sucursal', seleccionado: false },
 ];
+
+
+  
 
   constructor(private fb: FormBuilder, private peticionesService: ApiRequestService) {
     this.formularioEmpleado = this.fb.group({
@@ -38,6 +44,7 @@ export class EmployeesViewComponent implements OnInit {
       rol: ['', Validators.required],
       telefonoMovil: ['', Validators.required],
     });
+    
   }
 
   ngOnInit(): void {
@@ -144,5 +151,26 @@ export class EmployeesViewComponent implements OnInit {
     } else {
       console.error('Formulario inválido. Por favor, complete todos los campos requeridos.');
     }
+  }
+
+  getLoggedUser(): void {
+    this.peticionesService.me().subscribe(
+      (response: any) => {
+        this.employeeId = response.id;
+        const roleId = response.role_id;
+       
+        
+        if (roleId === 1) {
+          this.employeeRole = 'admin';
+        } else if (roleId === 2){
+          this.employeeRole = 'manager';
+        } else if (roleId===3){
+          this.employeeRole= 'usuario'
+        }
+      },
+      error => {
+        console.error('Error when obtaining data from the logged in user:', error);
+      }
+    );
   }
 }

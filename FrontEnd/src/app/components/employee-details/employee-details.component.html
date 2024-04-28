@@ -10,11 +10,11 @@
                 <!-- Botones para editar, eliminar y volver -->
                 <div class="space-x-4">
                     <button (click)="mostrarModal()"
-                        class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 px-4 rounded border border-blue-500">
+                        class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 px-4 rounded border border-blue-500" *ngIf="employeeRole === 'admin'">
                         Editar
                     </button>
                     <button (click)="confirmDelete(employeeDetails)"
-                        class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 px-4 rounded border border-red-500">
+                        class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 px-4 rounded border border-red-500" *ngIf="employeeRole === 'admin'">
                         Eliminar
                     </button>
                     <button (click)="volver()"

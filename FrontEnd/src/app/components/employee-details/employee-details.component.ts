@@ -18,6 +18,7 @@ export class EmployeeDetailsComponent implements OnInit {
   sucursales: any[] = [];
   mostrarModalEditar: boolean = false;
   formularioEmpleado!: FormGroup;
+  employeeRole!:string;
   roles: any[] = [
     { id: 1, name: 'Administrador' },
     { id: 2, name: 'Manager' },
@@ -149,7 +150,8 @@ export class EmployeeDetailsComponent implements OnInit {
     } else {
         console.error('Formulario inválido');
     }
-}
+  
+  }
 
   obtenerDepartamento() {
     this.employeeService.listDepartments().subscribe(
@@ -173,6 +175,7 @@ export class EmployeeDetailsComponent implements OnInit {
     );
   }
 
+
   confirmDelete(employee: any): void {
     const confirmacion = confirm(`¿Estás seguro de que quieres eliminar a ${employee.name}?`);
     if (confirmacion) {
@@ -181,6 +184,7 @@ export class EmployeeDetailsComponent implements OnInit {
       alert(`El empleado ${employee.name} ha sido eliminado.`);
     }
   }
+
 
   deleteEmployee(id: number): void {
 
@@ -195,6 +199,7 @@ export class EmployeeDetailsComponent implements OnInit {
       }
     );
   }
+
 
   desasignarMaterial(employeeId: number, materialId: number){
     // Lógica para desasignar el material del empleado actualmente asignado
@@ -212,10 +217,34 @@ export class EmployeeDetailsComponent implements OnInit {
       }
     );
   }
+
+
   clearMessagesAfterDelay(): void {
     setTimeout(() => {
       this.successMessage = '';
       //this.errorMessage = '';
     }, 2000); 
+  }
+
+
+  getLoggedUser(): void {
+    this.employeeService.me().subscribe(
+      (response: any) => {
+        this.employeeId = response.id;
+        const roleId = response.role_id;
+       
+        
+        if (roleId === 1) {
+          this.employeeRole = 'admin';
+        } else if (roleId === 2){
+          this.employeeRole = 'manager';
+        } else if (roleId===3){
+          this.employeeRole= 'usuario'
+        }
+      },
+      error => {
+        console.error('Error when obtaining data from the logged in user:', error);
+      }
+    );
   }
 }
