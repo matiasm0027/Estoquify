@@ -85,4 +85,56 @@ class ReportController extends Controller{
         });
         return response()->json($reports);
     }
+
+    public function changeReportStatus(Request $request, $id)
+{
+    try {
+        // Verifica si el usuario está autenticado
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['error' => 'Usuario no autenticado'], 401);
+        }
+
+        // Verifica si el usuario tiene el rol permitido
+        $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
+
+        // Encuentra el reporte por su ID
+        $report = Report::find($id);
+
+        // Verifica si se encontró el reporte
+        if (!$report) {
+            return response()->json(['message' => 'El reporte no fue encontrado'], 404);
+        }
+
+        // Valida el estado proporcionado en la solicitud
+        $request->validate([
+            'estado' => 'required|in:accepted,rejected' // Asegúrate de incluir todos los posibles estados aquí
+        ]);
+
+        // Actualiza el estado del reporte
+        $report->state = $request->estado;
+        $report->save();
+
+        // Devuelve una respuesta exitosa
+        return response()->json(['message' => 'Estado del reporte actualizado correctamente'], 200);
+    } catch (\Exception $e) {
+        // Captura y maneja cualquier excepción que pueda ocurrir
+        return response()->json(['error' => 'Error al cambiar el estado del reporte: ' . $e->getMessage()], 500);
+    }
+}
+
+protected function checkUserRole($allowedRoles)
+{
+    if (!Auth::check()) {
+        // El usuario no está autenticado
+        abort(401, 'Unauthorized');
+    }
+
+    $user = Auth::user();
+
+    if (!in_array($user->role_id, $allowedRoles)) {
+        // El usuario no tiene uno de los roles permitidos
+        abort(403, 'Access denied');
+    }
+}
 }

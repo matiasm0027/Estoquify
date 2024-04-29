@@ -61,6 +61,7 @@ Route::group([
 
     Route::get('listReports', [ReportController::class, 'listReports']);
     Route::post('agregarReporte', [ReportController::class, 'sendReports']);
+    Route::put('changeReportStatus/{id}', [ReportController::class, 'changeReportStatus']);
 
     Route::post('addMaterial', [MaterialController::class, 'addMaterial']);
     Route::delete('deleteMaterial/{id}', [MaterialController::class, 'deleteMaterial']);

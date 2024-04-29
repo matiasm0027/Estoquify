@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 
 @Component({
@@ -25,6 +25,9 @@ export class ReportesViewComponent implements OnInit {
   envioExitoso: boolean = false;
   mensajeNotificacion: string = '';
   reporteSeleccionado: any = null;
+  formularioEmpleado: FormGroup;
+  departamentos: any[] = [];
+  mostrarModalAgregar: boolean = false;
 
   
 
@@ -33,13 +36,25 @@ export class ReportesViewComponent implements OnInit {
     private apiRequestService: ApiRequestService,
     private fb: FormBuilder,
     ) 
-  {}
+  {
+    this.formularioEmpleado = this.fb.group({
+      nombre: ['', Validators.required],
+      apellido: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required],
+      departamento: ['', Validators.required],
+      sucursal: ['', Validators.required],
+      rol: ['', Validators.required],
+      telefonoMovil: ['', Validators.required],
+    });
+  }
 
   ngOnInit(): void {
     this.obtenerNombreCategoria();
     this.getLoggedUser();
     this.obtenerSucursales();
     this.obtenerReportes()
+    this.obtenerDepartamento()
   }
 
   toggleSidebar() {
@@ -255,43 +270,89 @@ obtenerSucursales() {
   );
 }
 
+obtenerDepartamento() {
+  this.apiRequestService.listDepartments().subscribe(
+    (response: any[]) => {
+      this.departamentos = response;
+    },
+    error => {
+      console.error('Error al obtener department:', error);
+    }
+  );
+}
+
 mostrarDetalle(reporte: any) {
   this.reporteSeleccionado = reporte;
 }
 
 cerrarModal() {
   this.reporteSeleccionado = null;
+  this.obtenerReportes();
+  this.cerrarModal_Agregar()
 }
 
 cambiarEstadoReporte(idReporte: number, estado: string, event: any) {
-  const target = event.target as HTMLInputElement; // Convertir el objetivo del evento a tipo HTMLInputElement
-  if (target) {
-    const isChecked = target.checked; // Acceder a la propiedad checked de manera segura
+  if (event) {
+    const target = event.target as HTMLInputElement;
+    if (target) {
+      const isChecked = target.checked;
 
-    // Lógica para enviar el estado del reporte según la selección del checkbox
-    let nuevoEstado = '';
-    if (isChecked) {
-      nuevoEstado = estado === 'aceptado' ? 'accepted' : 'rejected'; // Cambia el estado según la selección del checkbox
+      // Obtener una referencia a ambos checkboxes
+      const aceptarCheckbox = document.getElementById('aceptar') as HTMLInputElement;
+      const rechazarCheckbox = document.getElementById('rechazar') as HTMLInputElement;
+
+      // Desmarcar el otro checkbox si el checkbox actual se selecciona
+      if (isChecked) {
+        if (target === aceptarCheckbox) {
+          rechazarCheckbox.checked = false;
+        } else if (target === rechazarCheckbox) {
+          aceptarCheckbox.checked = false;
+        }
+      }
+
+      const nuevoEstado = isChecked ? (estado === 'aceptado' ? 'accepted' : 'rejected') : '';
+
+      // Llamar al servicio API para cambiar el estado del reporte
+      this.apiRequestService.cambiarEstadoReporte(idReporte, nuevoEstado).subscribe(
+        (response: any) => {
+          console.log('Estado del reporte cambiado:', response);
+          // Manejar la respuesta del servicio si es necesario
+        },
+        (error: any) => {
+          console.error('Error al cambiar el estado del reporte:', error);
+          // Manejar el error del servicio si es necesario
+        }
+      );
+
+      console.log('ID del reporte:', idReporte);
+      console.log('Nuevo estado:', nuevoEstado);
     }
+  }
+}
 
-    // Lógica para enviar el estado vacío si el checkbox se desmarca
-    if (!isChecked) {
-      nuevoEstado = ''; // Envía un estado vacío si el checkbox se desmarca
-    }
-
-    // Aquí debes llamar a tu servicio API para cambiar el estado del reporte con el nuevoEstado
-    this.apiRequestService.cambiarEstadoReporte(idReporte, nuevoEstado).subscribe(
+agregarEmpleado() {
+  if (this.formularioEmpleado.valid) {
+    const nuevoEmpleado = this.formularioEmpleado.value;
+    this.apiRequestService.addEmployee(nuevoEmpleado).subscribe(
       (response: any) => {
-        // Manejar la respuesta del servicio si es necesario
-        console.log('Estado del reporte cambiado:', response);
+        this.cerrarModal_Agregar();
+
       },
       (error: any) => {
-        console.error('Error al cambiar el estado del reporte:', error);
+        console.error('Error al agregar empleado:', error);
       }
     );
-
-    console.log('ID del reporte:', idReporte);
-    console.log('Nuevo estado:', nuevoEstado);
+  } else {
+    console.error('Formulario inválido. Por favor, complete todos los campos requeridos.');
   }
+}
+
+mostrarModal() {
+  this.mostrarModalAgregar = true;
+}
+
+cerrarModal_Agregar() {
+  this.mostrarModalAgregar = false;
+  this.formularioEmpleado.reset();
 }
 }
