@@ -310,7 +310,7 @@ cambiarEstadoReporte(idReporte: number, estado: string, event: any) {
         }
       }
 
-      const nuevoEstado = isChecked ? (estado === 'aceptado' ? 'accepted' : 'rejected') : '';
+      const nuevoEstado = isChecked ? (estado === 'aceptado' ? 'accepted' : 'denied') : '';
 
       // Llamar al servicio API para cambiar el estado del reporte
       this.apiRequestService.cambiarEstadoReporte(idReporte, nuevoEstado).subscribe(

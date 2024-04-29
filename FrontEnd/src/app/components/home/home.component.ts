@@ -15,6 +15,8 @@ export class HomeComponent implements OnInit {
   employee!: any;
   reportes: any[] = [];
   materials: any[] = [];
+  empleado_id!: number;
+  reportes_id: any[] = [];
 
   constructor(private ApiRequestService: ApiRequestService) {}
 
@@ -22,8 +24,8 @@ export class HomeComponent implements OnInit {
     this.getLoggedUser();
     this.obtenerReportes();
     this.obtenerCantidadMaterial();
-    this.mostrarMaterialesDisponiblesBajos
-    
+    this.mostrarMaterialesDisponiblesBajos();
+    this.obtenerReportesDelEmpleado();
   }
 
   toggleSidebar() {
@@ -89,18 +91,46 @@ getLoggedUser(): void {
   this.ApiRequestService.me().subscribe(
     (response: any) => {
       const roleId = response.role_id;
+      this.empleado_id = response.id
      
       
       if (roleId === 1) {
         this.employeeRole = 'admin';
-      } else {
+      } else if(roleId === 2){
+        this.employee = response;
+        this.employeeRole = 'manager';
+      }
+      else {
         this.employee = response;
         this.employeeRole = 'usuario';
       }
+      this.obtenerReportesDelEmpleado();
     },
     error => {
       console.error('Error when obtaining data from the logged in user:', error);
     }
   );
 }
+
+obtenerReportesDelEmpleado() {
+
+  this.ApiRequestService.listReportes().subscribe(
+    (response: any[]) => {
+      console.log(response);
+      // Filtrar los reportes que ha hecho el empleado actual
+      this.reportes_id = response.filter(reporte => reporte.employee_id === this.empleado_id)
+        .map(reporte => ({
+          id: reporte.id,
+          estado: reporte.state,
+          type: reporte.type,
+          date: reporte.date // Corregido de 'data' a 'date'
+        }));
+    },
+    error => {
+      console.error('Error al obtener los reportes del empleado:', error);
+    }
+  );
+}
+  
+
 }
