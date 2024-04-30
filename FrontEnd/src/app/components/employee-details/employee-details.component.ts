@@ -65,6 +65,7 @@ export class EmployeeDetailsComponent implements OnInit {
   }
 
   getEmployeeDetails(): void {
+    this.getEmployeeIdFromRoute();
     this.employeeService.getEmployeeDetails(this.employeeId)
       .subscribe(
         (employee: any) => {
@@ -210,6 +211,7 @@ export class EmployeeDetailsComponent implements OnInit {
       (response) => {
         // Actualiza la vista después de desasignar el material
         this.getEmployeeDetails();
+        
         this.successMessage = response.message;
         this.clearMessagesAfterDelay();
       },

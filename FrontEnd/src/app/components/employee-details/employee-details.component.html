@@ -62,11 +62,10 @@
         <!-- Tabla para mostrar los materiales asignados al empleado -->
         <div class="bg-white p-6 rounded shadow" *ngIf="employeeDetails">
             <h2 class="text-2xl font-bold my-4">Materiales Asignados</h2>
-            <div class="grid grid-cols-3 gap-4">
                 <!-- Iterar sobre las categorías y sus materiales asignados -->
-                <div *ngIf="employeeDetails.materials && employeeDetails.materials.length > 0">
+                <div *ngIf="employeeDetails.materials && employeeDetails.materials.length > 0" class="grid grid-cols-3 gap-4">
                     <ng-container *ngFor="let material of employeeDetails.materials">
-                        <div class="bg-white p-4 rounded shadow">
+                        <div class="bg-white p-4 rounded shadow col-span-1">
                             <p><strong>Categoría:</strong> {{ material.category_name }}</p>
                             <p><strong>Material:</strong> {{ material.material_name ? material.material_name : 'Material no asignado' }}</p>
                             <button (click)="desasignarMaterial(employeeDetails.employee_id, material.material_id)"
@@ -79,8 +78,11 @@
                 <div *ngIf="!employeeDetails.materials || employeeDetails.materials.length === 0">
                     <p>No hay materiales asignados.</p>
                 </div>                
-            </div>
         </div>
+        
+        
+        
+        
         <div *ngIf="mostrarModalEditar" class="fixed z-10 inset-0 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen px-4">
                 <!-- Contenido del modal -->
