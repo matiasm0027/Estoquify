@@ -51,6 +51,7 @@ export class EmployeesViewComponent implements OnInit {
     this.obtenerEmpleados();
     this.obtenerDepartamento();
     this.obtenerSucursales();
+    this.getLoggedUser();
   }
 
   opcionSeleccionada(opcion: string): boolean {
