@@ -48,6 +48,7 @@ export class MaterialDetailsComponent implements OnInit {
     this.getMaterialDetails();
     this.getCategoriaID();
     this.obtenerAtributos();
+    this.getLoggedUser();
     this.obtenerEmpleadoAsignado(this.materialId);
   }
 

@@ -79,15 +79,15 @@
                 <!-- Mostrar mensaje si no hay empleados asignados -->
                 <p>No hay empleados asignados a este material.</p>
                 <div *ngIf="successMessage" class="mensaje_exitoso fade-in-out mt-3 mb-3">{{ successMessage }}</div>
-                <h2 class="text-2xl font-bold my-4">Empleados Disponibles para Asignar</h2>
-                <div class="grid grid-cols-3 gap-4">
+                <h2 class="text-2xl font-bold my-4" *ngIf="employeeRole === 'admin'">Empleados Disponibles para Asignar</h2>
+                <div class="grid grid-cols-3 gap-4" *ngIf="employeeRole === 'admin'">
                     <ng-container *ngFor="let employee of asignado.assigned_employees">
                         <div class="bg-white p-4 rounded shadow">
 
                             <!-- Botón para asignar este empleado -->
                             <button (click)="asignarMaterial(employee.employee_id)">{{ employee.name }} {{
                                 employee.last_name }}
-                               <span *ngIf="employeeRole === 'admin'" style="font-size: 16px; line-height: 1;" class="ml-2">&#9650;</span> <!-- Utiliza el código Unicode para una flecha hacia arriba -->
+                               <span  style="font-size: 16px; line-height: 1;" class="ml-2">&#9650;</span> <!-- Utiliza el código Unicode para una flecha hacia arriba -->
                             </button>
                         </div>
                     </ng-container>
