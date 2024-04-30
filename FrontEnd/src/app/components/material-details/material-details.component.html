@@ -10,11 +10,11 @@
                 <!-- Botones para editar, eliminar y volver -->
                 <div class="space-x-4">
                     <button (click)="mostrarModal()"
-                        class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 px-4 rounded border border-blue-500">
+                        class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 px-4 rounded border border-blue-500" *ngIf="employeeRole === 'admin'">
                         Editar
                     </button>
                     <button (click)="confirmDelete(materialDetails)"
-                        class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 px-4 rounded border border-red-500">
+                        class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 px-4 rounded border border-red-500" *ngIf="employeeRole === 'admin'">
                         Eliminar
                     </button>
                     <button (click)="volver()"
@@ -68,7 +68,7 @@
                         asignado.assigned_employees[0].last_name }}</p>
                     <!-- Botón para desasignar el material -->
                     <button (click)="desasignarMaterial(asignado.assigned_employees[0].employee_id)"
-                        class="bg-white hover:bg-red-200 text-red-500 py-1 px-3 rounded border mt-2">
+                        class="bg-white hover:bg-red-200 text-red-500 py-1 px-3 rounded border mt-2" *ngIf="employeeRole === 'admin'">
                         Desasignar
                     </button>
                 </div>
@@ -87,7 +87,7 @@
                             <!-- Botón para asignar este empleado -->
                             <button (click)="asignarMaterial(employee.employee_id)">{{ employee.name }} {{
                                 employee.last_name }}
-                               <span style="font-size: 16px; line-height: 1;" class="ml-2">&#9650;</span> <!-- Utiliza el código Unicode para una flecha hacia arriba -->
+                               <span *ngIf="employeeRole === 'admin'" style="font-size: 16px; line-height: 1;" class="ml-2">&#9650;</span> <!-- Utiliza el código Unicode para una flecha hacia arriba -->
                             </button>
                                 
                         </div>

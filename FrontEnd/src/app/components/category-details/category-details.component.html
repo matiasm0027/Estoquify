@@ -10,9 +10,9 @@
         <div class="bg-white p-6 rounded shadow" *ngIf="categoryDetails">
             <div class="flex justify-between items-center mb-4">
                 <h1 class="text-2xl font-bold">{{this.detallesMaterial.category_name}}</h1>
-                <div class="space-x-4" *ngIf="employeeRole === 'admin'">
+                <div class="space-x-4">
                     <button (click)="mostrarModal()"
-                        class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded ">
+                        class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded " *ngIf="employeeRole === 'admin'">
                         Añadir Material
                     </button>
                     <button (click)="mostrarModalDeFiltros()"

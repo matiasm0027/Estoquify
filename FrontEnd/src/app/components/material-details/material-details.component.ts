@@ -28,6 +28,8 @@ export class MaterialDetailsComponent implements OnInit {
   ];
   asignado: any; 
   successMessage!: string;
+  employeeId!:number;
+  employeeRole!:string;
 
   constructor(
     private route: ActivatedRoute,
@@ -289,5 +291,24 @@ export class MaterialDetailsComponent implements OnInit {
       this.successMessage = '';
       //this.errorMessage = '';
     }, 2000); 
+  }
+
+  getLoggedUser(): void {
+    this.materialService.me().subscribe(
+      (response: any) => {
+        this.employeeId = response.id;
+        const roleId = response.role_id;
+       
+        
+        if (roleId === 1) {
+          this.employeeRole = 'admin';
+        } else if (roleId === 2){
+          this.employeeRole = 'manager';
+        }
+      },
+      error => {
+        console.error('Error when obtaining data from the logged in user:', error);
+      }
+    );
   }
 }
