@@ -49,12 +49,8 @@
                             <tbody>
                                 <tr *ngFor="let material of materials" class="odd:bg-blue-50 even:bg-blue-200">
                                     <td class="px-6 py-4 whitespace-nowrap">{{ material.name }}</td>
-                                    <td [ngClass]="{
-                                        'text-green-600': material.availableMaterial > 5,
-                                        'text-orange-600': material.availableMaterial === 5,
-                                        'text-red-600': material.availableMaterial < 5
-                                    }" class="px-6 py-4">{{ material.availableMaterial }}</td>
-                                    <td class="px-6 py-4">{{ material.inactiveMaterial }}</td>
+                                    <td class="px-6 py-4 text-center">{{ material.availableMaterial }}</td>
+                                    <td class="px-6 py-4 text-center">{{ material.inactiveMaterial }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -103,20 +99,33 @@
                 <!-- Columna 1: Información del empleado -->
                 <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm">
                     <div class="bg-blue-50 px-6 py-4">
-                        <h3 class="font-semibold text-lg text-gray-900 dark:text-gray-50 text-center">Información del Empleado</h3>
+                        <h3 class="font-semibold text-lg text-gray-900 dark:text-gray-50 text-center">Información del
+                            Empleado</h3>
                     </div>
                     <div class="p-6"> <!-- Aumentado el padding -->
-                        <p class="text-lg"><strong>Nombre:</strong> {{ employee.name }}</p> <!-- Aumentado el tamaño del texto -->
-                        <p class="text-lg"><strong>Apellido:</strong> {{ employee.last_name }}</p> <!-- Aumentado el tamaño del texto -->
-                        <p class="text-lg"><strong>Email:</strong> {{ employee.email }}</p> <!-- Aumentado el tamaño del texto -->
-                        <p class="text-lg"><strong>Número de teléfono:</strong> {{ employee.phone_number }}</p> <!-- Aumentado el tamaño del texto -->
+                        <p class="text-lg"><strong>Nombre:</strong> {{ employee.name }}</p>
+                        <!-- Aumentado el tamaño del texto -->
+                        <p class="text-lg"><strong>Apellido:</strong> {{ employee.last_name }}</p>
+                        <!-- Aumentado el tamaño del texto -->
+                        <p class="text-lg"><strong>Email:</strong> {{ employee.email }}</p>
+                        <!-- Aumentado el tamaño del texto -->
+                        <p class="text-lg"><strong>Número de teléfono:</strong> {{ employee.phone_number }}</p>
+                        <!-- Aumentado el tamaño del texto -->
+                    </div>
+                    <div class="bg-blue-50 px-6 py-2 ">
+                        <h3 class="font-semibold text-lg text-gray-900 dark:text-gray-50 text-center">Información de
+                            Stock</h3>
+                    </div>
+                    <div class="message px-6 py-4">
+                        <strong>Los niveles de stock estan correctos</strong>
                     </div>
                 </div>
-            
+
                 <!-- Columna 2: Tabla de reportes -->
                 <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm">
                     <div class="bg-blue-50 px-6 py-4">
-                        <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Estado de las incidencias</h3>
+                        <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Estado de las
+                            incidencias</h3>
                     </div>
                     <div class="p-4">
                         <!-- Verifica si hay reportes -->
@@ -133,16 +142,18 @@
                                 <tbody>
                                     <!-- Itera sobre los reportes y muestra los campos en la tabla -->
                                     <tr *ngFor="let reporte of reportes_id">
+
                                         <td class="border px-4 py-2">{{ reporte.id }}</td>
                                         <td class="border px-4 py-2">{{ reporte.date }}</td>
                                         <td class="border px-4 py-2">
                                             <span [ngClass]="{
                                                 'text-blue-600': reporte.estado === 'pending',
                                                 'text-green-600': reporte.estado === 'accepted',
-                                                'text-red-600': reporte.estado === 'denied'
-                                            }">{{ reporte.estado }}</span>
+                                                'text-red-600': reporte.estado === 'rejected'
+                                              }">{{ reporte.estado }}</span>
                                         </td>
                                         <td class="border px-4 py-2">{{ reporte.type }}</td>
+
                                     </tr>
                                 </tbody>
                             </table>
@@ -200,12 +211,8 @@
                             <tbody>
                                 <tr *ngFor="let material of materials" class="odd:bg-blue-50 even:bg-blue-200">
                                     <td class="px-6 py-4 whitespace-nowrap">{{ material.name }}</td>
-                                    <td [ngClass]="{
-                        'text-green-600': material.availableMaterial > 5,
-                        'text-orange-600': material.availableMaterial === 5,
-                        'text-red-600': material.availableMaterial < 5
-                    }" class="px-6 py-4">{{ material.availableMaterial }}</td>
-                                    <td class="px-6 py-4">{{ material.inactiveMaterial }}</td>
+                                    <td class="px-6 py-4 text-center">{{ material.availableMaterial }}</td>
+                                    <td class="px-6 py-4 text-center">{{ material.inactiveMaterial }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -275,12 +282,8 @@
                             <tbody>
                                 <tr *ngFor="let material of materials" class="odd:bg-blue-50 even:bg-blue-200">
                                     <td class="px-6 py-4 whitespace-nowrap">{{ material.name }}</td>
-                                    <td [ngClass]="{
-                        'text-green-600': material.availableMaterial > 5,
-                        'text-orange-600': material.availableMaterial === 5,
-                        'text-red-600': material.availableMaterial < 5
-                    }" class="px-6 py-4">{{ material.availableMaterial }}</td>
-                                    <td class="px-6 py-4">{{ material.inactiveMaterial }}</td>
+                                    <td class="px-6 py-4 text-center">{{ material.availableMaterial }}</td>
+                                    <td class="px-6 py-4 text-center">{{ material.inactiveMaterial }}</td>
                                 </tr>
                             </tbody>
                         </table>

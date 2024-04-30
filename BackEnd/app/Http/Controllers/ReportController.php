@@ -79,6 +79,7 @@ class ReportController extends Controller{
                 'state' => $report->state,
                 'priority' => $report->priority,
                 'type' => $report->type,
+                'updated' => $report->updated_at,
                 'employee_id' => $report->employee->id,
                 'employee_name' => $report->employee->name . ' ' . $report->employee->last_name,
                 'employee_id_sucursal' => $report->employee->branch_office_id ,
