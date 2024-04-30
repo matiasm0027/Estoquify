@@ -65,7 +65,6 @@ export class ReportesViewComponent implements OnInit {
   obtenerNombreCategoria(){
     this.apiRequestService.categoryMaterialInfo().subscribe(
       (response: any[]) => {
-        console.log(response),
         this.categories = response.map(material => ({
           id: material.id,
           name: material.name, // Cambiar a category_name

@@ -117,6 +117,14 @@ class EmployeeMaterialController extends Controller
     public function asignarMaterial(Request $request, $materialId)
     {
         try {
+            // Verificar si el usuario está autenticado
+            $user = auth()->user();
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no autenticado'], 401);
+            }
+    
+            // Verificar si el usuario tiene el rol permitido
+            $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
             // Validar el ID del empleado
             $employeeId = $request->input('employee_id');
             $employee = Employee::find($employeeId);
@@ -145,6 +153,14 @@ class EmployeeMaterialController extends Controller
     public function desasignarMaterial(Request $request, $materialId)
     {
         try {
+            // Verificar si el usuario está autenticado
+            $user = auth()->user();
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no autenticado'], 401);
+            }
+    
+            // Verificar si el usuario tiene el rol permitido
+            $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
             // Validar el ID del empleado
             $employeeId = $request->input('employee_id');
             $employee = Employee::find($employeeId);
@@ -182,6 +198,21 @@ class EmployeeMaterialController extends Controller
             return response()->json(['message' => 'Material desasignado correctamente'], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al desasignar material: ' . $e->getMessage()], 500);
+        }
+    }
+
+    protected function checkUserRole($allowedRoles)
+    {
+        if (!Auth::check()) {
+            // El usuario no está autenticado
+            abort(401, 'Unauthorized');
+        }
+
+        $user = Auth::user();
+
+        if (!in_array($user->role_id, $allowedRoles)) {
+            // El usuario no tiene uno de los roles permitidos
+            abort(403, 'Access denied');
         }
     }
 }
