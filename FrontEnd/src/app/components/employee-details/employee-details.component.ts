@@ -38,6 +38,7 @@ export class EmployeeDetailsComponent implements OnInit {
     this.obtenerDepartamento();
     this.obtenerSucursales();
     this.getEmployeeDetails();
+    this.getLoggedUser();
   }
 
   initForm() {
