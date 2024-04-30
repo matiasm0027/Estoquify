@@ -70,7 +70,7 @@
                             <p><strong>Categoría:</strong> {{ material.category_name }}</p>
                             <p><strong>Material:</strong> {{ material.material_name ? material.material_name : 'Material no asignado' }}</p>
                             <button (click)="desasignarMaterial(employeeDetails.employee_id, material.material_id)"
-                                class="bg-white hover:bg-red-200 text-red-500 py-1 px-3 rounded border mt-2">
+                                class="bg-white hover:bg-red-200 text-red-500 py-1 px-3 rounded border mt-2" *ngIf="employeeRole === 'admin'">
                                 Desasignar
                             </button>
                         </div>
