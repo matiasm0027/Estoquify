@@ -20,7 +20,6 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { CategoryDetailsComponent } from './components/category-details/category-details.component';
 import { MaterialDetailsComponent } from './components/material-details/material-details.component';
-import { ReportsComponent } from './components/reports/reports.component';
 import { ReportesViewComponent } from './components/reportes-view/reportes-view.component';
 
 @NgModule({
@@ -37,7 +36,6 @@ import { ReportesViewComponent } from './components/reportes-view/reportes-view.
     ForgotPasswordComponent,
     ResetPasswordComponent,
     MaterialDetailsComponent,
-    ReportsComponent,
     ReportesViewComponent
     
   ],

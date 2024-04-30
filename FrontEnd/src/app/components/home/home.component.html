@@ -143,16 +143,16 @@
                                     <!-- Itera sobre los reportes y muestra los campos en la tabla -->
                                     <tr *ngFor="let reporte of reportes_id">
 
-                                        <td class="border px-4 py-2">{{ reporte.id }}</td>
-                                        <td class="border px-4 py-2">{{ reporte.date }}</td>
-                                        <td class="border px-4 py-2">
-                                            <span [ngClass]="{
+                                        <td class="border px-4 py-2 text-center">{{ reporte.id }}</td>
+                                        <td class="border px-4 py-2 text-center">{{ reporte.date }}</td>
+                                        <td class="border px-4 py-2 text-center">
+                                            <span class="text-center" [ngClass]="{
                                                 'text-blue-600': reporte.estado === 'pending',
                                                 'text-green-600': reporte.estado === 'accepted',
                                                 'text-red-600': reporte.estado === 'rejected'
                                               }">{{ reporte.estado }}</span>
                                         </td>
-                                        <td class="border px-4 py-2">{{ reporte.type }}</td>
+                                        <td class="border px-4 py-2 text-center">{{ reporte.type }}</td>
 
                                     </tr>
                                 </tbody>
