@@ -41,16 +41,16 @@
                         <table class="w-full text-sm text-gray-700 dark:text-gray-400">
                             <thead class="bg-blue-100">
                                 <tr>
-                                    <th class="px-6 py-3 text-left">Nombre</th>
-                                    <th class="px-6 py-3 text-left">Cantidad Disponible</th>
-                                    <th class="px-6 py-3 text-left">Cantidad de Bajas</th>
+                                    <th class="px-6 py-3 text-center">Nombre</th>
+                                    <th class="px-6 py-3 text-center">Total</th>
+                                    <th class="px-6 py-3 text-center">Asignados</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let material of materials" class="odd:bg-blue-50 even:bg-blue-200">
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ material.name }}</td>
-                                    <td class="px-6 py-4 text-center">{{ material.availableMaterial }}</td>
-                                    <td class="px-6 py-4 text-center">{{ material.inactiveMaterial }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">{{ material.name }}</td>
+                                    <td class="px-6 py-4 text-center">{{ material.total_material }}</td>
+                                    <td class="px-6 py-4 text-center">{{ material.activeMaterial }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -178,16 +178,16 @@
                         <table class="w-full text-sm text-gray-700 dark:text-gray-400">
                             <thead class="bg-blue-100">
                                 <tr>
-                                    <th class="px-6 py-3 text-left">Nombre</th>
-                                    <th class="px-6 py-3 text-left">Total</th>
-                                    <th class="px-6 py-3 text-left">Asignados</th>
+                                    <th class="px-6 py-3 text-center">Nombre</th>
+                                    <th class="px-6 py-3 text-center">Total</th>
+                                    <th class="px-6 py-3 text-center">Asignados</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let material of materials" class="odd:bg-blue-50 even:bg-blue-200">
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ material.name }}</td>
-                                    <td class="px-6 py-4">{{ material.total_material }}</td>
-                                    <td class="px-6 py-4">{{ material.activeMaterial }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">{{ material.name }}</td>
+                                    <td class="px-6 py-4 text-center">{{ material.total_material }}</td>
+                                    <td class="px-6 py-4 text-center">{{ material.activeMaterial }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -203,14 +203,14 @@
                         <table class="w-full text-sm text-gray-700 dark:text-gray-400">
                             <thead class="bg-blue-100">
                                 <tr>
-                                    <th class="px-6 py-3 text-left">Nombre</th>
-                                    <th class="px-6 py-3 text-left">Cantidad Disponible</th>
-                                    <th class="px-6 py-3 text-left">Cantidad de Bajas</th>
+                                    <th class="px-6 py-3 text-center">Nombre</th>
+                                    <th class="px-6 py-3 text-center">Cantidad Disponible</th>
+                                    <th class="px-6 py-3 text-center">Cantidad de Bajas</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let material of materials" class="odd:bg-blue-50 even:bg-blue-200">
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ material.name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">{{ material.name }}</td>
                                     <td class="px-6 py-4 text-center">{{ material.availableMaterial }}</td>
                                     <td class="px-6 py-4 text-center">{{ material.inactiveMaterial }}</td>
                                 </tr>
@@ -274,14 +274,14 @@
                         <table class="w-full text-sm text-gray-700 dark:text-gray-400">
                             <thead class="bg-blue-100">
                                 <tr>
-                                    <th class="px-6 py-3 text-left">Nombre</th>
-                                    <th class="px-6 py-3 text-left">Cantidad Disponible</th>
-                                    <th class="px-6 py-3 text-left">Cantidad de Bajas</th>
+                                    <th class="px-6 py-3 text-center">Nombre</th>
+                                    <th class="px-6 py-3 text-center">Cantidad Disponible</th>
+                                    <th class="px-6 py-3 text-center">Cantidad de Bajas</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let material of materials" class="odd:bg-blue-50 even:bg-blue-200">
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ material.name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">{{ material.name }}</td>
                                     <td class="px-6 py-4 text-center">{{ material.availableMaterial }}</td>
                                     <td class="px-6 py-4 text-center">{{ material.inactiveMaterial }}</td>
                                 </tr>
