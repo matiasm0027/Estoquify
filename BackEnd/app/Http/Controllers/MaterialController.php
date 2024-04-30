@@ -97,7 +97,7 @@ class MaterialController extends Controller
         }
 
         // Verificar si el usuario tiene el rol permitido
-        $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
+        $this->checkUserRole(['1','2']); // Cambia '1' por el ID del rol permitido
 
         // Buscar el material por su ID
         $material = Material::with('category', 'attribute')->find($id);
