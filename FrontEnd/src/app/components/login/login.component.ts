@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
     private apiService: ApiRequestService
   ) {
     this.loginForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'),]],
       password: ['', Validators.required]
     });
   }

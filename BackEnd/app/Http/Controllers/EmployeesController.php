@@ -335,28 +335,28 @@ class EmployeesController extends Controller
     }
 
     public function listEmployeesByBranchOffice(Request $request, $id_branch_office)
-{
-    $user = $request->user()->id;
+    {
+        $user = $request->user()->id;
 
-    $employees = Employee::with('department', 'branchOffice')
-        ->where('id', '!=', $user)
-        ->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
-        ->where('branch_office_id', $id_branch_office)
-        ->get()
-        ->map(function ($employee) {
-            return [
-                'id' => $employee->id,
-                'name' => $employee->name,
-                'last_name' => $employee->last_name,
-                'email' => $employee->email,
-                'department' => $employee->department ? $employee->department->name : null,
-                'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
-            ];
-        });
+        $employees = Employee::with('department', 'branchOffice')
+            ->where('id', '!=', $user)
+            ->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
+            ->where('branch_office_id', $id_branch_office)
+            ->get()
+            ->map(function ($employee) {
+                return [
+                    'id' => $employee->id,
+                    'name' => $employee->name,
+                    'last_name' => $employee->last_name,
+                    'email' => $employee->email,
+                    'department' => $employee->department ? $employee->department->name : null,
+                    'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
+                ];
+            });
 
-    return response()->json($employees);
-}
-    
+        return response()->json($employees);
+    }
+ 
     protected function checkUserRole($allowedRoles)
     {
         if (!Auth::check()) {

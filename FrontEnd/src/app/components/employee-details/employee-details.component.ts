@@ -45,7 +45,7 @@ export class EmployeeDetailsComponent implements OnInit {
     this.formularioEmpleado = this.fb.group({
       nombre: [this.employeeDetails.name, Validators.required],
       apellido: [this.employeeDetails.last_name, Validators.required],
-      email: [this.employeeDetails.email, [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'),]],
       departamento: [this.employeeDetails.department, Validators.required],
       sucursal: [this.employeeDetails.branch_office, Validators.required],
       rol: [this.employeeDetails.role, Validators.required],

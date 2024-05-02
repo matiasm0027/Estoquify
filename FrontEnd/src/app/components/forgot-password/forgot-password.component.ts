@@ -19,7 +19,7 @@ export class ForgotPasswordComponent implements OnInit {
     private router: Router
   ) {
     this.changePasswordForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]]
+      email: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'),]],
     });
   }
 
@@ -32,11 +32,12 @@ export class ForgotPasswordComponent implements OnInit {
   submitResetPassword(): void {
     if (this.changePasswordForm.valid) {
       const emailValue = this.changePasswordForm.value.email; // Obtener el valor del campo email
-
+  
+      // Después de verificar el email, si es válido, enviar la solicitud de cambio de contraseña
       this.apiService.resetPasswordRequest(emailValue).subscribe(
         (response) => {
           this.successMessage = response.message;
-          this.errorMessage= "";
+          this.errorMessage = "";
         },
         (error) => {
           this.errorMessage = error.error.error;

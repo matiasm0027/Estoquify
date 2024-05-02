@@ -37,12 +37,12 @@ export class EmployeesViewComponent implements OnInit {
     this.formularioEmpleado = this.fb.group({
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'),]],
       password: ['', Validators.required],
       departamento: ['', Validators.required],
       sucursal: ['', Validators.required],
       rol: ['', Validators.required],
-      telefonoMovil: ['', Validators.required],
+      telefonoMovil: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
     });
     
   }
