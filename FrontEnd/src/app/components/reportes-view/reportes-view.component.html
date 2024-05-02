@@ -224,15 +224,13 @@
                         </div>
                         <!-- Cuerpo del modal -->
                         <div class="p-4">
+                            <form [formGroup]="formularioEmpleado" (submit)="agregarEmpleado()">
                             <!-- Campo de búsqueda de empleados -->
                             <div class="mb-4">
                                 <label for="buscarEmpleado" class="block text-gray-700">Buscar Empleado</label>
                                 <input type="text" id="buscarEmpleado" name="buscarEmpleado"
                                     class="form-input mt-1 block w-full" placeholder="Ingrese el nombre del empleado">
                             </div>
-                            <!-- Formulario aquí -->
-                            <form [formGroup]="formularioEmpleado" (submit)="agregarEmpleado()">
-                                <!-- Resto del formulario -->
                                 <!-- Select de materiales por categoría -->
                                 <div class="mb-4">
                                     <label class="block text-gray-700">Categoría de Material</label>
