@@ -138,8 +138,13 @@ export class ApiRequestService {
   agregarReporte(reporte: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/agregarReporte`, reporte);
   }
+
   cambiarEstadoReporte(idReporte: number, nuevoEstado: string): Observable<any> {
     const requestBody = { estado: nuevoEstado };
     return this.http.put<any>(`${this.apiUrl}/auth/changeReportStatus/${idReporte}`, requestBody);
+  }
+
+  listEmployeesByBranchOffice(id_branch_office : number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/auth/listEmployeesByBranchOffice/${id_branch_office}`);
   }
 }

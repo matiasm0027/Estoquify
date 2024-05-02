@@ -41,6 +41,7 @@ Route::group([
     Route::get('listEmployeeMaterial/{id}', [EmployeesController::class, 'listEmployeeMaterial']);
     Route::post('resetPasswordRequest', [EmployeesController::class, 'resetPasswordRequest']);
     Route::post('resetPassword', [EmployeesController::class, 'resetPassword']);
+    Route::get('listEmployeesByBranchOffice/{id_branch_office}', [EmployeesController::class, 'listEmployeesByBranchOffice']);
 
     Route::get('employeeInfoAssignments/{id}', [EmployeeMaterialController::class, 'employeeInfoAssignments']);
     Route::get('materialAssignedEmployees/{id}', [EmployeeMaterialController::class, 'materialAssignedEmployees']);
