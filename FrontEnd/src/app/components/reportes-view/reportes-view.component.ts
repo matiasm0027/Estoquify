@@ -13,6 +13,8 @@ export class ReportesViewComponent implements OnInit {
   categories: any[] = [];
   altaEmpleado: boolean = false;
   solicitudMaterial: boolean = false;
+  bajaEmpleado: boolean = false;
+  bajaMaterial: boolean = false;
   categoriasSeleccionadas: { [key: string]: boolean } = {};
   prioridadLow: boolean = false;
   prioridadMedium: boolean = false;
@@ -28,6 +30,8 @@ export class ReportesViewComponent implements OnInit {
   formularioEmpleado: FormGroup;
   departamentos: any[] = [];
   mostrarModalAgregar: boolean = false;
+  mostrarModalMaterial: boolean = false;
+  detallesMaterial: { [key: number]: any[] } = {};
 
   
 
@@ -69,6 +73,9 @@ export class ReportesViewComponent implements OnInit {
           id: material.id,
           name: material.name, // Cambiar a category_name
         }));
+        this.categories.forEach(categoria => {
+          this.getCategoriaDetails(categoria.id);
+        });
       }
     );
   }
@@ -76,13 +83,27 @@ export class ReportesViewComponent implements OnInit {
   toggleCheckbox(selectedCheckbox: string) {
     this.petition = '';
     if (selectedCheckbox === 'altaEmpleado' && this.altaEmpleado) {
-        this.solicitudMaterial = false; // Desselecciona Solicitud Material si se selecciona Alta Empleado
+        this.solicitudMaterial = false; // Deselecciona Solicitud Material si se selecciona Alta Empleado
+        this.bajaEmpleado = false;
+        this.bajaMaterial = false;
         this.onAltaEmpleado();
     } else if (selectedCheckbox === 'solicitudMaterial' && this.solicitudMaterial) {
-        this.altaEmpleado = false; // Desselecciona Alta Empleado si se selecciona Solicitud Material
-        this.onCategoriaChange()
+        this.altaEmpleado = false; // Deselecciona Alta Empleado si se selecciona Solicitud Material
+        this.bajaEmpleado = false;
+        this.bajaMaterial = false;
+        this.onCategoriaChange();
+    } else if (selectedCheckbox === 'bajaEmpleado') {
+      this.solicitudMaterial = false;
+      this.altaEmpleado = false;
+      this.bajaMaterial = false;
+        this.onBajaEmpleado(); // Llama a la función para manejar Baja Empleado
+    } else if (selectedCheckbox === 'bajaMaterial') {
+      this.solicitudMaterial = false;
+      this.altaEmpleado = false;
+      this.bajaEmpleado = false;
+        this.onBajaMaterial(); // Llama a la función para manejar Baja Material
     }
-}
+  }
 
 togglePriority(selectedPriority: string) {
   if (selectedPriority === 'prioridadLow' && this.prioridadLow) {
@@ -127,45 +148,59 @@ mostrarNotificacion(mensaje: string, duracion: number = 4000) {
 
 agregarReporte() {
   const date = new Date().toISOString().slice(0, 10);
-  const type = this.altaEmpleado ? 'Alta Empleado' : 'Solicitud Material'; // Determina el tipo según la selección del usuario
-  try {
-      let reporte;
-      if (type === 'Alta Empleado') {
-          reporte = {
-              date: date,
-              type: type,
-              petition: this.petition,
-              state: 'pending',
-              priority: this.getPriority(),
-              employee_id: this.employeeId
-          };
-      } else {
-          reporte = {
-              date: date,
-              type: type,
-              petition: this.petition,
-              state: 'pending',
-              priority: this.getPriority(),
-              employee_id: this.employeeId,
-              category: this.getCategoriasSeleccionadasIds()
-          };
-      }
-      this.apiRequestService.agregarReporte(reporte).subscribe(
-        (response: any) => {
-          this.resetForm();
-          this.mostrarNotificacion('El reporte se ha enviado correctamente', 4000);
-        },
-        (error: any) => {
-          console.error('Error al agregar el reporte:', error);
-        }
-      );
-    
-  } catch (error) {
-      console.error("Error al agregar el reporte:", error);
-      // Maneja el error de acuerdo a tus necesidades, por ejemplo, mostrar un mensaje al usuario
+  let type: string = '';
+
+  // Determinar el tipo según la selección del usuario
+  if (this.altaEmpleado) {
+    type = 'Alta Empleado';
+  } else if (this.solicitudMaterial) {
+    type = 'Solicitud Material';
+  } else if (this.bajaEmpleado) {
+    type = 'Baja Empleado';
+  } else if (this.bajaMaterial) {
+    type = 'Baja Material';
   }
 
-  
+  try {
+    let reporte;
+
+    // Construir el objeto de reporte
+    if (type === 'Solicitud Material') {
+      reporte = {
+        date: date,
+        type: type,
+        petition: this.petition,
+        state: 'pending',
+        priority: this.getPriority(),
+        employee_id: this.employeeId,
+        category: this.getCategoriasSeleccionadasIds()
+      };
+    } else {
+      reporte = {
+        date: date,
+        type: type,
+        petition: this.petition,
+        state: 'pending',
+        priority: this.getPriority(),
+        employee_id: this.employeeId
+      };
+    }
+
+    // Llamar al servicio API para agregar el reporte
+    this.apiRequestService.agregarReporte(reporte).subscribe(
+      (response: any) => {
+        this.resetForm();
+        this.mostrarNotificacion('El reporte se ha enviado correctamente', 4000);
+      },
+      (error: any) => {
+        console.error('Error al agregar el reporte:', error);
+        // Manejar el error si es necesario
+      }
+    );
+  } catch (error) {
+    console.error("Error al agregar el reporte:", error);
+    // Manejar el error de acuerdo a tus necesidades, por ejemplo, mostrar un mensaje al usuario
+  }
 }
 
 getPriority(): string {
@@ -201,6 +236,18 @@ getCategoriasSeleccionadas(): { id: number, name: string }[] {
     }
   }
   return categoriasSeleccionadas;
+}
+
+onBajaEmpleado() {
+  if (this.bajaEmpleado) {
+    this.petition += 'Empleado: '; // Agrega "Empleado: " a la petición si se selecciona Baja Empleado
+  } 
+}
+
+onBajaMaterial() {
+  if (this.bajaMaterial) {
+    this.petition += 'Material: '; // Agrega "Material: " a la petición si se selecciona Baja Material
+  }
 }
 
 onAltaEmpleado() {
@@ -354,5 +401,39 @@ mostrarModal() {
 cerrarModal_Agregar() {
   this.mostrarModalAgregar = false;
   this.formularioEmpleado.reset();
+}
+
+mostrarModal_Material() {
+  this.mostrarModalMaterial = true;
+  this.obtenerNombreCategoria()
+}
+
+cerrarModal_Material() {
+  this.mostrarModalMaterial = false;
+  this.formularioEmpleado.reset();
+}
+
+getCategoriaDetails(idCategoria: number): void {
+  this.apiRequestService.getCategoriaDetails(idCategoria).subscribe(
+    (categoria: any) => {
+      // Filtra los materiales disponibles de la categoría
+      const materialesDisponibles = categoria.materials.filter((material: any) => material.state === 'available');
+
+      // Verifica si el material ya existe en detallesMaterial antes de agregarlo
+      for (const material of materialesDisponibles) {
+        const existeMaterial = this.detallesMaterial[idCategoria]?.some((m: any) => m.id === material.id);
+        if (!existeMaterial) {
+          this.detallesMaterial[idCategoria] = [...(this.detallesMaterial[idCategoria] || []), material];
+        }
+      }
+    },
+    (error: any) => {
+      console.error('Error al obtener los detalles de la categoría:', error);
+    }
+  );
+}
+
+onChangeCategoria(idCategoria: number): void {
+  this.getCategoriaDetails(idCategoria);
 }
 }
