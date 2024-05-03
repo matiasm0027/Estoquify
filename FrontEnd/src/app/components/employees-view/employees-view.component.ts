@@ -175,4 +175,60 @@ export class EmployeesViewComponent implements OnInit {
       }
     );
   }
+
+  private convertToCsv(data: any[]): string {
+    if (!Array.isArray(data) || data.length === 0) {
+      console.error('Los datos de la tabla no son válidos o están vacíos.');
+      return '';
+    }
+  
+    const csvRows: string[] = [];
+    const headers: string[] = [];
+    
+    // Extraer encabezados de la primera fila
+    for (const key in data[0]) {
+      headers.push(key);
+    }
+    csvRows.push(headers.join(','));
+  
+    // Iterar sobre cada objeto en la matriz y generar una fila de CSV
+    data.forEach(obj => {
+      const values: string[] = [];
+      headers.forEach(header => {
+        values.push(this.escapeCsvValue(obj[header]));
+      });
+      csvRows.push(values.join(','));
+    });
+  
+    return csvRows.join('\n');
+  }
+  
+  
+  
+  private escapeCsvValue(value: any): string {
+    if (typeof value === 'string') {
+      return `"${value.replace(/"/g, '""')}"`;
+    }
+    return value;
+  }
+  
+
+  downloadCsv() {
+    if (!this.employees) {
+      console.error('No hay datos de empleado disponibles');
+      return;
+    }
+    const csvContent = this.convertToCsv(this.employees);
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'employee_details.csv';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  }
+
+  
 }

@@ -250,4 +250,51 @@ export class EmployeeDetailsComponent implements OnInit {
       }
     );
   }
+
+ 
+
+  private convertToCsv(data: any): string {
+    if (!data || typeof data !== 'object') {
+      console.error('Los datos de la tabla no son válidos.');
+      return '';
+    }
+  
+    const dataArray = [data]; // Convertir el objeto en un array de un solo elemento
+    const csvRows = [];
+    const headers = Object.keys(dataArray[0]);
+    csvRows.push(headers.join(','));
+  
+    dataArray.forEach(item => {
+      const values = headers.map(header => this.escapeCsvValue(item[header]));
+      csvRows.push(values.join(','));
+    });
+  
+    return csvRows.join('\n');
+  }
+  
+  
+
+  downloadCsv() {
+    if (!this.employeeDetails) {
+      console.error('No hay datos de empleado disponibles');
+      return;
+    }
+    const csvContent = this.convertToCsv(this.employeeDetails);
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'employee_details.csv';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  }
+
+  private escapeCsvValue(value: any): string {
+    if (typeof value === 'string') {
+      return `"${value.replace(/"/g, '""')}"`;
+    }
+    return value;
+  }
 }
