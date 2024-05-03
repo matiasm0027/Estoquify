@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Employee } from '../../model/Employee';
+import { Role } from '../../model/Role';
+import { Department } from '../../model/Department';
+import { BranchOffice } from '../../model/BranchOffice';
+
 
 @Injectable({
   providedIn: 'root'
@@ -22,8 +27,8 @@ export class ApiRequestService {
     return this.http.post<any>(`${this.apiUrl}/auth/refresh`, {});
   }
 
-  listEmployees(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/auth/listEmployees`);
+  listEmployees(): Observable<Employee[]> {
+    return this.http.get<Employee[]>(`${this.apiUrl}/auth/listEmployees`);
   }
 
   addEmployee(employeeData: any): Observable<any> {
@@ -34,12 +39,16 @@ export class ApiRequestService {
     return this.http.put<any>(`${this.apiUrl}/auth/editEmployee/${id}`, employeeData);
   }
 
-  listDepartments(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/auth/listDepartments`);
+  listDepartments(): Observable<Department[]> {
+    return this.http.get<Department[]>(`${this.apiUrl}/auth/listDepartments`);
   }
 
-  listBranchOffices(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/auth/listBranchOffices`);
+  listBranchOffices(): Observable<BranchOffice[]> {
+    return this.http.get<BranchOffice[]>(`${this.apiUrl}/auth/listBranchOffices`);
+  }
+
+  listRoles(): Observable<Role[]> {
+    return this.http.get<Role[]>(`${this.apiUrl}/auth/listRoles`);
   }
 
   listAtributos(): Observable<any[]> {

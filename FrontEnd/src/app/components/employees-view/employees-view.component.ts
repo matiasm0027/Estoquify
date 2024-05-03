@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
+import { Employee } from '../../model/Employee';
 
 @Component({
   selector: 'app-employees-view',
@@ -10,7 +11,7 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
 
 export class EmployeesViewComponent implements OnInit {
   page: number = 1;
-  employees: any[] = [];
+  employees: Employee[] = [];
   empleadosFiltrados: any[] = [];
   mostrarModalAgregar: boolean = false;
   filtroSeleccionado: string = '';
@@ -128,8 +129,8 @@ export class EmployeesViewComponent implements OnInit {
 
   obtenerEmpleados() {
     this.peticionesService.listEmployees().subscribe(
-      (response: any[]) => {
-        this.employees = response;
+      (data: Employee[]) => {
+        this.employees = data;
         this.aplicarFiltro(); // Aplicar filtro cada vez que se obtienen nuevos datos
       },
       error => {
