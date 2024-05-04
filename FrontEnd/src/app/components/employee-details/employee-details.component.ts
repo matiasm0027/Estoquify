@@ -33,6 +33,7 @@ export class EmployeeDetailsComponent implements OnInit {
     private router: Router
   ) {}
 
+  
   ngOnInit(): void {
     this.getEmployeeIdFromRoute();
     this.obtenerDepartamento();
@@ -40,6 +41,7 @@ export class EmployeeDetailsComponent implements OnInit {
     this.getEmployeeDetails();
     this.getLoggedUser();
   }
+
 
   initForm() {
     this.formularioEmpleado = this.fb.group({
@@ -53,10 +55,12 @@ export class EmployeeDetailsComponent implements OnInit {
     });
   }
 
+
   toggleSidebar() {
     this.sidebarVisible = !this.sidebarVisible;
     this.sidebarWidth = this.sidebarVisible ? 250 : 0;
   }
+
 
   getEmployeeIdFromRoute(): void {
     this.route.params.subscribe(params => {
@@ -78,19 +82,23 @@ export class EmployeeDetailsComponent implements OnInit {
       );
   }
 
+
   volver() {
     this.router.navigate(['/employees_view']);
   }
 
+
   mostrarModal() {
     this.mostrarModalEditar = true;
   }
+
 
   cerrarModal() {
     this.mostrarModalEditar = false;
     this.getEmployeeDetails();
     this.formularioEmpleado.reset();
   }
+
 
   editarEmpleado(): void {
     if (this.formularioEmpleado.valid) {
@@ -155,6 +163,7 @@ export class EmployeeDetailsComponent implements OnInit {
   
   }
 
+
   obtenerDepartamento() {
     this.employeeService.listDepartments().subscribe(
       (response: any[]) => {
@@ -165,6 +174,7 @@ export class EmployeeDetailsComponent implements OnInit {
       }
     );
   }
+
 
   obtenerSucursales() {
     this.employeeService.listBranchOffices().subscribe(
@@ -252,28 +262,34 @@ export class EmployeeDetailsComponent implements OnInit {
   }
 
  
-
   private convertToCsv(data: any): string {
     if (!data || typeof data !== 'object') {
       console.error('Los datos de la tabla no son válidos.');
       return '';
     }
   
-    const dataArray = [data]; // Convertir el objeto en un array de un solo elemento
-    const csvRows = [];
-    const headers = Object.keys(dataArray[0]);
-    csvRows.push(headers.join(','));
+    // Extraemos los encabezados
+    const headers = Object.keys(data);
+    const csvRows = [headers.join(',')];
   
-    dataArray.forEach(item => {
-      const values = headers.map(header => this.escapeCsvValue(item[header]));
-      csvRows.push(values.join(','));
-    });
+    // Convertimos cada objeto en una fila de CSV
+    const extractValues = (obj: any) => {
+      const values = headers.map(header => {
+        if (typeof obj[header] === 'object' && obj[header] !== null) {
+          return this.escapeCsvValue(obj[header].name); // Asumiendo que 'material' tiene una propiedad 'name'
+        } else {
+          return this.escapeCsvValue(obj[header]);
+        }
+      });
+      return values.join(',');
+    };
+  
+    csvRows.push(extractValues(data));
   
     return csvRows.join('\n');
   }
   
   
-
   downloadCsv() {
     if (!this.employeeDetails) {
       console.error('No hay datos de empleado disponibles');

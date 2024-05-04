@@ -310,6 +310,57 @@ export class CategoryDetailsComponent implements OnInit {
     });
 }
 
+private convertToCsv(data: any): string {
+  if (!data || !data.materials || !Array.isArray(data.materials) || data.materials.length === 0) {
+    console.error('Los datos de la tabla no son válidos o están vacíos.');
+    return '';
+  }
+
+  const csvRows = [];
+  const headers = ['ID', 'Nombre', 'Fecha Alta', 'Fecha Baja', 'Sucursal', 'Estado']; // Define los encabezados
+  csvRows.push(headers.join(','));
+
+  data.materials.forEach((material: any)=> {
+    const values = [
+      material.id,
+      this.escapeCsvValue(material.name),
+      material.high_date,
+      material.low_date ?? 'N/D',
+      this.getNombreSucursal(material.branch_office_id),
+      material.state
+    ];
+    const csvRow = values.map(value => this.escapeCsvValue(value)).join(',');
+    csvRows.push(csvRow);
+  });
+
+  return csvRows.join('\n');
+}
+
+
+downloadCsv() {
+  if (!this.categoryDetails) {
+    console.error('No hay datos de empleado disponibles');
+    return;
+  }
+  const csvContent = this.convertToCsv(this.categoryDetails);
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'employee_details.csv';
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+}
+
+private escapeCsvValue(value: any): string {
+  if (typeof value === 'string') {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
+}
+
   }
 
 
