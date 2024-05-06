@@ -225,12 +225,14 @@
                         <!-- Cuerpo del modal -->
                         <div class="p-4">
                             <form [formGroup]="formularioEmpleado" (submit)="agregarEmpleado()">
-                            <!-- Campo de búsqueda de empleados -->
-                            <div class="mb-4">
-                                <label for="buscarEmpleado" class="block text-gray-700">Buscar Empleado</label>
-                                <input type="text" id="buscarEmpleado" name="buscarEmpleado"
-                                    class="form-input mt-1 block w-full" placeholder="Ingrese el nombre del empleado">
-                            </div>
+                                <!-- Campo de búsqueda de empleados -->
+                                <ng-select [items]="filteredEmployees" bindLabel="name"
+                                    placeholder="Seleccionar empleado" (search)="buscarEmpleado($event)"
+                                    (change)="seleccionarEmpleado($event)">
+                                </ng-select>
+
+                                <input type="text"
+                                    [value]="selectedEmployee ? selectedEmployee.name + ' ' + selectedEmployee.last_name : ''">
                                 <!-- Select de materiales por categoría -->
                                 <div class="mb-4">
                                     <label class="block text-gray-700">Categoría de Material</label>

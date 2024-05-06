@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Employee } from 'src/app/model/Employee';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 
 @Component({
@@ -32,6 +33,9 @@ export class ReportesViewComponent implements OnInit {
   mostrarModalAgregar: boolean = false;
   mostrarModalMaterial: boolean = false;
   detallesMaterial: { [key: number]: any[] } = {};
+  employees: Employee[] = [];
+  filteredEmployees: Employee[] = [];
+  selectedEmployee: Employee | undefined;
 
   
 
@@ -406,6 +410,7 @@ cerrarModal_Agregar() {
 mostrarModal_Material() {
   this.mostrarModalMaterial = true;
   this.obtenerNombreCategoria()
+  this.obtenerEmpleados()
 }
 
 cerrarModal_Material() {
@@ -436,4 +441,34 @@ getCategoriaDetails(idCategoria: number): void {
 onChangeCategoria(idCategoria: number): void {
   this.getCategoriaDetails(idCategoria);
 }
+
+obtenerEmpleados() {
+  this.apiRequestService.listEmployees().subscribe(
+    (data: Employee[]) => {
+      this.employees = data;
+      this.filteredEmployees = data; // Inicialmente, mostrar todos los empleados
+      console.log(this.employees)
+    },
+    error => {
+      console.error('Error al obtener empleados:', error);
+    }
+  );
+}
+
+buscarEmpleado(event: { term: string; items: any[]; }) {
+  const searchTerm = event.term.toLowerCase();
+  this.filteredEmployees = this.employees.filter(employee =>
+    employee.name.toLowerCase().includes(searchTerm) ||
+    employee.last_name.toLowerCase().includes(searchTerm)
+  );
+}
+
+seleccionarEmpleado(employee: Employee) {
+  this.selectedEmployee = employee;
+}
+
+getFullName(filteredEmployees: Employee): string {
+  return `${filteredEmployees.name} ${filteredEmployees.last_name}`;
+}
+
 }
