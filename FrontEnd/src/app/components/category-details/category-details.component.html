@@ -5,7 +5,7 @@
     </div>
 
     <!-- Contenido de la página -->
-    <div class="flex flex-col justify-center lg:mt-24 lg:ml-80 lg:mr-12 box-fl container">
+    <div class="flex flex-col justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-24 md:ml-12 md:mr-12 box-fl container">
         <!-- Contenido de la vista de detalles del material -->
         <div class="bg-white p-6 rounded shadow" *ngIf="categoryDetails">
             <div class="flex justify-between items-center mb-4">
@@ -15,6 +15,9 @@
                         class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded " *ngIf="employeeRole === 'admin'">
                         Añadir Material
                     </button>
+                    <button (click)="downloadCsv()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+                        Descargar CSV
+                    </button>
                     <button (click)="mostrarModalDeFiltros()"
                         class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded ">
                         Filtro
@@ -23,10 +26,7 @@
                         class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded ">
                         Volver
                     </button>
-                    <button (click)="downloadCsv()"
-                    style="background-color: #3490dc; color: white; font-weight: bold; padding: 0.5rem 1rem; border-radius: 0.25rem;">
-                    Descargar CSV
-                    </button>
+                    
                 </div>
             </div>
             <div class="table-container overflow-x-auto">
@@ -34,9 +34,6 @@
                     class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-gray-300">
                     <thead class="text-xs text-gray-700 uppercase dark:text-gray-400">
                         <tr>
-                            <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
-                                ID
-                            </th>
                             <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
                                 Nombre
                             </th>
@@ -57,7 +54,6 @@
                     <tbody>
                         <tr
                             *ngFor="let material of categoryDetails.materials | paginate: { itemsPerPage: 10, currentPage: page }">
-                            <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ material.id }}</td>
                             <td class="px-6 py-4 text-gray-700">
                                 <span class="flex items-center ">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"

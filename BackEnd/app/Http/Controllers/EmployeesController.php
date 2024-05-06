@@ -164,8 +164,6 @@ class EmployeesController extends Controller
 
     public function resetPasswordTable($request)
     {
-        \Log::info($request['email']);
-
         // Accede a los valores del array utilizando la sintaxis de array
         return DB::table('password_resets')->where(['email' => $request['email'], 'token' => $request['resetToken']]);
     }

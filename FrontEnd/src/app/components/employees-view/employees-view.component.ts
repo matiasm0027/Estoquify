@@ -36,8 +36,8 @@ export class EmployeesViewComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private peticionesService: ApiRequestService) {
     this.formularioEmpleado = this.fb.group({
-      nombre: ['', Validators.required],
-      apellido: ['', Validators.required],
+      nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30), Validators.pattern('^[a-zA-Z]+$')]],
+      apellido: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30), Validators.pattern('^[a-zA-Z]+$')]],
       email: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'),]],
       password: ['', Validators.required],
       departamento: ['', Validators.required],
