@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Material;
 use App\Models\Attribute;
 use Illuminate\Support\Facades\Auth;
+use App\Models\EmployeeMaterial;
 
 class CategoriaMaterialController extends Controller
 {
@@ -20,6 +21,19 @@ class CategoriaMaterialController extends Controller
 
             if (!$category) {
                 return response()->json(['error' => 'Categoría no encontrada'], 404);
+            }
+
+            foreach ($category->material as $material) {
+                // Verificar si el material no tiene un registro en la tabla pivot employee_material
+                $employeeMaterial = EmployeeMaterial::where('material_id', $material->id)->first();
+                if (!$employeeMaterial && $material->state == 'active') {
+                    // Cambiar el estado del material a "disponible"
+                    $material->state = 'available';
+                    $material->save();
+                }else if ($employeeMaterial && $material->state == 'available'){
+                    $material->state = 'active';
+                    $material->save();
+                }
             }
 
             // Construir la respuesta con la información de la categoría, materiales y atributos
