@@ -12,7 +12,6 @@ import { EmployeesViewComponent } from './components/employees-view/employees-vi
 import { FormsModule } from '@angular/forms';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { NgSelectModule } from '@ng-select/ng-select';
 import { ApiRequestService } from './services/api/api-request.service';
 import { EmployeeDetailsComponent } from './components/employee-details/employee-details.component';
 import { CategoriesViewComponent } from './components/categories-view/categories-view.component';
@@ -22,6 +21,7 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
 import { CategoryDetailsComponent } from './components/category-details/category-details.component';
 import { MaterialDetailsComponent } from './components/material-details/material-details.component';
 import { ReportesViewComponent } from './components/reportes-view/reportes-view.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
   declarations: [

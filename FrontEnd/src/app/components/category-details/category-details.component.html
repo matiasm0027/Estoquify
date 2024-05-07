@@ -31,7 +31,7 @@
             </div>
             <div class="table-container overflow-x-auto">
                 <table
-                    class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-gray-300">
+                    class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-gray-300 md:mb-2 sm:mb-1">
                     <thead class="text-xs text-gray-700 uppercase dark:text-gray-400">
                         <tr>
                             <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
@@ -55,7 +55,7 @@
                         <tr
                             *ngFor="let material of categoryDetails.materials | paginate: { itemsPerPage: 10, currentPage: page }">
                             <td class="px-6 py-4 text-gray-700">
-                                <span class="flex items-center ">
+                                <span class="flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke="currentColor" class="h-4 w-4 mr-1 ">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
