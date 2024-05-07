@@ -12,8 +12,6 @@ import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-contr
 export class EmployeeDetailsComponent implements OnInit {
   employeeId!: number;
   employeeDetails: any = {};
-  sidebarVisible: boolean = true;
-  sidebarWidth: number = 250;
   departamentos: any[] = [];
   sucursales: any[] = [];
   mostrarModalEditar: boolean = false;
@@ -54,13 +52,6 @@ export class EmployeeDetailsComponent implements OnInit {
       telefonoMovil: [this.employeeDetails.phone_number]
     });
   }
-
-
-  toggleSidebar() {
-    this.sidebarVisible = !this.sidebarVisible;
-    this.sidebarWidth = this.sidebarVisible ? 250 : 0;
-  }
-
 
   getEmployeeIdFromRoute(): void {
     this.route.params.subscribe(params => {

@@ -1,8 +1,6 @@
 <div class="flex">
-    <div class="flex flex-col" [style.marginLeft.px]="sidebarVisible ? 0 : 64"> <!-- Ajusta el margen izquierdo -->
-        <app-sidebar *ngIf="sidebarVisible"></app-sidebar> <!-- Agrega ngIf para mostrar u ocultar el sidebar -->
-    </div>
-    <div class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-24 md:ml-12 md:mr-12 box-fl container">
+        <app-sidebar></app-sidebar> <!-- Agrega ngIf para mostrar u ocultar el sidebar -->
+       <div class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-24 md:ml-12 md:mr-12 box-fl container">
         <!-- Contenido de la vista principal -->
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-2xl font-bold">Empleados</h1>

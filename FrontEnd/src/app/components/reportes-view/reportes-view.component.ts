@@ -9,8 +9,6 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
   styleUrls: ['./reportes-view.component.css']
 })
 export class ReportesViewComponent implements OnInit {
-  sidebarVisible: boolean = true;
-  sidebarWidth: number = 250;
   categories: any[] = [];
   altaEmpleado: boolean = false;
   solicitudMaterial: boolean = false;
@@ -37,8 +35,6 @@ export class ReportesViewComponent implements OnInit {
   filteredEmployees: Employee[] = [];
   selectedEmployee: Employee | undefined;
 
-  
-
 
   constructor(
     private apiRequestService: ApiRequestService,
@@ -63,11 +59,6 @@ export class ReportesViewComponent implements OnInit {
     this.obtenerSucursales();
     this.obtenerReportes()
     this.obtenerDepartamento()
-  }
-
-  toggleSidebar() {
-    this.sidebarVisible = !this.sidebarVisible;
-    this.sidebarWidth = this.sidebarVisible ? 250 : 0;
   }
 
   obtenerNombreCategoria(){

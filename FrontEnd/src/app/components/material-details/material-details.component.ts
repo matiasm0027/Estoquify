@@ -12,8 +12,6 @@ import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-contr
 export class MaterialDetailsComponent implements OnInit {
   materialId!: number;
   materialDetails: any = {};
-  sidebarVisible: boolean = true;
-  sidebarWidth: number = 250;
   departamentos: any[] = [];
   sucursales: any[] = [];
   mostrarModalEditar: boolean = false;
@@ -83,11 +81,6 @@ export class MaterialDetailsComponent implements OnInit {
         console.error('Error al obtener atributos:', error);
       }
     );
-  }
-
-  toggleSidebar() {
-    this.sidebarVisible = !this.sidebarVisible;
-    this.sidebarWidth = this.sidebarVisible ? 250 : 0;
   }
 
   getMaterialIdFromRoute(): void {

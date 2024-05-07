@@ -9,8 +9,6 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
   styleUrls: ['./categories-view.component.css']
 })
 export class CategoriesViewComponent implements OnInit{
-  sidebarVisible: boolean = true;
-  sidebarWidth: number = 250;
   categoryForm: FormGroup;
   materials: any[] = [];
   mostrarModalAgregar: boolean = false;
@@ -35,17 +33,6 @@ export class CategoriesViewComponent implements OnInit{
   ngOnInit(): void {
     this.obtenerCantidadMaterial();
     this.getLoggedUser();
-  }
-
-  
-
-  toggleSidebar() {
-    this.sidebarVisible = !this.sidebarVisible;
-    if (this.sidebarVisible) {
-      this.sidebarWidth = 250; // Ancho del sidebar cuando es visible
-    } else {
-      this.sidebarWidth = 0; // Ancho del sidebar cuando es invisible
-    }
   }
 
   obtenerCantidadMaterial(){

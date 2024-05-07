@@ -9,8 +9,6 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
 })
 export class HomeComponent implements OnInit {
   
-  sidebarVisible: boolean = true;
-  sidebarWidth: number = 250;
   employeeRole!: string;
   employee!: any;
   reportes: any[] = [];
@@ -26,15 +24,6 @@ export class HomeComponent implements OnInit {
     this.obtenerCantidadMaterial();
     this.mostrarMaterialesDisponiblesBajos();
     this.obtenerReportesDelEmpleado(); 
-  }
-
-  toggleSidebar() {
-    this.sidebarVisible = !this.sidebarVisible;
-    if (this.sidebarVisible) {
-      this.sidebarWidth = 250; // Ancho del sidebar cuando es visible
-    } else {
-      this.sidebarWidth = 0; // Ancho del sidebar cuando es invisible
-    }
   }
 
   obtenerReportes() {

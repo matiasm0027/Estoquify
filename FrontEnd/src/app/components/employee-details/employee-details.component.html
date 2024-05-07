@@ -1,7 +1,5 @@
 <div class="flex">
-    <div class="flex flex-col" [style.marginLeft.px]="sidebarVisible ? 0 : 64"> <!-- Ajusta el margen izquierdo -->
-        <app-sidebar *ngIf="sidebarVisible"></app-sidebar>
-    </div>
+    <app-sidebar></app-sidebar>
     <div class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-24 md:ml-12 md:mr-12 box-fl container">
         <!-- Contenido de la vista de detalles del empleado -->
         <div class="bg-white p-6 rounded shadow" *ngIf="employeeDetails">

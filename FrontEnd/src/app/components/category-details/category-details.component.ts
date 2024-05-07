@@ -13,8 +13,6 @@ export class CategoryDetailsComponent implements OnInit {
   page: number = 1;
   categoryId!: number;
   categoryDetails: any = {};
-  sidebarVisible: boolean = true;
-  sidebarWidth: number = 250;
   mostrarModalAgregar: boolean = false;
   mostrarModalFiltros: boolean = false;
   sucursales: any[] = [];
@@ -55,11 +53,6 @@ export class CategoryDetailsComponent implements OnInit {
       sucursal: ['', Validators.required],
       atributo: ['', Validators.required]
     });
-  }
-
-  toggleSidebar() {
-    this.sidebarVisible = !this.sidebarVisible;
-    this.sidebarWidth = this.sidebarVisible ? 250 : 0;
   }
 
   obtenerSucursales() {

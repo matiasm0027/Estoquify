@@ -1,9 +1,6 @@
 <div class="flex">
-    <div class="flex flex-col">
-        <app-sidebar></app-sidebar>
-    </div>
-    <div
-        class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-16 md:ml-64 md:mr-12 sm:mt-12 sm:ml-40 sm:mr-12 box-fl container">
+    <app-sidebar></app-sidebar>
+    <div class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-16 md:ml-64 md:mr-12 sm:mt-12 sm:ml-40 sm:mr-12 box-fl container">
         <ng-container *ngIf="employeeRole === 'admin'">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Tabla 1 - Categoría de Materiales -->

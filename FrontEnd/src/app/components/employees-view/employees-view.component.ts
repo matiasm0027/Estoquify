@@ -21,8 +21,6 @@ export class EmployeesViewComponent implements OnInit {
   filtroSucursal: string = '';
   departamentos: any[] = [];
   sucursales: any[] = [];
-  sidebarVisible: boolean = true;
-  sidebarWidth: number = 250;
   employeeId!:number;
   employeeRole!:string;
 
@@ -58,14 +56,6 @@ export class EmployeesViewComponent implements OnInit {
   opcionSeleccionada(opcion: string): boolean {
     return this.opcionesFiltro.find(item => item.valor === opcion)?.seleccionado ?? false;
 }
-  toggleSidebar() {
-    this.sidebarVisible = !this.sidebarVisible;
-    if (this.sidebarVisible) {
-      this.sidebarWidth = 250; // Ancho del sidebar cuando es visible
-    } else {
-      this.sidebarWidth = 0; // Ancho del sidebar cuando es invisible
-    }
-  }
 
   obtenerDepartamento() {
     this.peticionesService.listDepartments().subscribe(

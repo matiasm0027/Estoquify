@@ -1,9 +1,6 @@
 <div class="flex">
     <!-- Sidebar -->
-    <div class="flex flex-col" [style.marginLeft.px]="sidebarVisible ? 0 : 64">
-        <app-sidebar *ngIf="sidebarVisible"></app-sidebar>
-    </div>
-
+    <app-sidebar></app-sidebar>
     <!-- Contenido de la página -->
     <div class="flex flex-col justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-24 md:ml-12 md:mr-12 box-fl container">
         <!-- Contenido de la vista de detalles del material -->
