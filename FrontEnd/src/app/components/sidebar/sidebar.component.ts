@@ -29,6 +29,7 @@ export class SidebarComponent implements OnInit{
       this.authControlService.logout();
       window.location.reload();
     }
+    
     toggleSidebar(): void {
       const sidebar = document.getElementById('logo-sidebar');
       if (sidebar) {

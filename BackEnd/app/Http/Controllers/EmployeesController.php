@@ -100,7 +100,6 @@ class EmployeesController extends Controller
 
             $email = $request->input('email');
 
-
             $employee = Employee::where('email', $email)->first();
 
             if (!$employee) {
@@ -152,11 +151,16 @@ class EmployeesController extends Controller
             'resetToken' => 'required',
         ]);
 
-        return $this->resetPasswordTable($validated) ? $this->changePasswordDB($validated) :
-            $this->NotFound();
-    } catch (\Exception $e) {
-        \Log::error('Reset password erroremail2: ' . $e->getMessage());
+        $tokenExists = $this->resetPasswordTable($validated)->exists();
 
+        if (!$tokenExists) {
+            return $this->NotFound();
+        }
+
+        $this->changePasswordDB($validated);
+
+        return response()->json(['message' => 'Successfully Changed Password'], 200);
+    } catch (\Exception $e) {
         // Return an error response with a meaningful message
         return response()->json(['error' => 'An unexpected error occurred while processing your request.'], 500);
     }
@@ -169,14 +173,15 @@ class EmployeesController extends Controller
     }
 
     public function NotFound(){
-        return response()->json(['error' => 'Token or email incorrect']);
+        return response()->json(['error' => 'Token or email incorrect'], 300);
     }
 
     public function changePasswordDB($request){
+        $employeeCambio = 
         $employee = Employee::whereEmail($request['email'])->first();
         $employee->Update(['password' => bcrypt($request['newPassword'])]);
         $this->resetPasswordTable($request)->delete();
-        return response()->json(['message' => 'Successfully Changed Password'], 200);
+        //return response()->json(['message' => 'Successfully Changed Password'], 200);
 
     }
 
