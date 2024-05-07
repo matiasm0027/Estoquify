@@ -43,7 +43,6 @@ export class EmployeesViewComponent implements OnInit {
       rol: ['', Validators.required],
       telefonoMovil: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
     });
-    
   }
 
   ngOnInit(): void {

@@ -26,7 +26,7 @@ export class CategoriesViewComponent implements OnInit{
     ) 
   {
     this.categoryForm = this.fb.group({
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
     });
   }
   
@@ -40,14 +40,13 @@ export class CategoriesViewComponent implements OnInit{
       (response: any[]) => {
         this.materials = response.map(material => ({
           id: material.id,
-          name: material.name, // Cambiar a category_name
-          total_material: material.total_materials, // Cambiar a total_materials
-          activeMaterial: material.active_materials, // Cambiar a active_materials
-          availableMaterial: material.available_materials, // Cambiar a available_materials
-          inactiveMaterial: material.inactive_materials // Cambiar a inactive_materials
-          
+          name: material.name, 
+          total_material: material.total_materials, 
+          activeMaterial: material.active_materials,
+          availableMaterial: material.available_materials,
+          inactiveMaterial: material.inactive_materials
+
         }));
-        
       }
     );
   }
