@@ -10,7 +10,6 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { EmployeesViewComponent } from './components/employees-view/employees-view.component';
 import { FormsModule } from '@angular/forms';
-import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { ApiRequestService } from './services/api/api-request.service';
 import { EmployeeDetailsComponent } from './components/employee-details/employee-details.component';
@@ -22,6 +21,7 @@ import { CategoryDetailsComponent } from './components/category-details/category
 import { MaterialDetailsComponent } from './components/material-details/material-details.component';
 import { ReportesViewComponent } from './components/reportes-view/reportes-view.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { RequestInterceptor } from './services/request/request-interceptor.service';
 
 @NgModule({
   declarations: [
@@ -47,10 +47,14 @@ import { NgSelectModule } from '@ng-select/ng-select';
     HttpClientModule,
     FormsModule,
     NgxPaginationModule,
-    NgSelectModule
+    NgSelectModule,
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RequestInterceptor,
+      multi: true
+    },
     ApiRequestService
   ],
   bootstrap: [AppComponent]
