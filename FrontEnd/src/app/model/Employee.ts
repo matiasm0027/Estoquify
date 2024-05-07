@@ -5,4 +5,5 @@ export interface Employee {
   email: string;
   department: string | null;
   branch_office: string | null;
+  fullname?: string; 
 }
