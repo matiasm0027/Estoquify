@@ -172,7 +172,7 @@
                             <div class="mb-4">
                                 <label for="sucursal" class="block text-gray-700">Sucursal</label>
                                 <select formControlName="sucursal" id="sucursal" name="sucursal"
-                                    class="form-select mt-1 block w-full" required  [(ngModel)]="employeeDetails.branch_office_id">
+                                    class="form-select mt-1 block w-full" required [(ngModel)]="employeeDetails.branch_office_id">
                                     <ng-container *ngFor="let suc of sucursales">
                                         <option [value]="suc.id"
                                             [selected]="suc.name === employeeDetails.branch_office">
