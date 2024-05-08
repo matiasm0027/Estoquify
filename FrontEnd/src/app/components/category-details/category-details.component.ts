@@ -48,8 +48,8 @@ export class CategoryDetailsComponent implements OnInit {
 
   initForm() {
     this.formularioMaterial = this.fb.group({
-      nombre: ['', Validators.required],
-      value: ['', Validators.required],
+      nombre: ['', [Validators.required, Validators.maxLength(30)]],
+      value: ['', [Validators.required, Validators.maxLength(50)]],
       sucursal: ['', Validators.required],
       atributo: ['', Validators.required]
     });
@@ -109,8 +109,9 @@ export class CategoryDetailsComponent implements OnInit {
     this.atributosAdicionales.push({});
     const controlNameAtributo = `atributo${this.atributosAdicionales.length + 1}`;
     const controlNameValor = `valor${this.atributosAdicionales.length + 1}`;
+    console.log(controlNameAtributo)
     this.formularioMaterial.addControl(controlNameAtributo, this.fb.control('', Validators.required));
-    this.formularioMaterial.addControl(controlNameValor, this.fb.control('', Validators.required));
+    this.formularioMaterial.addControl(controlNameValor, this.fb.control('', [Validators.required, Validators.maxLength(50)]));
   }
 
   eliminarAtributo(index: number) {

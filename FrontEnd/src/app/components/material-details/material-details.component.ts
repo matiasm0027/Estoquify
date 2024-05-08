@@ -56,15 +56,15 @@ export class MaterialDetailsComponent implements OnInit {
 
   initForm() {
     const formControls: { [key: string]: any } = {
-        nombre: [this.materialDetails.material.name, Validators.required],
-        valor: [this.materialDetails.material.attribute[0].pivot.value, Validators.required],
+        nombre: [this.materialDetails.material.name, [Validators.required, Validators.maxLength(30)]],
+        //valor: [this.materialDetails.material.attribute[0].pivot.value, [Validators.required, Validators.maxLength(50)]],
         sucursal: [this.materialDetails.material.branch_office_id, Validators.required],
         estado: [this.materialDetails.material.state, Validators.required],
         lowDate: [' ']
     };
 
     this.materialDetails.material.attribute.forEach((attribute: any, index: number) => {
-        formControls['atributo' + index] = [attribute.pivot.value, Validators.required];
+        formControls['atributo' + index] = [attribute.pivot.value, [Validators.required, Validators.maxLength(50)]];
     });
 
     this.formularioMaterial = this.fb.group(formControls);

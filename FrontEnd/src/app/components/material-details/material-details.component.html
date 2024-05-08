@@ -116,6 +116,12 @@
                                 <label for="nombre" class="block text-gray-700">Nombre</label>
                                 <input formControlName="nombre" type="text" id="nombre" name="nombre"
                                     class="form-input mt-1 block w-full" placeholder="Ingrese el nombre" required>
+                                    <div *ngIf="formularioMaterial.get('nombre')?.errors?.['required'] && formularioMaterial.get('nombre')?.touched" class="text-red-800 mensaje_error">
+                                        This field cannot be empty.
+                                    </div>
+                                    <div *ngIf="formularioMaterial.get('nombre')?.errors?.['maxlength'] && formularioMaterial.get('nombre')?.touched" class="text-red-800 mensaje_error">
+                                        The name cannot be more than 30 characters.
+                                    </div>
                             </div>
                             <div class="mb-4"
                                 *ngFor="let attribute of materialDetails.material?.attribute; let i = index">
@@ -124,6 +130,12 @@
                                 <input formControlName="{{ 'atributo' + i }}" type="text" [id]="'atributo' + i"
                                     [name]="'atributo' + i" class="form-input mt-1 block w-full"
                                     [placeholder]="'Ingrese el valor del atributo ' + attribute.name" required>
+                                    <div *ngIf="formularioMaterial.get('atributo' + i)?.errors?.['required'] && formularioMaterial.get('atributo' + i)?.touched" class="text-red-800 mensaje_error">
+                                        This field cannot be empty.
+                                    </div>
+                                    <div *ngIf="formularioMaterial.get('atributo' + i)?.errors?.['maxlength'] && formularioMaterial.get('atributo' + i)?.touched" class="text-red-800 mensaje_error">
+                                        The name cannot be more than 50 characters.
+                                    </div>  
                             </div>
                             <div class="mb-4">
                                 <label for="fechaActual" class="block text-gray-700">
@@ -144,6 +156,9 @@
                                         [selected]="sucursal.id === materialDetails.material.branch_office_id">{{
                                         sucursal.name }}</option>
                                 </select>
+                                <div *ngIf="formularioMaterial.get('sucursal')?.errors?.['required'] && formularioMaterial.get('sucursal')?.touched" class="text-red-800 mensaje_error">
+                                    Please select a branch office.
+                                </div>
                             </div>
                             <div class="mb-4">
                                 <label for="estado" class="block text-gray-700">Estado</label>
@@ -154,6 +169,9 @@
                                         [selected]="estado.value === materialDetails.material.state">{{ estado.label }}
                                     </option>
                                 </select>
+                                <div *ngIf="formularioMaterial.get('estado')?.errors?.['required'] && formularioMaterial.get('estado')?.touched" class="text-red-800 mensaje_error">
+                                    Please select a state.
+                                </div>
                             </div>
                             <!-- Botones -->
                             <div class="flex justify-end">

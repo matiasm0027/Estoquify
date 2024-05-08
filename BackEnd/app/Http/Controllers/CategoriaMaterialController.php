@@ -26,12 +26,15 @@ class CategoriaMaterialController extends Controller
             foreach ($category->material as $material) {
                 // Verificar si el material no tiene un registro en la tabla pivot employee_material
                 $employeeMaterial = EmployeeMaterial::where('material_id', $material->id)->first();
-                if (!$employeeMaterial && $material->state == 'active') {
+                if (!$employeeMaterial && $material->state == 'active' && $material->low_date === null) {
                     // Cambiar el estado del material a "disponible"
                     $material->state = 'available';
                     $material->save();
                 }else if ($employeeMaterial && $material->state == 'available'){
                     $material->state = 'active';
+                    $material->save();
+                }else if ($material->low_date !== null) {
+                    $material->state = 'inactive';
                     $material->save();
                 }
             }
