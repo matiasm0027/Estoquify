@@ -23,6 +23,7 @@ export class EmployeesViewComponent implements OnInit {
   sucursales: any[] = [];
   employeeId!:number;
   employeeRole!:string;
+  searchTerm: string = '';
 
   opcionesFiltro: { valor: string, etiqueta: string, seleccionado: boolean }[] = [
     { valor: 'departamento', etiqueta: 'Departamento', seleccionado: false },
@@ -50,6 +51,21 @@ export class EmployeesViewComponent implements OnInit {
     this.obtenerDepartamento();
     this.obtenerSucursales();
     this.getLoggedUser();
+    this.filtrarEmpleados()
+  }
+
+  filtrarEmpleados() {
+    if (!this.searchTerm.trim()) {
+      // Si el término de búsqueda está vacío, muestra todos los empleados
+      this.empleadosFiltrados = this.employees;
+    } else {
+      // Si hay un término de búsqueda, filtra los empleados que coincidan
+      this.empleadosFiltrados = this.employees.filter((empleado) =>
+        empleado.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+        || empleado.last_name.toLowerCase().includes(this.searchTerm.toLowerCase())
+        // Puedes agregar más criterios de búsqueda aquí si lo deseas
+      );
+    }
   }
 
   opcionSeleccionada(opcion: string): boolean {
