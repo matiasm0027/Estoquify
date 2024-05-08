@@ -27,6 +27,7 @@ export class CategoryDetailsComponent implements OnInit {
   atributosAdicionales: any[] = [];
   employeeId!: number;
   employeeRole!: string;
+  searchTerm: string = '';
 
 
   constructor(
@@ -44,15 +45,34 @@ export class CategoryDetailsComponent implements OnInit {
     this.obtenerAtributos();
     this.initForm();
     this.getLoggedUser();
+    
   }
 
   initForm() {
     this.formularioMaterial = this.fb.group({
-      nombre: ['', [Validators.required, Validators.maxLength(30)]],
-      value: ['', [Validators.required, Validators.maxLength(50)]],
+      nombre: ['', Validators.required],
+      value: ['', Validators.required],
       sucursal: ['', Validators.required],
       atributo: ['', Validators.required]
     });
+  }
+
+  filtrarMateriales() {
+    const uniqueMaterials = this.detallesMaterial.materials.reduce((acc: any[], current: any) => {
+      const found = acc.some((item: any) => item.id === current.id);
+      if (!found) {
+          acc.push(current);
+      }
+      return acc;
+  }, []);
+    if (!this.searchTerm.trim()) {
+      // Si el término de búsqueda está vacío, muestra todos los empleados
+      this.categoryDetails.materials = uniqueMaterials;
+    } else {
+      this.categoryDetails.materials = uniqueMaterials.filter((material: any) =>
+      material.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    }
   }
 
   obtenerSucursales() {
@@ -97,6 +117,7 @@ export class CategoryDetailsComponent implements OnInit {
         (categoria: any) => {
           this.detallesMaterial = categoria; // Convertir el objeto de categoría a una matriz
           this.aplicarFiltro();
+          this.filtrarMateriales();
         },
         (error: any) => {
           console.error('Error al obtener detalles de la categoría:', error);
@@ -109,9 +130,8 @@ export class CategoryDetailsComponent implements OnInit {
     this.atributosAdicionales.push({});
     const controlNameAtributo = `atributo${this.atributosAdicionales.length + 1}`;
     const controlNameValor = `valor${this.atributosAdicionales.length + 1}`;
-    console.log(controlNameAtributo)
     this.formularioMaterial.addControl(controlNameAtributo, this.fb.control('', Validators.required));
-    this.formularioMaterial.addControl(controlNameValor, this.fb.control('', [Validators.required, Validators.maxLength(50)]));
+    this.formularioMaterial.addControl(controlNameValor, this.fb.control('', Validators.required));
   }
 
   eliminarAtributo(index: number) {

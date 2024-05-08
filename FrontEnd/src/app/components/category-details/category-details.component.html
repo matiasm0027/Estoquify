@@ -6,7 +6,17 @@
         <!-- Contenido de la vista de detalles del material -->
         <div class="bg-white p-6 rounded shadow" *ngIf="categoryDetails">
             <div class="flex justify-between items-center mb-4">
-                <h1 class="text-2xl font-bold">{{this.detallesMaterial.category_name}}</h1>
+                <div class="flex items-center"> <!-- Nuevo contenedor flex para el título y el input -->
+                    <h1 class="text-2xl font-bold mr-4">{{this.detallesMaterial.category_name}}</h1>
+                    <!-- Añade margen a la derecha para separar el título del input -->
+                    <div class="relative"> <!-- Contenedor relativo para el input y el icono -->
+                        <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar material..."
+                            (input)="filtrarMateriales()"
+                            class="px-4 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500" >
+                        <!-- Añade espacio a la derecha para el icono -->
+                        <img src="assets/img/logo_search.png" class="absolute inset-y-0 right-0 flex items-center pr-3 h-6 mt-2" alt="Buscar">
+                    </div>
+                </div>
                 <div class="space-x-4">
                     <button (click)="mostrarModal()"
                         class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded " *ngIf="employeeRole === 'admin'">
@@ -50,7 +60,7 @@
                     </thead>
                     <tbody>
                         <tr
-                            *ngFor="let material of categoryDetails.materials | paginate: { itemsPerPage: 10, currentPage: page }">
+                            *ngFor="let material of categoryDetails?.materials | paginate: { itemsPerPage: 10, currentPage: page }">
                             <td class="px-6 py-4 text-gray-700">
                                 <span class="flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -92,12 +102,6 @@
                                     <label for="nombre" class="block text-gray-700">Nombre</label>
                                     <input type="text" id="nombre" name="nombre" class="form-input mt-1 block w-full"
                                         placeholder="Ingrese el nombre del material" formControlName="nombre">
-                                        <div *ngIf="formularioMaterial.get('nombre')?.errors?.['required'] && formularioMaterial.get('nombre')?.touched" class="text-red-800 mensaje_error">
-                                            This field cannot be empty.
-                                        </div>
-                                        <div *ngIf="formularioMaterial.get('nombre')?.errors?.['maxlength'] && formularioMaterial.get('nombre')?.touched" class="text-red-800 mensaje_error">
-                                            The name cannot be more than 30 characters.
-                                        </div>
                                 </div>
                                 <div style="display: flex; align-items: center;"  class="mb-5">
                                     <div style="flex: 1;margin-right: 14px;">
@@ -107,20 +111,11 @@
                                             <option *ngFor="let atributo of atributos" [value]="atributo.id">{{
                                                 atributo.name }}</option>
                                         </select>
-                                        <div *ngIf="formularioMaterial.get('atributo')?.errors?.['required'] && formularioMaterial.get('atributo')?.touched" class="text-red-800 mensaje_error">
-                                            Please select a attribute.
-                                        </div>
                                     </div>
                                     <div style="flex: 1;">
                                         <label for="valor" class="block text-gray-700">Valor</label>
                                         <input type="text" id="valor" name="valor" class="form-input mt-1 block w-full"
                                             placeholder="Ingrese el valor" formControlName="value">
-                                            <div *ngIf="formularioMaterial.get('value')?.errors?.['required'] && formularioMaterial.get('value')?.touched" class="text-red-800 mensaje_error">
-                                                This field cannot be empty.
-                                            </div>
-                                            <div *ngIf="formularioMaterial.get('value')?.errors?.['maxlength'] && formularioMaterial.get('value')?.touched" class="text-red-800 mensaje_error">
-                                                The name cannot be more than 50 characters.
-                                            </div>
                                     </div>
                                 </div>
                                 <!-- Campos adicionales para atributos y valores -->
@@ -133,9 +128,6 @@
                                                 class="form-select mt-1 block w-full" required>
                                                 <option *ngFor="let atributo of atributos" [value]="atributo.id">{{ atributo.name }}</option>
                                             </select>
-                                            <div *ngIf="formularioMaterial.get('atributo' + (index + 2))?.errors?.['required'] && formularioMaterial.get('atributo' + (index + 2))?.touched" class="text-red-800 mensaje_error">
-                                                This field cannot be empty.
-                                            </div>
                                         </div>
                                         <!-- Campo de Valor -->
                                         <div style="flex: 1;">
@@ -143,16 +135,10 @@
                                             <div class="flex items-center"> <!-- Contenedor para alinear los elementos -->
                                                 <input type="text" id="valor{{index + 2}}" name="valor{{index + 2}}"
                                                     class="form-input mt-1 block w-full mr-2" placeholder="Ingrese el valor"
-                                                    formControlName="valor{{index + 2}}">                                                  
+                                                    formControlName="valor{{index + 2}}">
                                                 <button type="button" (click)="eliminarAtributo(index)"
                                                     class="text-red-500 hover:text-red-700">Eliminar</button>
                                             </div>
-                                            <div *ngIf="formularioMaterial.get('valor' + (index + 2))?.errors?.['required'] && formularioMaterial.get('valor' + (index + 2))?.touched" class="text-red-800 mensaje_error">
-                                                This field cannot be empty.
-                                            </div>
-                                            <div *ngIf="formularioMaterial.get('valor' + (index + 2))?.errors?.['maxlength'] && formularioMaterial.get('valor' + (index + 2))?.touched" class="text-red-800 mensaje_error">
-                                                The name cannot be more than 50 characters.
-                                            </div>  
                                         </div>
                                     </div>
                                 </div>
@@ -170,9 +156,6 @@
                                         class="form-select mt-1 block w-full" required>
                                         <option *ngFor="let suc of sucursales" [value]="suc.id">{{ suc.name }}</option>
                                     </select>
-                                    <div *ngIf="formularioMaterial.get('sucursal')?.errors?.['required'] && formularioMaterial.get('sucursal')?.touched" class="text-red-800 mensaje_error">
-                                        Please select a branch office.
-                                    </div>
                                 </div>
                                 <div class="flex justify-end">
                                     <button (click)="agregarMaterial()" type="button"
