@@ -57,6 +57,7 @@ export class EmployeeDetailsComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.employeeId = +params['id'];
     });
+   
   }
 
   getEmployeeDetails(): void {
@@ -65,6 +66,7 @@ export class EmployeeDetailsComponent implements OnInit {
       .subscribe(
         (employee: any) => {
           this.employeeDetails = employee;
+          
           this.initForm(); // Initialize form after employee details are fetched
         },
         (error: any) => {
@@ -137,7 +139,6 @@ export class EmployeeDetailsComponent implements OnInit {
             telefonoMovil: this.formularioEmpleado.value.telefonoMovil
         };
 
-     
 
         this.employeeService.editEmployee(this.employeeId, empleadoEditado).subscribe(
           (response: any) => {
@@ -234,7 +235,7 @@ export class EmployeeDetailsComponent implements OnInit {
   getLoggedUser(): void {
     this.employeeService.me().subscribe(
       (response: any) => {
-        this.employeeId = response.id;
+      
         const roleId = response.role_id;
        
         

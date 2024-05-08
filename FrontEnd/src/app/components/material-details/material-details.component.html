@@ -126,10 +126,12 @@
                                     [placeholder]="'Ingrese el valor del atributo ' + attribute.name" required>
                             </div>
                             <div class="mb-4">
+                                <label for="fechaActual" class="block text-gray-700">
+                                    Establecer fecha de baja con la fecha actual </label>
                                 <input type="checkbox" id="fechaActual" name="fechaActual"
                                     (change)="setFechaActual(true)">
                                 <label for="fechaActual" class="block text-gray-700">
-                                    Establecer fecha de baja como hoy <br><span class="text-red-500">IMPORTANTE</span>
+                                    <span class="text-red-500">IMPORTANTE</span>
                                     una vez dado de baja no se podrá dar de alta
                                 </label>
                             </div>
@@ -152,9 +154,6 @@
                                         [selected]="estado.value === materialDetails.material.state">{{ estado.label }}
                                     </option>
                                 </select>
-                                <label for="fechaActual" class="block text-gray-700">
-                                    Recuerda canviar el estado si asignas fecha de baja
-                                </label>
                             </div>
                             <!-- Botones -->
                             <div class="flex justify-end">

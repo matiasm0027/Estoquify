@@ -158,14 +158,12 @@
                             <div class="mb-4">
                                 <label for="departamento" class="block text-gray-700">Departamento</label>
                                 <select formControlName="departamento" id="departamento" name="departamento"
-                                    class="form-select mt-1 block w-full" required>
+                                    class="form-select mt-1 block w-full" required [(ngModel)]="employeeDetails.department_id">
                                     <ng-container *ngFor="let dept of departamentos">
                                         <option [value]="dept.id" [selected]="dept.name === employeeDetails.department">
                                             {{ dept.name }}</option>
                                     </ng-container>
                                 </select>
-                                <div class="text-gray-500 text-sm mt-1">Si no se selecciona ninguna opción, se mantendrá
-                                    "{{ employeeDetails.department }}" por defecto.</div>
                                     <div *ngIf="formularioEmpleado.get('departamento')?.errors?.['required'] && formularioEmpleado.get('departamento')?.touched" class="error_form mensaje_error">
                                         Please select a department.
                                     </div>
@@ -174,15 +172,13 @@
                             <div class="mb-4">
                                 <label for="sucursal" class="block text-gray-700">Sucursal</label>
                                 <select formControlName="sucursal" id="sucursal" name="sucursal"
-                                    class="form-select mt-1 block w-full" required>
+                                    class="form-select mt-1 block w-full" required  [(ngModel)]="employeeDetails.branch_office_id">
                                     <ng-container *ngFor="let suc of sucursales">
                                         <option [value]="suc.id"
                                             [selected]="suc.name === employeeDetails.branch_office">
                                             {{ suc.name }}</option>
                                     </ng-container>
                                 </select>
-                                <div class="text-gray-500 text-sm mt-1">Si no se selecciona ninguna opción, se mantendrá
-                                    "{{ employeeDetails.branch_office }}" por defecto.</div>
                                     <div *ngIf="formularioEmpleado.get('sucursal')?.errors?.['required'] && formularioEmpleado.get('sucursal')?.touched" class="error_form mensaje_error">
                                         Please select a branch office.
                                     </div>
@@ -191,14 +187,12 @@
                             <div class="mb-4">
                                 <label for="rol" class="block text-gray-700">Rol</label>
                                 <select formControlName="rol" id="rol" name="rol" class="form-select mt-1 block w-full"
-                                    required>
+                                    required [(ngModel)]="employeeDetails.role_id">
                                     <ng-container *ngFor="let rol of roles">
                                         <option [value]="rol.id" [selected]="rol.name === employeeDetails.role">
                                             {{ rol.name }}</option>
                                     </ng-container>
                                 </select>
-                                <div class="text-gray-500 text-sm mt-1">Si no se selecciona ninguna opción, se mantendrá
-                                    "{{ employeeDetails.role }}" por defecto.</div>
                                     <div *ngIf="formularioEmpleado.get('rol')?.errors?.['required'] && formularioEmpleado.get('rol')?.touched" class="error_form mensaje_error">
                                         Please select a role.
                                     </div>
