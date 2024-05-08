@@ -22,6 +22,7 @@ import { MaterialDetailsComponent } from './components/material-details/material
 import { ReportesViewComponent } from './components/reportes-view/reportes-view.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { RequestInterceptor } from './services/request/request-interceptor.service';
+import { JwtInterceptor } from './interceptors/jwt.interceptor';
 
 @NgModule({
   declarations: [
@@ -50,6 +51,7 @@ import { RequestInterceptor } from './services/request/request-interceptor.servi
     NgSelectModule,
   ],
   providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
