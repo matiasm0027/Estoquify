@@ -11,7 +11,7 @@ import { BranchOffice } from '../../model/BranchOffice';
   providedIn: 'root'
 })
 export class ApiRequestService {
-  private apiUrl = 'http://localhost:8000/api';
+  private apiUrl = 'https://damasprovenupcg4.com/api';
 
   constructor(private http: HttpClient) {}
 
