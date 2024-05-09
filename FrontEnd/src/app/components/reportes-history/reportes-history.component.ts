@@ -11,13 +11,34 @@ export class ReportesHistoryComponent implements OnInit {
   reportes: any[] = [];
   reporteSeleccionado: any = null;
   sucursales: any[] = [];
+  employeeId!: number;
+  employeeRole!: string;
   
   constructor(private apiRequestService: ApiRequestService) {}
 
   ngOnInit(): void {
     this.obtenerReportes();
+    this.getLoggedUser()
   }
 
+  getLoggedUser(): void {
+    this.apiRequestService.me().subscribe(
+      (response: any) => {
+        this.employeeId = response.id;
+        const roleId = response.role_id;
+
+
+        if (roleId === 1) {
+          this.employeeRole = 'admin';
+        } else if (roleId === 2) {
+          this.employeeRole = 'manager';
+        }
+      },
+      error => {
+        console.error('Error when obtaining data from the logged in user:', error);
+      }
+    );
+  }
   obtenerReportes() {
     this.apiRequestService.listReportes().subscribe(
       (response: any[]) => {
