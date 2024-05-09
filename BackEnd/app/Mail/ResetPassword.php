@@ -26,7 +26,6 @@ class ResetPassword extends Mailable
 
     public function build()
     {
-        Log::info('New token generated:', [$this->token]);
         return $this->markdown('Email.passwordReset')->with([
             'token' => $this->token
                 ]);
