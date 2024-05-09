@@ -110,7 +110,7 @@ class ReportController extends Controller{
 
         // Valida el estado proporcionado en la solicitud
         $request->validate([
-            'estado' => 'required|in:accepted,rejected' // Asegúrate de incluir todos los posibles estados aquí
+            'estado' => 'required|in:accepted,rejected,pending' // Asegúrate de incluir todos los posibles estados aquí
         ]);
 
         // Actualiza el estado del reporte

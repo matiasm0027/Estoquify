@@ -14,6 +14,7 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
 import { CategoryDetailsComponent } from './components/category-details/category-details.component';
 import { MaterialDetailsComponent } from './components/material-details/material-details.component';
 import { ReportesViewComponent } from './components/reportes-view/reportes-view.component';
+import { ReportesHistoryComponent } from './components/reportes-history/reportes-history.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -29,6 +30,7 @@ const routes: Routes = [
   { path: 'change_password', component: ChangePasswordComponent, canActivate: [MyGuardGuard, ]},
   { path: 'material_details/:id', component: MaterialDetailsComponent, canActivate: [MyGuardGuard, ]},
   { path: 'reportes_view', component: ReportesViewComponent, canActivate: [MyGuardGuard, ]},
+  { path: 'reportes_history', component: ReportesHistoryComponent, canActivate: [MyGuardGuard, ]},
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', component: NotFoundComponent }
 
