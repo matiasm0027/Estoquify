@@ -289,4 +289,9 @@
                 </div>
             </div>
         </div>
+        <div *ngIf="employeeRole === 'user'"  class="flex justify-center items-start h-screen">
+            <div class="text-center text-4xl text-red-500 mt-40">
+                <p>No tienes acceso a esta sección.</p>
+            </div>
+        </div>
     </div>

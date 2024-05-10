@@ -87,6 +87,8 @@ export class ReportesViewComponent implements OnInit {
           this.employeeRole = 'admin';
         } else if (roleId === 2) {
           this.employeeRole = 'manager';
+        }else if (roleId === 3) {
+          this.employeeRole = 'user';
         }
       },
       error => {
