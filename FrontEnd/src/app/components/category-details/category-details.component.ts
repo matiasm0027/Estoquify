@@ -180,8 +180,8 @@ export class CategoryDetailsComponent implements OnInit {
 
         // Crear múltiples materiales con nombres secuenciales
         for (let i = 1; i <= cantidad; i++) {
-            const nombreMaterial = `${nombreBase}_${i.toString().padStart(2, '0')}`;
-            const nuevoMaterial = this.construirObjetoMaterial(nombreMaterial, sucursal, atributoPrincipal, atributosExtras);
+            //const nombreMaterial = `${nombreBase}_${i.toString().padStart(2, '0')}`;
+            const nuevoMaterial = this.construirObjetoMaterial(nombreBase, sucursal, atributoPrincipal, atributosExtras);
 
             // Llamar al servicio para agregar el material
             this.ApiRequestService.agregarMaterial(nuevoMaterial).subscribe(

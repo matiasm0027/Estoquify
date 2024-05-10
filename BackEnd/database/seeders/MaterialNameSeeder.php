@@ -22,7 +22,7 @@ class MaterialNameSeeder extends Seeder
 
 
             // Obtener la cantidad de materiales con el mismo prefijo
-            $count = Material::where('name', 'like', $category->name . '_%')->count() + 1;
+            $count = Material::where('name', 'like', substr($category->name, 0, 3) . '_%')->count() + 1;
 
             // Construir el nuevo nombre del material
             $newName = substr($category->name, 0, 3) . '_' . str_pad($count, 3, '0', STR_PAD_LEFT);
