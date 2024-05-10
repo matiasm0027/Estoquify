@@ -33,9 +33,7 @@ export class ChangePasswordComponent implements OnInit {
     if (!localStorage.getItem('first_login')) {
        this.router.navigate(['/home']);
     }
-
   }
-
  
   submitChangePassword(): void {
     if (this.changePasswordForm.valid) {

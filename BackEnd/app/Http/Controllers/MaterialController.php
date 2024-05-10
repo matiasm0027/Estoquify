@@ -39,6 +39,10 @@ class MaterialController extends Controller
 
         // Convertir la fecha al formato adecuado para la base de datos
         $high_date = date('Y-m-d H:i:s', strtotime($request->input('material.high_date')));
+        // Obtener la categoría del material
+        $nameMaterial=  substr($request->input('material.name'), 0, 3);
+        // Obtener la cantidad de materiales con el mismo prefijo
+        $count = Material::where('name', 'like', $nameMaterial . '_%')->count() + 1;
 
         // Verificar si ya existe un material con el mismo nombre
         $existingMaterial = Material::where('name', $request->input('material.name'))->first();
@@ -48,7 +52,7 @@ class MaterialController extends Controller
 
         // Crear una nueva instancia del material y asignar los valores
         $material = new Material();
-        $material->name = $request->input('material.name');
+        $material->name = ucfirst($request->input('material.name').'_'. str_pad($count, 3, '0', STR_PAD_LEFT));
         $material->high_date = $high_date;
         $material->branch_office_id = $request->input('material.branch_office_id');
         $material->state = $request->input('material.state');

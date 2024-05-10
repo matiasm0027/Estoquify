@@ -57,7 +57,7 @@ class DatabaseSeeder extends Seeder
         ]);
         Employee::factory(70)->create();
         Report::factory(10)->create();
-        Material::factory(1000)->create();
+        Material::factory(300)->create();
         CategoryReport::factory(10)->create();
 
         // Llamar a otros seeders después de crear registros

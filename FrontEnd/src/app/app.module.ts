@@ -24,6 +24,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { RequestInterceptor } from './services/request/request-interceptor.service';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { ReportesHistoryComponent } from './components/reportes-history/reportes-history.component';
+import { PasswordStrengthDirective } from './directivas/passwordRules/password-strength.directive';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { ReportesHistoryComponent } from './components/reportes-history/reportes
     ResetPasswordComponent,
     MaterialDetailsComponent,
     ReportesViewComponent,
-    ReportesHistoryComponent
+    ReportesHistoryComponent,
+    PasswordStrengthDirective
     
   ],
   imports: [
@@ -51,6 +53,9 @@ import { ReportesHistoryComponent } from './components/reportes-history/reportes
     FormsModule,
     NgxPaginationModule,
     NgSelectModule,
+  ],
+  exports: [
+    PasswordStrengthDirective,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
