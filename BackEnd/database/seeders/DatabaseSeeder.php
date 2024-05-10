@@ -22,15 +22,50 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Crear registros utilizando factories
-        Employee::factory(100)->create();
-        Report::factory(20)->create();
-        Material::factory(50)->create();
-        CategoryReport::factory(20)->create();
+        Employee::create([
+            'name' => 'admin',
+             'last_name' => 'istrador',
+             'email' => 'admin@gmail.com',
+             'password' => bcrypt('admin123'),
+             'phone_number' => '688341967',
+             'first_login' => false,
+             'department_id' => 1,
+             'role_id' => 1,
+             'branch_office_id' => 1,
+        ]);
+        Employee::create([
+            'name' => 'mana',
+             'last_name' => 'ger',
+             'email' => 'manager@gmail.com',
+             'password' => bcrypt('manager123'),
+             'phone_number' => '688341967',
+             'first_login' => false,
+             'department_id' => 1,
+             'role_id' => 2,
+             'branch_office_id' => 1,
+        ]);
+        Employee::create([
+            'name' => 'us',
+             'last_name' => 'er',
+             'email' => 'user@gmail.com',
+             'password' => bcrypt('user123'),
+             'phone_number' => '688341967',
+             'first_login' => false,
+             'department_id' => 1,
+             'role_id' => 3,
+             'branch_office_id' => 1,
+        ]);
+        Employee::factory(70)->create();
+        Report::factory(10)->create();
+        Material::factory(1000)->create();
+        CategoryReport::factory(10)->create();
 
         // Llamar a otros seeders después de crear registros
         $this->call([
             EmployeeMaterialSeeder::class,
             AttributeCategoryMaterialSeeder::class,
+            MaterialNameSeeder::class,
         ]);
+
     }
 }
