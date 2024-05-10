@@ -11,7 +11,7 @@
                     </button>
                 </div>
             </div>
-           
+
             <div>
             </div>
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-gray-300 lg:text-center md:text-center sm:text-center">
@@ -49,14 +49,14 @@
                         </td>
                         <td class="px-6 py-4" *ngIf="employeeRole === 'admin'">
                             <button (click)="mostrarModalEditar(material.id)"
-                                    class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 px-4 rounded border border-blue-500 mr-2">
+                                    class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 px-6 rounded border border-blue-500 lg:mr-2">
                                 Editar
                             </button>
                             <button (click)="confirmDelete(material)"
                                     class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 px-4 rounded border border-red-500 md:mt-2 sm:mt-1">
                                 Eliminar
                             </button>
-                        </td>      
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -76,16 +76,16 @@
                                 <div class="mb-4">
                                     <label for="name" class="block text-gray-700">Nombre</label>
                                     <input formControlName="name" type="text" id="name" name="name" class="form-input mt-1 block w-full" placeholder="Ingrese el nombre" required>
-                                    <div *ngIf="categoryForm.get('name')?.errors?.['required'] && categoryForm.get('name')?.touched" class="text-red-800 mensaje_error">
+                                    <div *ngIf="categoryForm.get('name')?.errors?.['required'] && categoryForm.get('name')?.touched" class="text-red-800">
                                         This field cannot be empty.
                                     </div>
-                                    <div *ngIf="categoryForm.get('name')?.errors?.['minlength'] && categoryForm.get('name')?.touched" class="text-red-800 mensaje_error">
+                                    <div *ngIf="categoryForm.get('name')?.errors?.['minlength'] && categoryForm.get('name')?.touched" class="text-red-800">
                                         The name must be at least 3 characters.
                                     </div>
-                                    <div *ngIf="categoryForm.get('name')?.errors?.['maxlength'] && categoryForm.get('name')?.touched" class="text-red-800 mensaje_error">
+                                    <div *ngIf="categoryForm.get('name')?.errors?.['maxlength'] && categoryForm.get('name')?.touched" class="text-red-800">
                                         The name cannot be more than 30 characters.
                                     </div>
-                                </div>                           
+                                </div>
                                 <div class="flex justify-end">
                                     <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar</button>
                                     <button (click)="cerrarModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
@@ -98,9 +98,9 @@
 
             <div *ngIf="mostrarModalEdit" class="fixed z-10 inset-0 overflow-y-auto">
                 <div class="flex items-center justify-center min-h-screen px-4">
-                    
+
                     <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full">
-                   
+
                         <div class="px-4 py-2 bg-gray-200">
                             <h3 class="text-lg font-bold">Editar Categoria</h3>
                         </div>
@@ -118,9 +118,9 @@
                                     <div *ngIf="categoryForm.get('name')?.errors?.['maxlength'] && categoryForm.get('name')?.touched" class="text-red-800 mensaje_error">
                                         The name cannot be more than 30 characters.
                                     </div>
-                                </div>                           
+                                </div>
                                 <div class="flex justify-end">
-                                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar</button>
+                                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-">Guardar</button>
                                     <button (click)="cerrarModalEdit()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
                                 </div>
                             </form>

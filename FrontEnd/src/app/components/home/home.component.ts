@@ -1,4 +1,5 @@
-import { Component, NgModule, OnInit } from '@angular/core';
+import { Component, NgModule, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 
 
@@ -7,14 +8,16 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit {
-  
+export class HomeComponent implements OnInit, OnDestroy {
+
   employeeRole!: string;
   employee!: any;
   reportes: any[] = [];
   materials: any[] = [];
   empleado_id!: number;
   reportes_id: any[] = [];
+
+  private subscriptions: Subscription[] = [];
 
   constructor(private ApiRequestService: ApiRequestService) {}
 
@@ -23,13 +26,17 @@ export class HomeComponent implements OnInit {
     this.obtenerReportes();
     this.obtenerCantidadMaterial();
     this.mostrarMaterialesDisponiblesBajos();
-    this.obtenerReportesDelEmpleado(); 
+    this.obtenerReportesDelEmpleado();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   obtenerReportes() {
     this.ApiRequestService.listReportes().subscribe(
       (response: any[]) => {
-        
+
         this.reportes = response
         .filter(reporte => reporte.state === 'pending')
         .map(reporte => ({
@@ -40,16 +47,16 @@ export class HomeComponent implements OnInit {
           type: reporte.type,
           empleado: reporte.employee_id,
           nameempleado: reporte.employee_name
-          
+
         }));
-       
+
       },
       error => {
         console.error('Error al obtener reportes:', error);
       }
-      
+
     );
-   
+
   }
 
   obtenerCantidadMaterial(){
@@ -70,11 +77,11 @@ export class HomeComponent implements OnInit {
   mostrarMaterialesDisponiblesBajos() {
     // Filtrar los materiales con una cantidad disponible de menos de 5 unidades
     const mensajeDiv = document.querySelector('.message');
-  
+
     // Limpiar el contenido actual del div
     if (mensajeDiv !== null) {
       mensajeDiv.innerHTML = '';
-   
+
     const materialesDisponiblesBajos = this.materials.filter(material => material.availableMaterial < 5);
     // Mostrar los materiales disponibles bajos en pantalla
     materialesDisponiblesBajos.forEach(material => {
@@ -85,13 +92,13 @@ export class HomeComponent implements OnInit {
         mensajeParrafo.textContent = `Quedan pocas unidades disponibles de ${material.name}: ${material.availableMaterial}`;
         mensajeParrafo.style.color = 'red'; // Cambiar el color del texto a rojo
         mensajeParrafo.style.fontSize = '16px'; // Cambiar el tamaño de la fuente
-     
-     
+
+
         // Agregar el elemento de párrafo al div
         mensajeDiv?.appendChild(mensajeParrafo);
       }
     });
-   
+
   }
   }
 
@@ -100,8 +107,8 @@ getLoggedUser(): void {
     (response: any) => {
       const roleId = response.role_id;
       this.empleado_id = response.id
-     
-      
+
+
       if (roleId === 1) {
         this.employeeRole = 'admin';
       } else if(roleId === 2){
@@ -112,7 +119,7 @@ getLoggedUser(): void {
         this.employee = response;
         this.employeeRole = 'usuario';
       }
-     
+
     },
     error => {
       console.error('Error when obtaining data from the logged in user:', error);
@@ -149,7 +156,7 @@ obtenerReportesDelEmpleado() {
           date: reporte.date,
           update: reporte.updated
         }));
-     
+
     },
     error => {
       console.error('Error al obtener los reportes del empleado:', error);
@@ -157,6 +164,6 @@ obtenerReportesDelEmpleado() {
   );
 }
 
-  
+
 
 }

@@ -1,191 +1,202 @@
 <div class="flex">
-    <app-sidebar></app-sidebar>
-    <div class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-24 md:ml-12 md:mr-12 sm:mt-24 sm:ml-12 sm:mr-12 mt-24 ml-12 mr-12 box-fl container">
-        <!-- Contenido de la vista de detalles del material -->
-        <div class="bg-white p-6 rounded shadow">
-            <div class="flex justify-between items-center mb-4">
-                <h1 class="text-2xl font-bold">Detalles del Material</h1>
-                <!-- Botones para editar, eliminar y volver -->
-                <div class="space-x-4">
-                    <button (click)="mostrarModal()"
-                        class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 lg:px-4 md:px-2 rounded border border-blue-500 md:ml-2" *ngIf="employeeRole === 'admin'">
-                        Editar
-                    </button>
-                    <button (click)="confirmDelete(materialDetails)"
-                        class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 lg:px-4 md:px-2 rounded border border-red-500" *ngIf="employeeRole === 'admin'">
-                        Eliminar
-                    </button>
-                    <button (click)="volver()"
-                        class="bg-white-500 hover:bg-white hover:text-gray-500 font-bold py-2 lg:px-4 md:px-2 rounded border border-gray-500">
-                        Volver
-                    </button>
-                    <button (click)="downloadCsv()" class="hover:bg-green hover:text-green-500 font-bold py-2 lg:px-4 md:px-2 rounded border border-green-500 md:mt-3">
-                        Descargar CSV
-                    </button>
-                </div>
-            </div>
-            <!-- Tabla para mostrar los detalles específicos del material -->
-            <table class="table-auto w-full">
-                <tbody>
-                    <tr>
-                        <td class="py-2"><strong>ID:</strong></td>
-                        <td class="py-2">{{ materialDetails.material?.id }}</td>
-                    </tr>
-                    <tr>
-                        <td class="py-2"><strong>Nombre:</strong></td>
-                        <td class="py-2">{{ materialDetails.material?.name }}</td>
-                    </tr>
-                    <tr>
-                        <td class="py-2"><strong>Fecha Alta:</strong></td>
-                        <td class="py-2">{{ materialDetails.material?.high_date }}</td>
-                    </tr>
-                    <tr>
-                        <td class="py-2"><strong>Fecha Baja:</strong></td>
-                        <td class="py-2">{{ materialDetails.material?.low_date ?? 'Sigue operativo' }}</td>
-                    </tr>
-                    <tr *ngFor="let attribute of materialDetails.material?.attribute; let i = index">
-                        <td class="py-2"><strong>Atributo {{ i + 1 }}:</strong></td>
-                        <td class="py-2">{{ attribute.name }} -- > {{ attribute.pivot.value }}</td>
-                    </tr>
-                    <tr>
-                        <td class="py-2"><strong>Sucursal:</strong></td>
-                        <td class="py-2">{{ getNombreSucursal(materialDetails.material?.branch_office_id) }}</td>
-                    </tr>
-                    <tr>
-                        <td class="py-2"><strong>Estado:</strong></td>
-                        <td class="py-2" [ngStyle]="{ 'color': getColor(materialDetails.material?.state) }">
-                            {{ materialDetails.material?.state }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+  <app-sidebar></app-sidebar>
+  <div
+    class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-24 md:ml-12 md:mr-12 sm:mt-24 sm:ml-12 sm:mr-12 mt-24 ml-12 mr-12 box-fl container">
+    <!-- Contenido de la vista de detalles del material -->
+    <div class="bg-white p-6 rounded shadow">
+      <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold">Detalles del Material</h1>
+        <!-- Botones para editar, eliminar y volver -->
+        <div class="space-x-4">
+          <button (click)="mostrarModal()"
+            class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 lg:px-4 md:px-2 rounded border border-blue-500 md:ml-2"
+            *ngIf="employeeRole === 'admin'">
+            Editar
+          </button>
+          <button (click)="confirmDelete(materialDetails)"
+            class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 lg:px-4 md:px-2 rounded border border-red-500"
+            *ngIf="employeeRole === 'admin'">
+            Eliminar
+          </button>
+          <button (click)="volver()"
+            class="bg-white-500 hover:bg-white hover:text-gray-500 font-bold py-2 lg:px-4 md:px-2 rounded border border-gray-500">
+            Volver
+          </button>
+          <button (click)="downloadCsv()"
+            class="hover:bg-green hover:text-green-500 font-bold py-2 lg:px-4 md:px-2 rounded border border-green-500 md:mt-3">
+            Descargar CSV
+          </button>
         </div>
-        <div class="bg-white p-6 rounded shadow" *ngIf="asignado">
-            <h2 class="text-2xl font-bold my-4">Empleado Asignado</h2>
-            <div class="grid grid-cols-3 gap-4">
-                <div *ngIf="asignado.assigned_employees && asignado.assigned_employees.length < 2">
-                    <!-- Mostrar información del empleado asignado -->
-                    <div class="bg-white p-4 rounded shadow">
-                        <p><strong>Empleado Asignado:</strong> {{ asignado.assigned_employees[0].name }} {{
-                            asignado.assigned_employees[0].last_name }}</p>
-                        <!-- Botón para desasignar el material -->
-                        <button (click)="desasignarMaterial(asignado.assigned_employees[0].employee_id)"
-                            class="bg-white hover:bg-red-200 text-red-500 py-1 px-3 rounded border mt-2" *ngIf="employeeRole === 'admin'">
-                            Desasignar
-                        </button>
-                    </div>
-                    <div *ngIf="successMessage" class="mensaje_exitoso fade-in-out mt-1 mb-3">{{ successMessage }}</div>
-            
-                </div>
-            </div>
-            <div *ngIf="asignado.assigned_employees && asignado.assigned_employees.length > 2">
-                <!-- Mostrar mensaje si no hay empleados asignados -->
-                <p>No hay empleados asignados a este material.</p>
-                <div *ngIf="successMessage" class="mensaje_exitoso fade-in-out mt-3 mb-3">{{ successMessage }}</div>
-                <h2 class="text-2xl font-bold my-4" *ngIf="employeeRole === 'admin'">Empleados Disponibles para Asignar</h2>
-                <div class="grid grid-cols-3 gap-4" *ngIf="employeeRole === 'admin'">
-                    <ng-container *ngFor="let employee of asignado.assigned_employees">
-                        <div class="bg-white p-4 rounded shadow">
-
-                            <!-- Botón para asignar este empleado -->
-                            <button (click)="asignarMaterial(employee.employee_id)">{{ employee.name }} {{
-                                employee.last_name }}
-                               <span  style="font-size: 16px; line-height: 1;" class="ml-2">&#9650;</span> <!-- Utiliza el código Unicode para una flecha hacia arriba -->
-                            </button>
-                        </div>
-                    </ng-container>
-                </div>
-            </div>
-        </div>
-
-
-
-        <div *ngIf="mostrarModalEditar" class="fixed z-10 inset-0 overflow-y-auto">
-            <div class="flex items-center justify-center min-h-screen px-4">
-                <!-- Contenido del modal -->
-                <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full">
-                    <!-- Encabezado del modal -->
-                    <div class="px-4 py-2 bg-gray-200">
-                        <h3 class="text-lg font-bold">Editar Material</h3>
-                    </div>
-                    <!-- Cuerpo del modal (aquí va el formulario) -->
-                    <div class="p-4">
-                        <!-- Formulario de edición -->
-                        <form [formGroup]="formularioMaterial" (submit)="editarMaterial()">
-                            <div class="mb-4">
-                                <label for="nombre" class="block text-gray-700">Nombre</label>
-                                <input formControlName="nombre" type="text" id="nombre" name="nombre"
-                                    class="form-input mt-1 block w-full" placeholder="Ingrese el nombre" required>
-                                    <div *ngIf="formularioMaterial.get('nombre')?.errors?.['required'] && formularioMaterial.get('nombre')?.touched" class="text-red-800 mensaje_error">
-                                        This field cannot be empty.
-                                    </div>
-                                    <div *ngIf="formularioMaterial.get('nombre')?.errors?.['maxlength'] && formularioMaterial.get('nombre')?.touched" class="text-red-800 mensaje_error">
-                                        The name cannot be more than 30 characters.
-                                    </div>
-                            </div>
-                            <div class="mb-4"
-                                *ngFor="let attribute of materialDetails.material?.attribute; let i = index">
-                                <label [for]="'atributo' + i" class="block text-gray-700">Atributo {{ i + 1 }}: {{
-                                    attribute.name }}</label>
-                                <input formControlName="{{ 'atributo' + i }}" type="text" [id]="'atributo' + i"
-                                    [name]="'atributo' + i" class="form-input mt-1 block w-full"
-                                    [placeholder]="'Ingrese el valor del atributo ' + attribute.name" required>
-                                    <div *ngIf="formularioMaterial.get('atributo' + i)?.errors?.['required'] && formularioMaterial.get('atributo' + i)?.touched" class="text-red-800 mensaje_error">
-                                        This field cannot be empty.
-                                    </div>
-                                    <div *ngIf="formularioMaterial.get('atributo' + i)?.errors?.['maxlength'] && formularioMaterial.get('atributo' + i)?.touched" class="text-red-800 mensaje_error">
-                                        The name cannot be more than 50 characters.
-                                    </div>  
-                            </div>
-                            <div class="mb-4">
-                                <label for="fechaActual" class="block text-gray-700">
-                                    Establecer fecha de baja con la fecha actual </label>
-                                <input type="checkbox" id="fechaActual" name="fechaActual"
-                                    (change)="setFechaActual(true)">
-                                <label for="fechaActual" class="block text-gray-700">
-                                    <span class="text-red-500">IMPORTANTE</span>
-                                    una vez dado de baja no se podrá dar de alta
-                                </label>
-                            </div>
-                            <div class="mb-4">
-                                <label for="sucursal" class="block text-gray-700">Sucursal</label>
-                                <!-- Lista de sucursales -->
-                                <select formControlName="sucursal" id="sucursal" name="sucursal"
-                                    class="form-select mt-1 block w-full">
-                                    <option *ngFor="let sucursal of sucursales" [value]="sucursal.id"
-                                        [selected]="sucursal.id === materialDetails.material.branch_office_id">{{
-                                        sucursal.name }}</option>
-                                </select>
-                                <div *ngIf="formularioMaterial.get('sucursal')?.errors?.['required'] && formularioMaterial.get('sucursal')?.touched" class="text-red-800 mensaje_error">
-                                    Please select a branch office.
-                                </div>
-                            </div>
-                            <div class="mb-4">
-                                <label for="estado" class="block text-gray-700">Estado</label>
-                                <!-- Lista de estados -->
-                                <select formControlName="estado" id="estado" name="estado"
-                                    class="form-select mt-1 block w-full">
-                                    <option *ngFor="let estado of estados" [value]="estado.value"
-                                        [selected]="estado.value === materialDetails.material.state">{{ estado.label }}
-                                    </option>
-                                </select>
-                                <div *ngIf="formularioMaterial.get('estado')?.errors?.['required'] && formularioMaterial.get('estado')?.touched" class="text-red-800 mensaje_error">
-                                    Please select a state.
-                                </div>
-                            </div>
-                            <!-- Botones -->
-                            <div class="flex justify-end">
-                                <button type="submit"
-                                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar
-                                    Cambios</button>
-                                <button (click)="cerrarModal()"
-                                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
+      </div>
+      <!-- Tabla para mostrar los detalles específicos del material -->
+      <table class="table-auto w-full">
+        <tbody>
+          <tr>
+            <td class="py-2"><strong>ID:</strong></td>
+            <td class="py-2">{{ materialDetails.material?.id }}</td>
+          </tr>
+          <tr>
+            <td class="py-2"><strong>Nombre:</strong></td>
+            <td class="py-2">{{ materialDetails.material?.name }}</td>
+          </tr>
+          <tr>
+            <td class="py-2"><strong>Fecha Alta:</strong></td>
+            <td class="py-2">{{ materialDetails.material?.high_date }}</td>
+          </tr>
+          <tr>
+            <td class="py-2"><strong>Fecha Baja:</strong></td>
+            <td class="py-2">{{ materialDetails.material?.low_date ?? 'Sigue operativo' }}</td>
+          </tr>
+          <tr *ngFor="let attribute of materialDetails.material?.attribute; let i = index">
+            <td class="py-2"><strong>Atributo {{ i + 1 }}:</strong></td>
+            <td class="py-2">{{ attribute.name }} -- > {{ attribute.pivot.value }}</td>
+          </tr>
+          <tr>
+            <td class="py-2"><strong>Sucursal:</strong></td>
+            <td class="py-2">{{ getNombreSucursal(materialDetails.material?.branch_office_id) }}</td>
+          </tr>
+          <tr>
+            <td class="py-2"><strong>Estado:</strong></td>
+            <td class="py-2" [ngStyle]="{ 'color': getColor(materialDetails.material?.state) }">
+              {{ materialDetails.material?.state }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+    <div class="bg-white p-6 rounded shadow" *ngIf="asignado">
+      <h2 class="text-2xl font-bold my-4">Empleado Asignado</h2>
+      <div class="grid grid-cols-3 gap-4">
+        <div *ngIf="asignado.assigned_employees && asignado.assigned_employees.length < 2">
+          <!-- Mostrar información del empleado asignado -->
+          <div class="bg-white p-4 rounded shadow">
+            <p><strong>Empleado Asignado:</strong> {{ asignado.assigned_employees[0].name }} {{
+              asignado.assigned_employees[0].last_name }}</p>
+            <!-- Botón para desasignar el material -->
+            <button (click)="desasignarMaterial(asignado.assigned_employees[0].employee_id)"
+              class="bg-white hover:bg-red-200 text-red-500 py-1 px-3 rounded border mt-2"
+              *ngIf="employeeRole === 'admin'">
+              Desasignar
+            </button>
+            <div *ngIf="successMessage" class="mensaje_exitoso fade-in-out mt-1 mb-3">{{ successMessage }}</div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="asignado.assigned_employees && asignado.assigned_employees.length > 2">
+        <!-- Mostrar mensaje si no hay empleados asignados -->
+        <p>No hay empleados asignados a este material.</p>
+        <div *ngIf="successMessage" class="mensaje_exitoso fade-in-out mt-3 mb-3">{{ successMessage }}</div>
+        <h2 class="text-2xl font-bold my-4" *ngIf="employeeRole === 'admin'">Empleados Disponibles para Asignar</h2>
+        <div class="grid grid-cols-3 gap-4" *ngIf="employeeRole === 'admin'">
+          <ng-container *ngFor="let employee of asignado.assigned_employees">
+            <div class="bg-white p-4 rounded shadow">
+              <!-- Botón para asignar este empleado -->
+              <button (click)="asignarMaterial(employee.employee_id)">{{ employee.name }} {{
+                employee.last_name }}
+                <span style="font-size: 16px; line-height: 1;" class="ml-2">&#9650;</span>
+                <!-- Utiliza el código Unicode para una flecha hacia arriba -->
+              </button>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+
+    <div *ngIf="mostrarModalEditar" class="fixed z-10 inset-0 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4">
+        <!-- Contenido del modal -->
+        <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full">
+          <!-- Encabezado del modal -->
+          <div class="px-4 py-2 bg-gray-200">
+            <h3 class="text-lg font-bold">Editar Material</h3>
+          </div>
+          <!-- Cuerpo del modal (aquí va el formulario) -->
+          <div class="p-4">
+            <!-- Formulario de edición -->
+            <form [formGroup]="formularioMaterial" (submit)="editarMaterial()">
+              <div class="mb-4">
+                <label for="nombre" class="block text-gray-700">Nombre</label>
+                <input formControlName="nombre" type="text" id="nombre" name="nombre"
+                  class="form-input mt-1 block w-full" placeholder="Ingrese el nombre" required>
+                <div
+                  *ngIf="formularioMaterial.get('nombre')?.errors?.['required'] && formularioMaterial.get('nombre')?.touched"
+                  class="text-red-800 mensaje_error">
+                  This field cannot be empty.
+                </div>
+                <div
+                  *ngIf="formularioMaterial.get('nombre')?.errors?.['maxlength'] && formularioMaterial.get('nombre')?.touched"
+                  class="text-red-800 mensaje_error">
+                  The name cannot be more than 30 characters.
+                </div>
+              </div>
+              <div class="mb-4" *ngFor="let attribute of materialDetails.material?.attribute; let i = index">
+                <label [for]="'atributo' + i" class="block text-gray-700">Atributo {{ i + 1 }}: {{
+                  attribute.name }}</label>
+                <input formControlName="{{ 'atributo' + i }}" type="text" [id]="'atributo' + i" [name]="'atributo' + i"
+                  class="form-input mt-1 block w-full" [placeholder]="'Ingrese el valor del atributo ' + attribute.name"
+                  required>
+                <div
+                  *ngIf="formularioMaterial.get('atributo' + i)?.errors?.['required'] && formularioMaterial.get('atributo' + i)?.touched"
+                  class="text-red-800 mensaje_error">
+                  This field cannot be empty.
+                </div>
+                <div
+                  *ngIf="formularioMaterial.get('atributo' + i)?.errors?.['maxlength'] && formularioMaterial.get('atributo' + i)?.touched"
+                  class="text-red-800 mensaje_error">
+                  The name cannot be more than 50 characters.
+                </div>
+              </div>
+              <div class="mb-4">
+                <label for="fechaActual" class="block text-gray-700">
+                  Establecer fecha de baja con la fecha actual </label>
+                <input type="checkbox" id="fechaActual" name="fechaActual" (change)="setFechaActual(true)">
+                <label for="fechaActual" class="block text-gray-700">
+                  <span class="text-red-500">IMPORTANTE</span>
+                  una vez dado de baja no se podrá dar de alta
+                </label>
+              </div>
+              <div class="mb-4">
+                <label for="sucursal" class="block text-gray-700">Sucursal</label>
+                <!-- Lista de sucursales -->
+                <select formControlName="sucursal" id="sucursal" name="sucursal" class="form-select mt-1 block w-full">
+                  <option *ngFor="let sucursal of sucursales" [value]="sucursal.id"
+                    [selected]="sucursal.id === materialDetails.material.branch_office_id">{{
+                    sucursal.name }}</option>
+                </select>
+                <div
+                  *ngIf="formularioMaterial.get('sucursal')?.errors?.['required'] && formularioMaterial.get('sucursal')?.touched"
+                  class="text-red-800 mensaje_error">
+                  Please select a branch office.
+                </div>
+              </div>
+              <div class="mb-4">
+                <label for="estado" class="block text-gray-700">Estado</label>
+                <!-- Lista de estados -->
+                <select formControlName="estado" id="estado" name="estado" class="form-select mt-1 block w-full">
+                  <option *ngFor="let estado of estados" [value]="estado.value"
+                    [selected]="estado.value === materialDetails.material.state">{{ estado.label }}
+                  </option>
+                </select>
+                <div
+                  *ngIf="formularioMaterial.get('estado')?.errors?.['required'] && formularioMaterial.get('estado')?.touched"
+                  class="text-red-800 mensaje_error">
+                  Please select a state.
+                </div>
+              </div>
+              <!-- Botones -->
+              <div class="flex justify-end">
+                <button type="submit"
+                  class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar
+                  Cambios</button>
+                <button (click)="cerrarModal()"
+                  class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="successMessage2" class="mensaje_exitoso fade-in-out mt-3 mb-3">{{ successMessage2 }}</div>
+  </div>
+</div>

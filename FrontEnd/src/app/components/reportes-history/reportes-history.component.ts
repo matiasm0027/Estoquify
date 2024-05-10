@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 
 @Component({
@@ -7,19 +8,25 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
   styleUrl: './reportes-history.component.css'
 })
 
-export class ReportesHistoryComponent implements OnInit {
+export class ReportesHistoryComponent implements OnInit, OnDestroy{
   reportes: any[] = [];
   reporteSeleccionado: any = null;
   sucursales: any[] = [];
   employeeId!: number;
   employeeRole!: string;
-  
+
+  private subscriptions: Subscription[] = [];
+
   constructor(private apiRequestService: ApiRequestService) {}
 
   ngOnInit(): void {
     this.getLoggedUser()
     this.obtenerReportes();
     this.obtenerSucursales();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   getLoggedUser(): void {

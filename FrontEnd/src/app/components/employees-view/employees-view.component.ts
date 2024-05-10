@@ -28,6 +28,9 @@ export class EmployeesViewComponent implements OnInit, OnDestroy {
     { valor: 'departamento', etiqueta: 'Departamento', seleccionado: false },
     { valor: 'sucursal', etiqueta: 'Sucursal', seleccionado: false },
   ];
+  errorMessage!: string;
+  successMessage!: string;
+
   private subscriptions: Subscription[] = [];
 
   constructor(private fb: FormBuilder, private peticionesService: ApiRequestService) {
@@ -150,10 +153,11 @@ export class EmployeesViewComponent implements OnInit, OnDestroy {
       const nuevoEmpleado = this.formularioEmpleado.value;
         this.peticionesService.addEmployee(nuevoEmpleado).subscribe(
         (response: any) => {
+          this.successMessage = response.message;
           this.cerrarModal();
         },
         (error: any) => {
-          console.error('Error al agregar empleado:', error);
+          this.errorMessage = error.error.error;
         }
       );
     } else {
@@ -187,16 +191,16 @@ export class EmployeesViewComponent implements OnInit, OnDestroy {
       console.error('Los datos de la tabla no son válidos o están vacíos.');
       return '';
     }
-  
+
     const csvRows: string[] = [];
     const headers: string[] = [];
-    
+
     // Extraer encabezados de la primera fila
     for (const key in data[0]) {
       headers.push(key);
     }
     csvRows.push(headers.join(','));
-  
+
     // Iterar sobre cada objeto en la matriz y generar una fila de CSV
     data.forEach(obj => {
       const values: string[] = [];
@@ -205,7 +209,7 @@ export class EmployeesViewComponent implements OnInit, OnDestroy {
       });
       csvRows.push(values.join(','));
     });
-  
+
     return csvRows.join('\n');
   }
 
@@ -221,9 +225,9 @@ downloadCsv(): void {
     console.error('No hay datos de empleado disponibles');
     return;
   }
-  
+
   const csvContent = this.convertToCsv(this.empleadosFiltrados);
-  
+
   const blob = new Blob([csvContent], { type: 'text/csv' });
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');

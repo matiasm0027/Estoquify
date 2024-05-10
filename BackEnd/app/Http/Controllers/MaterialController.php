@@ -40,7 +40,7 @@ class MaterialController extends Controller
         // Convertir la fecha al formato adecuado para la base de datos
         $high_date = date('Y-m-d H:i:s', strtotime($request->input('material.high_date')));
         // Obtener la categoría del material
-        $nameMaterial=  substr($request->input('material.name'), 0, 3);
+        $nameMaterial=  substr($request->input('material.name'), 0, 4);
         // Obtener la cantidad de materiales con el mismo prefijo
         $count = Material::where('name', 'like', $nameMaterial . '_%')->count() + 1;
 

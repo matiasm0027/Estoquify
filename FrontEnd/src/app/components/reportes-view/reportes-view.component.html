@@ -161,58 +161,133 @@
                         <div class="p-4">
                             <!-- Formulario aquí -->
                             <form [formGroup]="formularioEmpleado" (submit)="agregarEmpleado()">
-                                <div class="mb-4">
-                                    <label for="nombre" class="block text-gray-700">Nombre</label>
-                                    <input formControlName="nombre" type="text" id="nombre" name="nombre"
-                                        class="form-input mt-1 block w-full" placeholder="Ingrese el nombre" required>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="apellido" class="block text-gray-700">Apellido</label>
-                                    <input formControlName="apellido" type="text" id="apellido" name="apellido"
-                                        class="form-input mt-1 block w-full" placeholder="Ingrese el apellido" required>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="email" class="block text-gray-700">Email</label>
-                                    <input formControlName="email" type="email" id="email" name="email"
-                                        class="form-input mt-1 block w-full" placeholder="Ingrese el correo electrónico"
-                                        required>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="password" class="block text-gray-700">Contraseña</label>
-                                    <input formControlName="password" type="password" id="password" name="password"
-                                        class="form-input mt-1 block w-full" placeholder="Ingrese la contraseña"
-                                        required>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="telefonoMovil" class="block text-gray-700">Teléfono Móvil</label>
-                                    <input formControlName="telefonoMovil" type="tel" id="telefonoMovil"
-                                        name="telefonoMovil" class="form-input mt-1 block w-full"
-                                        placeholder="Ingrese el teléfono móvil">
-                                </div>
-                                <div class="mb-4">
-                                    <label for="departamento" class="block text-gray-700">Departamento</label>
-                                    <select formControlName="departamento" id="departamento" name="departamento"
-                                        class="form-select mt-1 block w-full" required>
-                                        <option *ngFor="let dept of departamentos" [value]="dept.id">{{ dept.name }}
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="sucursal" class="block text-gray-700">Sucursal</label>
-                                    <select formControlName="sucursal" id="sucursal" name="sucursal"
-                                        class="form-select mt-1 block w-full" required>
-                                        <option *ngFor="let suc of sucursales" [value]="suc.id">{{ suc.name }}</option>
-                                    </select>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="rol" class="block text-gray-700">Rol</label>
-                                    <select formControlName="rol" id="rol" name="rol"
-                                        class="form-select mt-1 block w-full" required>
-                                        <option value="1">Administrador</option>
-                                        <option value="2">Responsable</option>
-                                        <option value="3">Empleado</option>
-                                    </select>
-                                </div>
+                              <div class="mb-4">
+                                  <label for="nombre" class="block text-gray-700">Nombre</label>
+                                  <input formControlName="nombre" type="text" id="nombre" name="nombre"
+                                      class="form-input mt-1 block w-full" placeholder="Ingrese el Nombre" required>
+                                  <!-- Error handling -->
+                                  <div *ngIf="formularioEmpleado.get('nombre')?.errors?.['required'] && formularioEmpleado.get('nombre')?.touched"
+                                      class="text-red-800">
+                                      This field cannot be empty.
+                                  </div>
+                                  <div *ngIf="formularioEmpleado.get('nombre')?.errors?.['minlength'] && formularioEmpleado.get('nombre')?.touched"
+                                      class="text-red-800">
+                                      The name must be at least 3 characters.
+                                  </div>
+                                  <div *ngIf="formularioEmpleado.get('nombre')?.errors?.['maxlength'] && formularioEmpleado.get('nombre')?.touched"
+                                      class="text-red-800">
+                                      The name cannot be more than 30 characters.
+                                  </div>
+                                  <div *ngIf="formularioEmpleado.get('nombre')?.errors?.['pattern'] && formularioEmpleado.get('nombre')?.touched"
+                                      class="text-red-800">
+                                      The name can only contain letters.
+                                  </div>
+                              </div>
+
+                              <div class="mb-4">
+                                  <label for="apellido" class="block text-gray-700">Apellido</label>
+                                  <input formControlName="apellido" type="text" id="apellido" name="apellido"
+                                      class="form-input mt-1 block w-full" placeholder="Ingrese el Apellido" required>
+                                  <!-- Error handling -->
+                                  <div *ngIf="formularioEmpleado.get('apellido')?.errors?.['required'] && formularioEmpleado.get('apellido')?.touched"
+                                      class="text-red-800">
+                                      This field cannot be empty.
+                                  </div>
+                                  <div *ngIf="formularioEmpleado.get('apellido')?.errors?.['minlength'] && formularioEmpleado.get('nombre')?.touched"
+                                      class="text-red-800">
+                                      The last name must be at least 3 characters.
+                                  </div>
+                                  <div *ngIf="formularioEmpleado.get('apellido')?.errors?.['maxlength'] && formularioEmpleado.get('nombre')?.touched"
+                                      class="text-red-800">
+                                      The last name cannot be more than 30 characters.
+                                  </div>
+                                  <div *ngIf="formularioEmpleado.get('apellido')?.errors?.['pattern'] && formularioEmpleado.get('nombre')?.touched"
+                                      class="text-red-800">
+                                      The last name can only contain letters.
+                                  </div>
+                              </div>
+
+                              <div class="mb-4">
+                                  <label for="email" class="block text-gray-700">Email</label>
+                                  <input formControlName="email" type="email" id="email" name="email"
+                                      class="form-input mt-1 block w-full" placeholder="Ingrese el Email" required>
+                                  <!-- Error handling -->
+                                  <div *ngIf="formularioEmpleado.get('email')?.errors?.['required'] && formularioEmpleado.get('email')?.touched"
+                                      class="text-red-800">
+                                      This field cannot be empty.
+                                  </div>
+                                  <div *ngIf="formularioEmpleado.get('email')?.errors?.['pattern'] && formularioEmpleado.get('email')?.touched"
+                                      class="text-red-800">
+                                      Invalid email format.
+                                  </div>
+                              </div>
+
+                              <div class="mb-4">
+                                  <label for="password" class="block text-gray-700">Contraseña</label>
+                                  <input formControlName="password" type="password" id="password" name="password"
+                                      class="form-input mt-1 block w-full" placeholder="Ingrese la Contraseña" required>
+                                  <!-- Error handling -->
+                                  <div *ngIf="formularioEmpleado.get('password')?.errors?.['required'] && formularioEmpleado.get('password')?.touched"
+                                      class="text-red-800">
+                                      This field cannot be empty.
+                                  </div>
+                              </div>
+
+                              <div class="mb-4">
+                                  <label for="telefonoMovil" class="block text-gray-700">Telefono</label>
+                                  <input formControlName="telefonoMovil" type="tel" id="telefonoMovil" name="telefonoMovil"
+                                      class="form-input mt-1 block w-full" placeholder="Ingrese el Numero de Telefono" required>
+                                  <!-- Error handling -->
+                                  <div *ngIf="formularioEmpleado.get('telefonoMovil')?.errors?.['required'] && formularioEmpleado.get('telefonoMovil')?.touched"
+                                      class="text-red-800">
+                                      This field cannot be empty.
+                                  </div>
+                                  <div *ngIf="formularioEmpleado.get('telefonoMovil')?.errors?.['pattern'] && formularioEmpleado.get('telefonoMovil')?.touched"
+                                      class="text-red-800">
+                                      Only numbers are allowed.
+                                  </div>
+                              </div>
+
+                              <div class="mb-4">
+                                  <label for="departamento" class="block text-gray-700">Departamento</label>
+                                  <select formControlName="departamento" id="departamento" name="departamento"
+                                      class="form-select mt-1 block w-full" required>
+                                      <option *ngFor="let dept of departamentos" [value]="dept.id">{{ dept.name }}</option>
+                                  </select>
+                                  <!-- Error handling -->
+                                  <div *ngIf="formularioEmpleado.get('departamento')?.errors?.['required'] && formularioEmpleado.get('departamento')?.touched"
+                                      class="text-red-800">
+                                      Please select a department.
+                                  </div>
+                              </div>
+
+                              <div class="mb-4">
+                                  <label for="sucursal" class="block text-gray-700">Sucursal</label>
+                                  <select formControlName="sucursal" id="sucursal" name="sucursal"
+                                      class="form-select mt-1 block w-full" required>
+                                      <option *ngFor="let suc of sucursales" [value]="suc.id">{{ suc.name }}</option>
+                                  </select>
+                                  <!-- Error handling -->
+                                  <div *ngIf="formularioEmpleado.get('sucursal')?.errors?.['required'] && formularioEmpleado.get('sucursal')?.touched"
+                                      class="text-red-800">
+                                      Please select a branch office.
+                                  </div>
+                              </div>
+
+                              <div class="mb-4">
+                                  <label for="rol" class="block text-gray-700">Rol</label>
+                                  <select formControlName="rol" id="rol" name="rol" class="form-select mt-1 block w-full"
+                                      required>
+                                      <option value="1">Administrator</option>
+                                      <option value="2">Manager</option>
+                                      <option value="3">Employee</option>
+                                  </select>
+                                  <!-- Error handling -->
+                                  <div *ngIf="formularioEmpleado.get('rol')?.errors?.['required'] && formularioEmpleado.get('rol')?.touched"
+                                      class="text-red-800">
+                                      Please select a role.
+                                  </div>
+                              </div>
                                 <div class="flex justify-end">
                                     <button type="submit"
                                         class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar</button>

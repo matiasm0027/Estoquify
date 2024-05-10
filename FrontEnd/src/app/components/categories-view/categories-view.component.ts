@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 
 @Component({
@@ -8,7 +9,7 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
   templateUrl: './categories-view.component.html',
   styleUrls: ['./categories-view.component.css']
 })
-export class CategoriesViewComponent implements OnInit{
+export class CategoriesViewComponent implements OnInit, OnDestroy{
   categoryForm: FormGroup;
   materials: any[] = [];
   mostrarModalAgregar: boolean = false;
@@ -19,20 +20,25 @@ export class CategoriesViewComponent implements OnInit{
   employeeRole!: string;
   employeeId!: number;
 
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private ApiRequestService: ApiRequestService,
     private fb: FormBuilder,
-    ) 
+    )
   {
     this.categoryForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
     });
   }
-  
+
   ngOnInit(): void {
     this.obtenerCantidadMaterial();
     this.getLoggedUser();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   obtenerCantidadMaterial(){
@@ -40,8 +46,8 @@ export class CategoriesViewComponent implements OnInit{
       (response: any[]) => {
         this.materials = response.map(material => ({
           id: material.id,
-          name: material.name, 
-          total_material: material.total_materials, 
+          name: material.name,
+          total_material: material.total_materials,
           activeMaterial: material.active_materials,
           availableMaterial: material.available_materials,
           inactiveMaterial: material.inactive_materials
@@ -94,7 +100,7 @@ export class CategoriesViewComponent implements OnInit{
       const categoryEdit = {
         name: this.categoryForm.value.name,
       };
-  
+
       this.ApiRequestService.editCategory(this.categoryID, categoryEdit).subscribe(
         (response: any) => {
           this.successMessage = response.message;
@@ -117,7 +123,7 @@ export class CategoriesViewComponent implements OnInit{
     setTimeout(() => {
       this.successMessage = '';
       this.errorMessage = '';
-    }, 2000); 
+    }, 2000);
   }
 
 
@@ -148,8 +154,8 @@ export class CategoriesViewComponent implements OnInit{
       (response: any) => {
         this.employeeId = response.id;
         const roleId = response.role_id;
-       
-        
+
+
         if (roleId === 1) {
           this.employeeRole = 'admin';
         } else if (roleId === 2){

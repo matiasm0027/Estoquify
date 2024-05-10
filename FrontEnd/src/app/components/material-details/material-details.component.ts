@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-material-details',
   templateUrl: './material-details.component.html',
   styleUrls: ['./material-details.component.css']
 })
-export class MaterialDetailsComponent implements OnInit {
+export class MaterialDetailsComponent implements OnInit, OnDestroy {
   materialId!: number;
   materialDetails: any = {};
   departamentos: any[] = [];
@@ -26,8 +27,11 @@ export class MaterialDetailsComponent implements OnInit {
   ];
   asignado: any;
   successMessage!: string;
+  successMessage2!: string;
   employeeId!:number;
   employeeRole!:string;
+
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -48,6 +52,10 @@ export class MaterialDetailsComponent implements OnInit {
     this.obtenerAtributos();
     this.getLoggedUser();
     this.obtenerEmpleadoAsignado(this.materialId);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   getCategoriaID(){
@@ -161,6 +169,7 @@ export class MaterialDetailsComponent implements OnInit {
 
         this.materialService.editMaterial(this.materialId, materialEditado).subscribe(
             (response: any) => {
+              this.successMessage2=response.message;
                 this.cerrarModal();
                 this.getMaterialDetails();
             },
@@ -256,7 +265,6 @@ export class MaterialDetailsComponent implements OnInit {
         // Actualiza la vista después de desasignar el material
         this.obtenerEmpleadoAsignado(materialId);
         this.successMessage = response.message;
-        this.clearMessagesAfterDelay();
       },
       (error) => {
         console.error('Error al desasignar el material:', error);
@@ -273,7 +281,6 @@ export class MaterialDetailsComponent implements OnInit {
         // Actualiza la vista después de asignar el material
         this.obtenerEmpleadoAsignado(materialId);
         this.successMessage = response.message;
-        this.clearMessagesAfterDelay();
       },
       (error) => {
         console.error('Error al asignar el material:', error);

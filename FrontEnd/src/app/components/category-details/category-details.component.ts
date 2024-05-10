@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-category-details',
   templateUrl: './category-details.component.html',
   styleUrls: ['./category-details.component.css']
 })
-export class CategoryDetailsComponent implements OnInit {
+export class CategoryDetailsComponent implements OnInit, OnDestroy {
   page: number = 1;
   categoryId!: number;
   categoryDetails: any = {};
@@ -19,9 +20,9 @@ export class CategoryDetailsComponent implements OnInit {
   atributos: any[] = [];
   formularioMaterial!: FormGroup;
   categories: any[] = [];
-  fechaInicio: string = ''; 
-  fechaFin: string = ''; 
-  filtroEstado: string = ''; 
+  fechaInicio: string = '';
+  fechaFin: string = '';
+  filtroEstado: string = '';
   filtroSucursal: string = '';
   detallesMaterial: any = {};
   atributosAdicionales: any[] = [];
@@ -29,7 +30,9 @@ export class CategoryDetailsComponent implements OnInit {
   employeeRole!: string;
   searchTerm: string = '';
   errorMessage!: string;
+  successMessage!: string;
 
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -46,13 +49,17 @@ export class CategoryDetailsComponent implements OnInit {
     this.obtenerAtributos();
     this.initForm();
     this.getLoggedUser();
-    
+
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   initForm() {
     this.formularioMaterial = this.fb.group({
       nombre: ['', Validators.required],
-      cantidad: ['', Validators.required],
+      cantidad: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
       value: ['', Validators.required],
       sucursal: ['', Validators.required],
       atributo: ['', Validators.required]
@@ -83,7 +90,7 @@ export class CategoryDetailsComponent implements OnInit {
     this.ApiRequestService.listBranchOffices().subscribe(
       (response: any[]) => {
         this.sucursales = response;
-        
+
       },
       error => {
         console.error('Error al obtener sucursales:', error);
@@ -95,7 +102,7 @@ export class CategoryDetailsComponent implements OnInit {
     this.ApiRequestService.listAtributos().subscribe(
       (response: any[]) => {
         this.atributos = response;
-        
+
       },
       error => {
         console.error('Error al obtener sucursales:', error);
@@ -171,7 +178,7 @@ export class CategoryDetailsComponent implements OnInit {
   agregarMaterial() {
     if (this.formularioMaterial.valid) {
         const nombreBase = this.formularioMaterial.value.nombre;
-        const cantidad = this.formularioMaterial.value.cantidad;
+        const cantidad = parseInt(this.formularioMaterial.value.cantidad, 10);
         const sucursal = this.formularioMaterial.value.sucursal;
         const atributoId = this.formularioMaterial.value.atributo; // Obtener el ID del atributo seleccionado
         const nombreAtributo = this.atributos.find(atributo => atributo.id === atributoId)?.name;
@@ -187,6 +194,7 @@ export class CategoryDetailsComponent implements OnInit {
             this.ApiRequestService.agregarMaterial(nuevoMaterial).subscribe(
                 (response: any) => {
                     // Cerrar el modal y limpiar el formulario después de agregar cada material
+                    this.successMessage= response.message;
                     if (i === cantidad) {
                         this.cerrarModal();
                     }
@@ -211,7 +219,7 @@ clearMessagesAfterDelay(): void {
     this.errorMessage = '';
   }, 2000);
 }
-  
+
   // Función para construir el atributo principal
   construirAtributoPrincipal(atributoId: number, nombreAtributo: string): any {
     return {
@@ -223,30 +231,30 @@ clearMessagesAfterDelay(): void {
       }
     };
   }
-  
+
   // Función para construir los atributos extras
   construirAtributosExtras(): any[] {
     const atributosExtras = [];
-  
+
     for (let i = 0; i < this.atributosAdicionales.length; i++) {
       const atributoExtraId = this.formularioMaterial.value[`atributo${i + 2}`];
       const valorExtra = this.formularioMaterial.value[`valor${i + 2}`];
       const nombreAtributoExtra = this.atributos.find(atributo => atributo.id === atributoExtraId)?.name;
-  
+
       const atributoExtra = {
 
           category_id: this.categoryId,
           attribute_id: atributoExtraId,
           value: valorExtra
-        
+
       };
-  
+
       atributosExtras.push(atributoExtra);
     }
-  
+
     return atributosExtras;
   }
-  
+
   // Función para construir el objeto del material
   construirObjetoMaterial(nombre: string, sucursal: number, atributoPrincipal: any, atributosExtras: any[]): any {
     return {
@@ -266,7 +274,7 @@ clearMessagesAfterDelay(): void {
       },
       category_id: this.categoryId,
       category_name: "",
-      
+
     };
   }
 
@@ -275,8 +283,8 @@ clearMessagesAfterDelay(): void {
       (response: any) => {
         this.employeeId = response.id;
         const roleId = response.role_id;
-       
-        
+
+
         if (roleId === 1) {
           this.employeeRole = 'admin';
         } else if (roleId === 2){

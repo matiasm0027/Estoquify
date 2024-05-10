@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
-import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 
 @Component({
   selector: 'app-employee-details',
   templateUrl: './employee-details.component.html',
   styleUrls: ['./employee-details.component.css']
 })
-export class EmployeeDetailsComponent implements OnInit {
+export class EmployeeDetailsComponent implements OnInit , OnDestroy {
   employeeId!: number;
   employeeDetails: any = {};
   departamentos: any[] = [];
@@ -24,6 +24,8 @@ export class EmployeeDetailsComponent implements OnInit {
   ];
   successMessage!: string;
 
+  private subscriptions: Subscription[] = [];
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -31,7 +33,7 @@ export class EmployeeDetailsComponent implements OnInit {
     private router: Router
   ) {}
 
-  
+
   ngOnInit(): void {
     this.getEmployeeIdFromRoute();
     this.obtenerDepartamento();
@@ -40,6 +42,9 @@ export class EmployeeDetailsComponent implements OnInit {
     this.getLoggedUser();
   }
 
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
 
   initForm() {
     this.formularioEmpleado = this.fb.group({
@@ -57,7 +62,7 @@ export class EmployeeDetailsComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.employeeId = +params['id'];
     });
-   
+
   }
 
   getEmployeeDetails(): void {
@@ -66,7 +71,7 @@ export class EmployeeDetailsComponent implements OnInit {
       .subscribe(
         (employee: any) => {
           this.employeeDetails = employee;
-          
+
           this.initForm(); // Initialize form after employee details are fetched
         },
         (error: any) => {
@@ -103,7 +108,7 @@ export class EmployeeDetailsComponent implements OnInit {
             const departamentoEncontrado = this.departamentos.find(dept => dept.name === departamentoId);
             if (departamentoEncontrado) {
                 departamentoId = departamentoEncontrado.id;
-            } 
+            }
         }
 
         // Obtener el ID de la sucursal
@@ -114,7 +119,7 @@ export class EmployeeDetailsComponent implements OnInit {
             const sucursalEncontrada = this.sucursales.find(suc => suc.name === sucursalId);
             if (sucursalEncontrada) {
                 sucursalId = sucursalEncontrada.id;
-            } 
+            }
         }
 
         // Obtener el ID del rol
@@ -125,7 +130,7 @@ export class EmployeeDetailsComponent implements OnInit {
             const rolEncontrado = this.roles.find(rol => rol.name === rolId);
             if (rolEncontrado) {
                 rolId = rolEncontrado.id;
-            } 
+            }
         }
 
         const empleadoEditado = {
@@ -142,6 +147,7 @@ export class EmployeeDetailsComponent implements OnInit {
 
         this.employeeService.editEmployee(this.employeeId, empleadoEditado).subscribe(
           (response: any) => {
+            this.successMessage = response.message;
             this.cerrarModal();
             this.getEmployeeDetails();
           },
@@ -152,7 +158,7 @@ export class EmployeeDetailsComponent implements OnInit {
     } else {
         console.error('Formulario inválido');
     }
-  
+
   }
 
 
@@ -183,7 +189,7 @@ export class EmployeeDetailsComponent implements OnInit {
   confirmDelete(employee: any): void {
     const confirmacion = confirm(`¿Estás seguro de que quieres eliminar a ${employee.name}?`);
     if (confirmacion) {
-      this.router.navigate(['/employees_view']); 
+      this.router.navigate(['/employees_view']);
       this.deleteEmployee(employee.employee_id);
       alert(`El empleado ${employee.name} ha sido eliminado.`);
     }
@@ -213,9 +219,8 @@ export class EmployeeDetailsComponent implements OnInit {
       (response) => {
         // Actualiza la vista después de desasignar el material
         this.getEmployeeDetails();
-        
+
         this.successMessage = response.message;
-        this.clearMessagesAfterDelay();
       },
       (error) => {
         console.error('Error al desasignar el material:', error);
@@ -228,17 +233,17 @@ export class EmployeeDetailsComponent implements OnInit {
     setTimeout(() => {
       this.successMessage = '';
       //this.errorMessage = '';
-    }, 2000); 
+    }, 2000);
   }
 
 
   getLoggedUser(): void {
     this.employeeService.me().subscribe(
       (response: any) => {
-      
+
         const roleId = response.role_id;
-       
-        
+
+
         if (roleId === 1) {
           this.employeeRole = 'admin';
         } else if (roleId === 2){
@@ -253,17 +258,17 @@ export class EmployeeDetailsComponent implements OnInit {
     );
   }
 
- 
+
   private convertToCsv(data: any): string {
     if (!data || typeof data !== 'object') {
       console.error('Los datos de la tabla no son válidos.');
       return '';
     }
-  
+
     // Extraemos los encabezados
     const headers = Object.keys(data);
     const csvRows = [headers.join(',')];
-  
+
     // Convertimos cada objeto en una fila de CSV
     const extractValues = (obj: any) => {
       const values = headers.map(header => {
@@ -275,13 +280,13 @@ export class EmployeeDetailsComponent implements OnInit {
       });
       return values.join(',');
     };
-  
+
     csvRows.push(extractValues(data));
-  
+
     return csvRows.join('\n');
   }
-  
-  
+
+
   downloadCsv() {
     if (!this.employeeDetails) {
       console.error('No hay datos de empleado disponibles');

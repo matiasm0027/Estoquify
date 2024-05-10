@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { Employee } from 'src/app/model/Employee';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 
@@ -8,7 +9,7 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
   templateUrl: './reportes-view.component.html',
   styleUrls: ['./reportes-view.component.css']
 })
-export class ReportesViewComponent implements OnInit {
+export class ReportesViewComponent implements OnInit, OnDestroy {
   categories: any[] = [];
   altaEmpleado: boolean = false;
   solicitudMaterial: boolean = false;
@@ -38,21 +39,21 @@ export class ReportesViewComponent implements OnInit {
   formularioMaterial: FormGroup;
   successMessage!: string;
 
-
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private apiRequestService: ApiRequestService,
     private fb: FormBuilder,
   ) {
     this.formularioEmpleado = this.fb.group({
-      nombre: ['', Validators.required],
-      apellido: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
+      nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30), Validators.pattern('^[a-zA-Z]+$')]],
+      apellido: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30), Validators.pattern('^[a-zA-Z]+$')]],
+      email: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'),]],
       password: ['', Validators.required],
       departamento: ['', Validators.required],
       sucursal: ['', Validators.required],
       rol: ['', Validators.required],
-      telefonoMovil: ['', Validators.required],
+      telefonoMovil: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
     });
     this.formularioMaterial = this.fb.group({
       fullname: [, Validators.required],
@@ -73,9 +74,12 @@ export class ReportesViewComponent implements OnInit {
     this.obtenerDepartamento()
   }
 
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
 
   //--------------------------------------------------------------------------FUNCIONES COMUNES-----------------------------------------------------------------
-  
+
   getLoggedUser(): void {
     this.apiRequestService.me().subscribe(
       (response: any) => {

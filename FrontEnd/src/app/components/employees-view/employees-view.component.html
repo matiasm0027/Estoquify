@@ -16,12 +16,12 @@
             </div>
             <div> <!-- Contenedor para los botones -->
                 <button (click)="mostrarModal()"
-                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-4"
+                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 md:ml-3 md:mb-2 rounded mr-2"
                     *ngIf="employeeRole === 'admin'">
                     Añadir Empleado
                 </button>
                 <button (click)="downloadCsv()"
-                    class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mr-4">
+                    class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 md:ml-3 md:px-6 rounded mr-4">
                     Descargar CSV
                 </button>
                 <button (click)="mostrarModalDeFiltros()"
@@ -34,7 +34,7 @@
         <div class="table-container overflow-x-auto">
             <!-- Agrega margen superior adicional en pantallas más pequeñas -->
             <table
-                class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-gray-300 lg:text-center md:text-center sm:text-center">
+                class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-gray-300 mb-2 lg:text-center md:text-center sm:text-center">
                 <thead class="text-xs text-gray-700 uppercase dark:text-gray-400">
                     <tr>
                         <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
@@ -79,8 +79,11 @@
             </table>
             <pagination-controls (pageChange)="page = $event"></pagination-controls>
         </div>
+        <div *ngIf="successMessage" class="text-green-800 mensaje_exitoso fade-in-out">{{ successMessage }}</div>
+        <div *ngIf="errorMessage" class="text-red-800 mensaje_error fade-in-out">{{ errorMessage }}</div>
     </div>
 </div>
+
 
 <div *ngIf="mostrarModalAgregar" class="fixed z-10 inset-0 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen px-4">
@@ -100,19 +103,19 @@
                             class="form-input mt-1 block w-full" placeholder="Ingrese el Nombre" required>
                         <!-- Error handling -->
                         <div *ngIf="formularioEmpleado.get('nombre')?.errors?.['required'] && formularioEmpleado.get('nombre')?.touched"
-                            class="error_form mensaje_error">
+                            class="text-red-800">
                             This field cannot be empty.
                         </div>
                         <div *ngIf="formularioEmpleado.get('nombre')?.errors?.['minlength'] && formularioEmpleado.get('nombre')?.touched"
-                            class="error_form mensaje_error">
+                            class="text-red-800">
                             The name must be at least 3 characters.
                         </div>
                         <div *ngIf="formularioEmpleado.get('nombre')?.errors?.['maxlength'] && formularioEmpleado.get('nombre')?.touched"
-                            class="error_form mensaje_error">
+                            class="text-red-800">
                             The name cannot be more than 30 characters.
                         </div>
                         <div *ngIf="formularioEmpleado.get('nombre')?.errors?.['pattern'] && formularioEmpleado.get('nombre')?.touched"
-                            class="error_form mensaje_error">
+                            class="text-red-800">
                             The name can only contain letters.
                         </div>
                     </div>
@@ -123,19 +126,19 @@
                             class="form-input mt-1 block w-full" placeholder="Ingrese el Apellido" required>
                         <!-- Error handling -->
                         <div *ngIf="formularioEmpleado.get('apellido')?.errors?.['required'] && formularioEmpleado.get('apellido')?.touched"
-                            class="error_form mensaje_error">
+                            class="text-red-800">
                             This field cannot be empty.
                         </div>
                         <div *ngIf="formularioEmpleado.get('apellido')?.errors?.['minlength'] && formularioEmpleado.get('nombre')?.touched"
-                            class="error_form mensaje_error">
+                            class="text-red-800">
                             The last name must be at least 3 characters.
                         </div>
                         <div *ngIf="formularioEmpleado.get('apellido')?.errors?.['maxlength'] && formularioEmpleado.get('nombre')?.touched"
-                            class="error_form mensaje_error">
+                            class="text-red-800">
                             The last name cannot be more than 30 characters.
                         </div>
                         <div *ngIf="formularioEmpleado.get('apellido')?.errors?.['pattern'] && formularioEmpleado.get('nombre')?.touched"
-                            class="error_form mensaje_error">
+                            class="text-red-800">
                             The last name can only contain letters.
                         </div>
                     </div>
@@ -146,11 +149,11 @@
                             class="form-input mt-1 block w-full" placeholder="Ingrese el Email" required>
                         <!-- Error handling -->
                         <div *ngIf="formularioEmpleado.get('email')?.errors?.['required'] && formularioEmpleado.get('email')?.touched"
-                            class="error_form mensaje_error">
+                            class="text-red-800">
                             This field cannot be empty.
                         </div>
                         <div *ngIf="formularioEmpleado.get('email')?.errors?.['pattern'] && formularioEmpleado.get('email')?.touched"
-                            class="error_form mensaje_error">
+                            class="text-red-800">
                             Invalid email format.
                         </div>
                     </div>
@@ -161,7 +164,7 @@
                             class="form-input mt-1 block w-full" placeholder="Ingrese la Contraseña" required>
                         <!-- Error handling -->
                         <div *ngIf="formularioEmpleado.get('password')?.errors?.['required'] && formularioEmpleado.get('password')?.touched"
-                            class="error_form mensaje_error">
+                            class="text-red-800">
                             This field cannot be empty.
                         </div>
                     </div>
@@ -172,15 +175,14 @@
                             class="form-input mt-1 block w-full" placeholder="Ingrese el Numero de Telefono" required>
                         <!-- Error handling -->
                         <div *ngIf="formularioEmpleado.get('telefonoMovil')?.errors?.['required'] && formularioEmpleado.get('telefonoMovil')?.touched"
-                            class="error_form mensaje_error">
+                            class="text-red-800">
                             This field cannot be empty.
                         </div>
-                        <div *ngIf="formularioEmpleado.get('telefonoMovil')?.errors?.['pattern']"
-                            class="error_form mensaje_error">
+                        <div *ngIf="formularioEmpleado.get('telefonoMovil')?.errors?.['pattern'] && formularioEmpleado.get('telefonoMovil')?.touched"
+                            class="text-red-800">
                             Only numbers are allowed.
                         </div>
                     </div>
-
 
                     <div class="mb-4">
                         <label for="departamento" class="block text-gray-700">Departamento</label>
@@ -190,7 +192,7 @@
                         </select>
                         <!-- Error handling -->
                         <div *ngIf="formularioEmpleado.get('departamento')?.errors?.['required'] && formularioEmpleado.get('departamento')?.touched"
-                            class="error_form mensaje_error">
+                            class="text-red-800">
                             Please select a department.
                         </div>
                     </div>
@@ -203,7 +205,7 @@
                         </select>
                         <!-- Error handling -->
                         <div *ngIf="formularioEmpleado.get('sucursal')?.errors?.['required'] && formularioEmpleado.get('sucursal')?.touched"
-                            class="error_form mensaje_error">
+                            class="text-red-800">
                             Please select a branch office.
                         </div>
                     </div>
@@ -218,7 +220,7 @@
                         </select>
                         <!-- Error handling -->
                         <div *ngIf="formularioEmpleado.get('rol')?.errors?.['required'] && formularioEmpleado.get('rol')?.touched"
-                            class="error_form mensaje_error">
+                            class="text-red-800">
                             Please select a role.
                         </div>
                     </div>
