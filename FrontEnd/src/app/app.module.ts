@@ -23,6 +23,7 @@ import { ReportesViewComponent } from './components/reportes-view/reportes-view.
 import { NgSelectModule } from '@ng-select/ng-select';
 import { RequestInterceptor } from './services/request/request-interceptor.service';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
+import { ReportesHistoryComponent } from './components/reportes-history/reportes-history.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { JwtInterceptor } from './interceptors/jwt.interceptor';
     ForgotPasswordComponent,
     ResetPasswordComponent,
     MaterialDetailsComponent,
-    ReportesViewComponent
+    ReportesViewComponent,
+    ReportesHistoryComponent
     
   ],
   imports: [

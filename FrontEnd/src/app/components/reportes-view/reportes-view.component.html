@@ -1,6 +1,7 @@
 <div class="flex">
     <app-sidebar></app-sidebar>
-    <div class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-24 md:ml-12 md:mr-12 sm:mt-24 sm:ml-12 sm:mr-12 mt-24 ml-12 mr-12 box-fl container">
+    <div
+        class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-24 md:ml-12 md:mr-12 sm:mt-24 sm:ml-12 sm:mr-12 mt-24 ml-12 mr-12 box-fl container">
         <ng-container *ngIf="employeeRole === 'manager'">
             <div class="bg-white p-6 rounded shadow">
                 <h1 class="text-2xl font-bold mb-4">Formulario de Incidencias</h1>
@@ -73,24 +74,33 @@
             </div>
         </ng-container>
         <div *ngIf="employeeRole === 'admin'" class="bg-gray-100 p-6 rounded shadow">
-            <h1 class="text-2xl font-bold mb-4">Incidencias recibidas</h1>
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold mb-4">Incidencias recibidas</h1>
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-3"
+                    [routerLink]="['/reportes_history']">Historial de Incidencias</button>
+            </div>
             <div class="grid grid-cols-4 gap-4">
                 <!-- Iterar sobre los reportes -->
-                <ng-container *ngFor="let reporte of reportes">
-                    <div [ngClass]="{
-                        'bg-green-200': reporte.prioridad === 'Low',
-                        'bg-yellow-200': reporte.prioridad === 'Medium',
-                        'bg-red-200': reporte.prioridad === 'High'
-                    }" class="rounded border border-gray-300 p-2 relative">
-                        <div>ID: {{ reporte.id }}</div>
-                        <div>Tipo: {{ reporte.type }}</div>
-                        <div>Sucursal: {{ this.obtenerNombreSucursal(reporte.sucursalid) }}</div>
-                        <div>Prioridad: {{ reporte.prioridad }}</div>
-                        <button (click)="mostrarDetalle(reporte)" class="absolute top-0 right-0 mt-2 mr-2">
-                            <span class="text-blue-900 opacity-75 rounded">Ver detalles</span>
-                        </button>
-                    </div>
+                <ng-container *ngIf="reportes.length > 0; else noIncidencias">
+                    <ng-container *ngFor="let reporte of reportes">
+                        <div [ngClass]="{
+                            'bg-green-200': reporte.prioridad === 'Low',
+                            'bg-yellow-200': reporte.prioridad === 'Medium',
+                            'bg-red-200': reporte.prioridad === 'High'
+                        }" class="rounded border border-gray-300 p-2 relative">
+                            <div>ID: {{ reporte.id }}</div>
+                            <div>Tipo: {{ reporte.type }}</div>
+                            <div>Sucursal: {{ obtenerNombreSucursal(reporte.sucursalid) }}</div>
+                            <div>Prioridad: {{ reporte.prioridad }}</div>
+                            <button (click)="mostrarDetalle(reporte)" class="absolute top-0 right-0 mt-2 mr-2">
+                                <span class="text-blue-900 opacity-75 rounded">Ver detalles</span>
+                            </button>
+                        </div>
+                    </ng-container>
                 </ng-container>
+                <ng-template #noIncidencias>
+                    <div class="text-center text-gray-600">No hay incidencias pendientes.</div>
+                </ng-template>
             </div>
             <!-- Modal para mostrar los detalles del reporte seleccionado -->
             <div *ngIf="reporteSeleccionado" class="fixed z-10 inset-0 overflow-y-auto">
@@ -109,10 +119,10 @@
                                 <span class="ml-auto">
                                     <input type="checkbox" id="aceptar" name="aceptar" class="mr-2"
                                         (change)="reporteSeleccionado?.id && cambiarEstadoReporte(reporteSeleccionado.id,'aceptado', $event)">
-                                    <label for="aceptar" class="mr-6">Aceptar</label>
+                                    <label for="aceptar" class="mr-6 text-green-700">Aceptar</label>
                                     <input type="checkbox" id="rechazar" name="rechazar" class="mr-2"
-                                        (change)="reporteSeleccionado?.id && cambiarEstadoReporte(reporteSeleccionado.id,'rechazado', $event)"><!-- Llama a la función cambiarEstadoReporte con el estado 'rechazado' -->
-                                    <label for="rechazar" class="mr-6">Rechazar</label>
+                                        (change)="reporteSeleccionado?.id && cambiarEstadoReporte(reporteSeleccionado.id,'rechazado', $event)">
+                                    <label for="rechazar" class="mr-6 text-red-700">Rechazar</label>
                                 </span>
                             </p>
                             <p class="mb-4">Tipo: {{ reporteSeleccionado.type }}</p>
@@ -133,7 +143,8 @@
                                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2"
                                     (click)="mostrarModal_Material()">Asignar Material</button>
                             </div>
-                            <div *ngIf="successMessage" class="mensaje_exitoso fade-in-out mt-1 mb-3">{{ successMessage }}</div>
+                            <div *ngIf="successMessage" class="mensaje_exitoso fade-in-out mt-1 mb-3">{{ successMessage
+                                }}</div>
                         </div>
                     </div>
                 </div>
@@ -223,47 +234,55 @@
                         </div>
                         <!-- Cuerpo del modal -->
                         <div class="p-4">
-                            <form  [formGroup]="formularioMaterial" (submit)="asignarMaterial()" >
+                            <form [formGroup]="formularioMaterial" (submit)="asignarMaterial()">
                                 <!-- Campo de búsqueda de empleados -->
                                 <div class="flex flex-col lg:flex-row">
-                                <div>
-                                    <ng-select formControlName="fullname" [items]="filteredEmployees" bindLabel="fullname" [placeholder]="placeholder" (search)="buscarEmpleado($event)"
-                                        (change)="seleccionarEmpleado($event)" class="ml-auto" [clearable]="false" >
-                                    </ng-select>
-                                </div>
-                        
-                                <!-- Select de materiales por categoría -->
-                                <div class="ml-2">
-                                    <label class="block text-gray-700">Categoría de Material</label>
-                                    <div class="overflow-x-auto">
-                                        <table class="table-auto">
-                                            <tbody>
-                                                <div class="mt-2">
-                                                    <tr *ngFor="let categoria of categories" class="mb-2">
-                                                        <td class="pr-2">{{ categoria.name }}:</td>
-                                                        <td>
-                                                            <select formControlName="categoria{{categoria.id}}" class="ml-2 pr-2 mb-2" (change)="onChangeCategoria(categoria.id)">
-                                                                <option value="">Seleccionar material</option>
-                                                                <option *ngFor="let material of detallesMaterial[categoria.id]" [value]="material.id">
-                                                                    {{ material.name }}
-                                                                </option>
-                                                            </select>
-                                                        </td>
-                                                    </tr>
-                                                </div>
-                                            </tbody>
-                                        </table>
+                                    <div>
+                                        <ng-select formControlName="fullname" [items]="filteredEmployees"
+                                            bindLabel="fullname" [placeholder]="placeholder"
+                                            (search)="buscarEmpleado($event)" (change)="seleccionarEmpleado($event)"
+                                            class="ml-auto" [clearable]="false">
+                                        </ng-select>
+                                    </div>
+
+                                    <!-- Select de materiales por categoría -->
+                                    <div class="ml-2">
+                                        <label class="block text-gray-700">Categoría de Material</label>
+                                        <div class="overflow-x-auto">
+                                            <table class="table-auto">
+                                                <tbody>
+                                                    <div class="mt-2">
+                                                        <tr *ngFor="let categoria of categories" class="mb-2">
+                                                            <td class="pr-2">{{ categoria.name }}:</td>
+                                                            <td>
+                                                                <select formControlName="categoria{{categoria.id}}"
+                                                                    class="ml-2 pr-2 mb-2"
+                                                                    (change)="onChangeCategoria(categoria.id)">
+                                                                    <option value="">Seleccionar material</option>
+                                                                    <option
+                                                                        *ngFor="let material of detallesMaterial[categoria.id]"
+                                                                        [value]="material.id">
+                                                                        {{ material.name }}
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                    </div>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                                 <br>
                                 <!-- Botones -->
                                 <div class="relative justify-end mt-4">
-                                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar</button>
-                                    <button (click)="cerrarModal_Material()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
+                                    <button type="submit"
+                                        class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar</button>
+                                    <button (click)="cerrarModal_Material()"
+                                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
                                 </div>
                             </form>
-                           
+
                         </div>
                     </div>
                 </div>

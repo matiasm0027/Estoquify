@@ -15,15 +15,12 @@ class AttributeCategoryMaterialSeeder extends Seeder
         $materials = Material::all();
         $attributes = Attribute::all();
         $categories = Category::all();
-
         foreach ($materials as $material) {
             // Seleccionar un conjunto aleatorio de atributos una vez por material
             $number = rand(1, 3);
             $selectedAttributes = $attributes->random($number)->unique('id')->values();
-
             // Seleccionar una categoría aleatoria una vez por material
             $selectedCategory = $categories->random();
-
             foreach ($selectedAttributes as $attribute) {
                 AttributeCategoryMaterial::factory()->create([
                     'material_id' => $material->id,

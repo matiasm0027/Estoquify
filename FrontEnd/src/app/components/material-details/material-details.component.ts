@@ -24,7 +24,7 @@ export class MaterialDetailsComponent implements OnInit {
     { value: 'active', label: 'Activo' },
     { value: 'inactive', label: 'Inactivo' }
   ];
-  asignado: any; 
+  asignado: any;
   successMessage!: string;
   employeeId!:number;
   employeeRole!:string;
@@ -36,7 +36,7 @@ export class MaterialDetailsComponent implements OnInit {
     private fb: FormBuilder,
     private controlUsuario: UsuariosControlService
   ) {
-    
+
   }
 
   ngOnInit(): void {
@@ -69,13 +69,13 @@ export class MaterialDetailsComponent implements OnInit {
 
     this.formularioMaterial = this.fb.group(formControls);
 }
-  
+
 
   obtenerAtributos() {
     this.materialService.listAtributos().subscribe(
       (response: any[]) => {
         this.atributos = response;
-        
+
       },
       error => {
         console.error('Error al obtener atributos:', error);
@@ -145,13 +145,13 @@ export class MaterialDetailsComponent implements OnInit {
             state: this.formularioMaterial.value.estado,
             pivot: {} as { [key: string]: any } // Especificar el tipo de las claves como string
           }
-            
+
         };
 
 
         // Agregar los valores de los atributos al objeto pivot
         this.materialDetails.material.attribute.forEach((attribute: any, index: number) => {
-         
+
             materialEditado.material.pivot[index] = {
                 attribute_id: attribute.id,
                 category_id: this.materialDetails.material.category[0].id,
@@ -203,7 +203,7 @@ export class MaterialDetailsComponent implements OnInit {
   confirmDelete(material: any): void {
     const confirmacion = confirm(`¿Estás seguro de que quieres eliminar el: ${ material.material.name }?`);
     if (confirmacion) {
-      this.router.navigate(['/categories_details/' + this.materialDetails.material.category[0].id]); 
+      this.router.navigate(['/categories_details/' + this.materialDetails.material.category[0].id]);
       this.deleteMaterial(material.material.id);
       alert(`El material: ${material.material.name} ha sido eliminado.`);
     }
@@ -239,6 +239,7 @@ export class MaterialDetailsComponent implements OnInit {
     this.materialService.materialAsignado(id).subscribe(
       (response) => {
         this.asignado = response;
+        console.log(this.materialDetails)
       },
       error => {
         console.error('Error al obtener la asignación:', error);
@@ -284,7 +285,7 @@ export class MaterialDetailsComponent implements OnInit {
     setTimeout(() => {
       this.successMessage = '';
       //this.errorMessage = '';
-    }, 2000); 
+    }, 2000);
   }
 
   getLoggedUser(): void {
@@ -292,8 +293,8 @@ export class MaterialDetailsComponent implements OnInit {
       (response: any) => {
         this.employeeId = response.id;
         const roleId = response.role_id;
-       
-        
+
+
         if (roleId === 1) {
           this.employeeRole = 'admin';
         } else if (roleId === 2){
@@ -311,11 +312,11 @@ export class MaterialDetailsComponent implements OnInit {
       console.error('Los datos de la tabla no son válidos o están vacíos.');
       return '';
     }
-  
+
     const csvRows = [];
     const headers = ['ID', 'Nombre', 'Fecha Alta', 'Fecha Baja','Atributos', 'Sucursal', 'Estado' ]; // Ajusta los encabezados
     csvRows.push(headers.join(','));
-  
+
     const attributes = data.material.attribute.map((attribute: any) => `${attribute.name} - ${attribute.pivot.value}`).join('; ');
 
 
@@ -327,16 +328,16 @@ export class MaterialDetailsComponent implements OnInit {
       this.escapeCsvValue(attributes),
       this.getNombreSucursal(data.material.branch_office_id),
       data.material.state
-      
+
     ];
     const csvRow = values.map(value => this.escapeCsvValue(value)).join(',');
     csvRows.push(csvRow);
-  
+
     return csvRows.join('\n');
   }
-  
-  
-  
+
+
+
   downloadCsv() {
     if (!this.materialDetails) {
       console.error('No hay datos de empleado disponibles');
@@ -353,7 +354,7 @@ export class MaterialDetailsComponent implements OnInit {
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
   }
-  
+
   private escapeCsvValue(value: any): string {
     if (typeof value === 'string') {
       return `"${value.replace(/"/g, '""')}"`;

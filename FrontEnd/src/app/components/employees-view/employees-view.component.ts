@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { Employee } from '../../model/Employee';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-employees-view',
   templateUrl: './employees-view.component.html',
   styleUrls: ['./employees-view.component.css']
 })
-
-export class EmployeesViewComponent implements OnInit {
+export class EmployeesViewComponent implements OnInit, OnDestroy {
   page: number = 1;
   employees: Employee[] = [];
   empleadosFiltrados: any[] = [];
@@ -24,14 +24,11 @@ export class EmployeesViewComponent implements OnInit {
   employeeId!:number;
   employeeRole!:string;
   searchTerm: string = '';
-
   opcionesFiltro: { valor: string, etiqueta: string, seleccionado: boolean }[] = [
     { valor: 'departamento', etiqueta: 'Departamento', seleccionado: false },
     { valor: 'sucursal', etiqueta: 'Sucursal', seleccionado: false },
-];
-
-
-  
+  ];
+  private subscriptions: Subscription[] = [];
 
   constructor(private fb: FormBuilder, private peticionesService: ApiRequestService) {
     this.formularioEmpleado = this.fb.group({
@@ -54,43 +51,48 @@ export class EmployeesViewComponent implements OnInit {
     this.filtrarEmpleados()
   }
 
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
   filtrarEmpleados() {
     if (!this.searchTerm.trim()) {
-      // Si el término de búsqueda está vacío, muestra todos los empleados
       this.empleadosFiltrados = this.employees;
     } else {
-      // Si hay un término de búsqueda, filtra los empleados que coincidan
       this.empleadosFiltrados = this.employees.filter((empleado) =>
         empleado.name.toLowerCase().includes(this.searchTerm.toLowerCase())
         || empleado.last_name.toLowerCase().includes(this.searchTerm.toLowerCase())
-        // Puedes agregar más criterios de búsqueda aquí si lo deseas
       );
     }
   }
 
   opcionSeleccionada(opcion: string): boolean {
     return this.opcionesFiltro.find(item => item.valor === opcion)?.seleccionado ?? false;
-}
+  }
 
   obtenerDepartamento() {
-    this.peticionesService.listDepartments().subscribe(
-      (response: any[]) => {
-        this.departamentos = response;
-      },
-      error => {
-        console.error('Error al obtener department:', error);
-      }
+    this.subscriptions.push(
+      this.peticionesService.listDepartments().subscribe(
+        (response: any[]) => {
+          this.departamentos = response;
+        },
+        error => {
+          console.error('Error al obtener department:', error);
+        }
+      )
     );
   }
 
   obtenerSucursales() {
-    this.peticionesService.listBranchOffices().subscribe(
-      (response: any[]) => {
-        this.sucursales = response;
-      },
-      error => {
-        console.error('Error al obtener sucursales:', error);
-      }
+    this.subscriptions.push(
+      this.peticionesService.listBranchOffices().subscribe(
+        (response: any[]) => {
+          this.sucursales = response;
+        },
+        error => {
+          console.error('Error al obtener sucursales:', error);
+        }
+      )
     );
   }
 
@@ -112,12 +114,11 @@ export class EmployeesViewComponent implements OnInit {
     this.mostrarModalFiltros = false;
   }
 
-
   aplicarFiltro(): void {
     this.empleadosFiltrados = this.employees.filter(empleado => {
       const filtroDepartamentoSeleccionado = this.opcionSeleccionada('departamento');
       const filtroSucursalSeleccionado = this.opcionSeleccionada('sucursal');
-  
+
       if (filtroDepartamentoSeleccionado && filtroSucursalSeleccionado) {
         return empleado.department === this.filtroDepartamento && empleado.branch_office === this.filtroSucursal;
       } else if (filtroDepartamentoSeleccionado) {
@@ -125,29 +126,29 @@ export class EmployeesViewComponent implements OnInit {
       } else if (filtroSucursalSeleccionado) {
         return empleado.branch_office === this.filtroSucursal;
       } else {
-        // Si no se selecciona ningún filtro, mostrar todos los empleados
         return true;
       }
     });
-    
   }
 
   obtenerEmpleados() {
-    this.peticionesService.listEmployees().subscribe(
-      (data: Employee[]) => {
-        this.employees = data;
-        this.aplicarFiltro(); // Aplicar filtro cada vez que se obtienen nuevos datos
-      },
-      error => {
-        console.error('Error al obtener empleados:', error);
-      }
+    this.subscriptions.push(
+      this.peticionesService.listEmployees().subscribe(
+        (data: Employee[]) => {
+          this.employees = data;
+          this.aplicarFiltro();
+        },
+        error => {
+          console.error('Error al obtener empleados:', error);
+        }
+      )
     );
   }
 
-  agregarEmpleado() {
+  agregarEmpleado(): void {
     if (this.formularioEmpleado.valid) {
       const nuevoEmpleado = this.formularioEmpleado.value;
-      this.peticionesService.addEmployee(nuevoEmpleado).subscribe(
+        this.peticionesService.addEmployee(nuevoEmpleado).subscribe(
         (response: any) => {
           this.cerrarModal();
         },
@@ -161,23 +162,23 @@ export class EmployeesViewComponent implements OnInit {
   }
 
   getLoggedUser(): void {
-    this.peticionesService.me().subscribe(
-      (response: any) => {
-        this.employeeId = response.id;
-        const roleId = response.role_id;
-       
-        
-        if (roleId === 1) {
-          this.employeeRole = 'admin';
-        } else if (roleId === 2){
-          this.employeeRole = 'manager';
-        } else if (roleId===3){
-          this.employeeRole= 'usuario'
+    this.subscriptions.push(
+      this.peticionesService.me().subscribe(
+        (response: any) => {
+          this.employeeId = response.id;
+          const roleId = response.role_id;
+          if (roleId === 1) {
+            this.employeeRole = 'admin';
+          } else if (roleId === 2){
+            this.employeeRole = 'manager';
+          } else if (roleId===3){
+            this.employeeRole= 'usuario'
+          }
+        },
+        (error: any) => {
+          console.error('Error al obtener usuario logueado:', error);
         }
-      },
-      error => {
-        console.error('Error when obtaining data from the logged in user:', error);
-      }
+      )
     );
   }
 
@@ -242,6 +243,4 @@ downloadEmployeeCsv(): void {
     }
 }
 
-
-  
 }

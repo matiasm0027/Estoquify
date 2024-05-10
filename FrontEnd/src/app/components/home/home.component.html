@@ -72,7 +72,7 @@
                                 <th class="px-6 py-3 text-left">Usuario</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody *ngIf="reportes && reportes.length > 0; else noIncidencias">
                             <tr *ngFor="let reporte of reportes" class="odd:bg-blue-50 even:bg-blue-200">
                                 <td class="px-6 py-4 whitespace-nowrap">{{ reporte.id }}</td>
                                 <td class="px-6 py-4">{{ reporte.solicitud }}</td>
@@ -86,6 +86,11 @@
                                 <td class="px-6 py-4">{{ reporte.nameempleado }}</td>
                             </tr>
                         </tbody>
+                        <ng-template #noIncidencias>
+                            <tr>
+                                <td colspan="6" class="px-6 py-4 text-center">No hay incidencias</td>
+                            </tr>
+                        </ng-template>
                     </table>
                 </div>
             </div>
