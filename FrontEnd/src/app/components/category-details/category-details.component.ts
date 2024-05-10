@@ -28,6 +28,7 @@ export class CategoryDetailsComponent implements OnInit {
   employeeId!: number;
   employeeRole!: string;
   searchTerm: string = '';
+  errorMessage!: string;
 
 
   constructor(
@@ -51,6 +52,7 @@ export class CategoryDetailsComponent implements OnInit {
   initForm() {
     this.formularioMaterial = this.fb.group({
       nombre: ['', Validators.required],
+      cantidad: ['', Validators.required],
       value: ['', Validators.required],
       sucursal: ['', Validators.required],
       atributo: ['', Validators.required]
@@ -168,37 +170,47 @@ export class CategoryDetailsComponent implements OnInit {
 
   agregarMaterial() {
     if (this.formularioMaterial.valid) {
-      const nombre = this.formularioMaterial.value.nombre;
-      const sucursal = this.formularioMaterial.value.sucursal;
-      const atributoId = this.formularioMaterial.value.atributo; // Obtener el ID del atributo seleccionado
-  
-      // Obtener el nombre del atributo seleccionado
-      const nombreAtributo = this.atributos.find(atributo => atributo.id === atributoId)?.name;
-  
-      // Construir el atributo principal
-      const atributoPrincipal = this.construirAtributoPrincipal(atributoId, nombreAtributo);
-  
-      // Construir los atributos extras
-      const atributosExtras = this.construirAtributosExtras();
-  
-      // Crear el objeto del material con los valores proporcionados
-      const nuevoMaterial = this.construirObjetoMaterial(nombre, sucursal, atributoPrincipal, atributosExtras);
-  
-      // Llamar al servicio para agregar el material
-      this.ApiRequestService.agregarMaterial(nuevoMaterial).subscribe(
-        (response: any) => {
-          // Cerrar el modal y limpiar el formulario
-          this.cerrarModal();
-        },
-        (error: any) => {
-          console.error('Error al agregar el material:', error);
+        const nombreBase = this.formularioMaterial.value.nombre;
+        const cantidad = this.formularioMaterial.value.cantidad;
+        const sucursal = this.formularioMaterial.value.sucursal;
+        const atributoId = this.formularioMaterial.value.atributo; // Obtener el ID del atributo seleccionado
+        const nombreAtributo = this.atributos.find(atributo => atributo.id === atributoId)?.name;
+        const atributoPrincipal = this.construirAtributoPrincipal(atributoId, nombreAtributo);
+        const atributosExtras = this.construirAtributosExtras();
+
+        // Crear múltiples materiales con nombres secuenciales
+        for (let i = 1; i <= cantidad; i++) {
+            const nombreMaterial = `${nombreBase}_${i.toString().padStart(2, '0')}`;
+            const nuevoMaterial = this.construirObjetoMaterial(nombreMaterial, sucursal, atributoPrincipal, atributosExtras);
+
+            // Llamar al servicio para agregar el material
+            this.ApiRequestService.agregarMaterial(nuevoMaterial).subscribe(
+                (response: any) => {
+                    // Cerrar el modal y limpiar el formulario después de agregar cada material
+                    if (i === cantidad) {
+                        this.cerrarModal();
+                    }
+                },
+                (error: any) => {
+                    console.error('Error al agregar el material:', error);
+                    this.errorMessage = error.error.error;
+                    this.clearMessagesAfterDelay()
+                }
+            );
         }
-      );
     } else {
-      // Marcar los campos inválidos
-      this.formularioMaterial.markAllAsTouched();
+        // Marcar los campos inválidos
+        this.formularioMaterial.markAllAsTouched();
+        this.errorMessage = "Formulario invalido";
+        this.clearMessagesAfterDelay()
     }
-  }
+}
+
+clearMessagesAfterDelay(): void {
+  setTimeout(() => {
+    this.errorMessage = '';
+  }, 2000);
+}
   
   // Función para construir el atributo principal
   construirAtributoPrincipal(atributoId: number, nombreAtributo: string): any {

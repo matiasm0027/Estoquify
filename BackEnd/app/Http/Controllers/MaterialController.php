@@ -40,6 +40,12 @@ class MaterialController extends Controller
         // Convertir la fecha al formato adecuado para la base de datos
         $high_date = date('Y-m-d H:i:s', strtotime($request->input('material.high_date')));
 
+        // Verificar si ya existe un material con el mismo nombre
+        $existingMaterial = Material::where('name', $request->input('material.name'))->first();
+        if ($existingMaterial) {
+            return response()->json(['error' => 'Ya existe un material con el mismo nombre'], 400);
+        }
+
         // Crear una nueva instancia del material y asignar los valores
         $material = new Material();
         $material->name = $request->input('material.name');
