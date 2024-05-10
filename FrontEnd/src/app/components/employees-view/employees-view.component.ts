@@ -207,33 +207,41 @@ export class EmployeesViewComponent implements OnInit {
   
     return csvRows.join('\n');
   }
-  
-  
-  
-  private escapeCsvValue(value: any): string {
-    if (typeof value === 'string') {
-      return `"${value.replace(/"/g, '""')}"`;
-    }
-    return value;
-  }
-  
 
-  downloadCsv() {
-    if (!this.employees) {
-      console.error('No hay datos de empleado disponibles');
-      return;
-    }
-    const csvContent = this.convertToCsv(this.employees);
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'employee_details.csv';
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+private escapeCsvValue(value: any): string {
+  if (typeof value === 'string') {
+    return `"${value.replace(/"/g, '""')}"`;
   }
+  return value;
+}
+
+downloadCsv(): void {
+  if (!this.empleadosFiltrados || this.empleadosFiltrados.length === 0) {
+    console.error('No hay datos de empleado disponibles');
+    return;
+  }
+  
+  const csvContent = this.convertToCsv(this.empleadosFiltrados);
+  
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'employee_details_filtered.csv';
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+}
+
+
+downloadEmployeeCsv(): void {
+    if (!this.employees) {
+        console.error('No hay datos de empleado disponibles');
+        return;
+    }
+}
+
 
   
 }

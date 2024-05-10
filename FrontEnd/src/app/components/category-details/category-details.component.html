@@ -22,7 +22,7 @@
                         class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded " *ngIf="employeeRole === 'admin'">
                         Añadir Material
                     </button>
-                    <button (click)="downloadCsv()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+                    <button (click)="downloadCsv('NombreDeLaCategoria')" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
                         Descargar CSV
                     </button>
                     <button (click)="mostrarModalDeFiltros()"

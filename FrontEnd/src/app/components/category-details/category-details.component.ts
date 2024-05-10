@@ -75,6 +75,8 @@ export class CategoryDetailsComponent implements OnInit {
     }
   }
 
+
+
   obtenerSucursales() {
     this.ApiRequestService.listBranchOffices().subscribe(
       (response: any[]) => {
@@ -351,17 +353,32 @@ private convertToCsv(data: any): string {
 }
 
 
-downloadCsv() {
-  if (!this.categoryDetails) {
-    console.error('No hay datos de empleado disponibles');
+downloadCsv(categoryName: string): void {
+
+  //if there is no data in both it shows the error message
+  if (!this.categoryDetails || !this.categoryDetails.materials) {
+    console.error('No hay datos disponibles para descargar');
     return;
   }
-  const csvContent = this.convertToCsv(this.categoryDetails);
-  const blob = new Blob([csvContent], { type: 'text/csv' });
+
+  // To know the material that is downloaded depending on whether it is filtered or not
+  const filteredMaterials = this.categoryDetails.materials.filter((material: any) => {
+    let cumpleFiltroFecha = true;
+    let cumpleFiltroEstado = true;
+    let cumpleFiltroSucursal = true;
+
+   return cumpleFiltroFecha && cumpleFiltroEstado && cumpleFiltroSucursal;
+  });
+
+  // Convertir los materiales filtrados a formato CSV
+  const csvContenido = this.convertToCsv({ materials: filteredMaterials });
+
+  // Crear el archivo CSV y descargarlo
+  const blob = new Blob([csvContenido], { type: 'text/csv' });
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'employee_details.csv';
+  a.download = `Category_details.csv`;
   document.body.appendChild(a);
   a.click();
   window.URL.revokeObjectURL(url);
