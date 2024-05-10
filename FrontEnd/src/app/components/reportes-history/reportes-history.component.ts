@@ -17,8 +17,9 @@ export class ReportesHistoryComponent implements OnInit {
   constructor(private apiRequestService: ApiRequestService) {}
 
   ngOnInit(): void {
-    this.obtenerReportes();
     this.getLoggedUser()
+    this.obtenerReportes();
+    this.obtenerSucursales();
   }
 
   getLoggedUser(): void {
@@ -26,12 +27,12 @@ export class ReportesHistoryComponent implements OnInit {
       (response: any) => {
         this.employeeId = response.id;
         const roleId = response.role_id;
-
-
         if (roleId === 1) {
           this.employeeRole = 'admin';
         } else if (roleId === 2) {
           this.employeeRole = 'manager';
+        } else if (roleId === 3) {
+          this.employeeRole = 'user';
         }
       },
       error => {
@@ -61,6 +62,17 @@ export class ReportesHistoryComponent implements OnInit {
 
   mostrarDetalle(reporte: any) {
     this.reporteSeleccionado = reporte;
+  }
+
+  obtenerSucursales() {
+    this.apiRequestService.listBranchOffices().subscribe(
+      (response: any[]) => {
+        this.sucursales = response;
+      },
+      error => {
+        console.error('Error al obtener sucursales:', error);
+      }
+    );
   }
 
   obtenerNombreSucursal(sucursalId: number): string {
