@@ -456,12 +456,13 @@ export class ReportesViewComponent implements OnInit {
     this.obtenerNombreCategoria()
     this.obtenerEmpleados()
     this.placeholder = "Seleccionar empleado";
-
+    this.selectedEmployee = undefined;
   }
 
   cerrarModal_Material() {
     this.mostrarModalMaterial = false;
-    this.formularioEmpleado.reset();
+    this.formularioMaterial.reset();
+    this.selectedEmployee = undefined;
   }
 
   getCategoriaDetails(idCategoria: number): void {
@@ -514,17 +515,28 @@ export class ReportesViewComponent implements OnInit {
   }
 
   buscarEmpleado(event: { term: string; items: any[]; }) {
+    this.selectedEmployee = undefined;
     const searchTerm = event.term.toLowerCase();
-    this.filteredEmployees = this.employees.filter(employee =>
-      employee.name.toLowerCase().includes(searchTerm) ||
-      employee.last_name.toLowerCase().includes(searchTerm)
-    );
-  }
+
+    // Si hay un término de búsqueda, filtrar la lista de empleados, de lo contrario, mostrar todos los empleados
+    if (searchTerm.trim() !== '') {
+      this.filteredEmployees = this.employees.filter(employee =>
+        employee.name.toLowerCase().includes(searchTerm) ||
+        employee.last_name.toLowerCase().includes(searchTerm)
+      );
+    } else {
+      this.filteredEmployees = this.employees;
+    }
+}
 
   seleccionarEmpleado(employee: Employee) {
     this.selectedEmployee = employee;
     this.placeholder = '';
+    this.filteredEmployees = this.employees;
   }
+  limpiarSeleccion() {
+    this.selectedEmployee = undefined;
+}
 
   clearMessagesAfterDelay(): void {
     setTimeout(() => {

@@ -235,16 +235,7 @@
                         <!-- Cuerpo del modal -->
                         <div class="p-4">
                             <form [formGroup]="formularioMaterial" (submit)="asignarMaterial()">
-                                <!-- Campo de búsqueda de empleados -->
                                 <div class="flex flex-col lg:flex-row">
-                                    <div>
-                                        <ng-select formControlName="fullname" [items]="filteredEmployees"
-                                            bindLabel="fullname" [placeholder]="placeholder"
-                                            (search)="buscarEmpleado($event)" (change)="seleccionarEmpleado($event)"
-                                            class="ml-auto" [clearable]="false">
-                                        </ng-select>
-                                    </div>
-
                                     <!-- Select de materiales por categoría -->
                                     <div class="ml-2">
                                         <label class="block text-gray-700">Categoría de Material</label>
@@ -271,6 +262,16 @@
                                                 </tbody>
                                             </table>
                                         </div>
+                                    </div>
+                                    <div class="ml-2">
+                                        <ng-select formControlName="fullname" [items]="filteredEmployees"
+                                            bindLabel="fullname" [placeholder]="placeholder"
+                                            (search)="buscarEmpleado($event)" (change)="seleccionarEmpleado($event)"
+                                            (click)="limpiarSeleccion()"
+                                            class="ml-auto w-full lg:w-auto">
+                                        </ng-select>
+                                        <input type="text"
+                                        [value]="selectedEmployee ? selectedEmployee.name + ' ' + selectedEmployee.last_name : ''">
                                     </div>
                                 </div>
                                 <br>

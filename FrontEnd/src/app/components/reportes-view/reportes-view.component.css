@@ -1,3 +1,7 @@
 .mensaje_exitoso {
     color: green;
 }
+
+.ng-select {
+    width: 100%; /* O un valor específico en píxeles */
+}
