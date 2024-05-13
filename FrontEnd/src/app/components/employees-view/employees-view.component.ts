@@ -232,7 +232,7 @@ downloadCsv(): void {
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'employee_details_filtered.csv';
+  a.download = 'employees.csv';
   document.body.appendChild(a);
   a.click();
   window.URL.revokeObjectURL(url);

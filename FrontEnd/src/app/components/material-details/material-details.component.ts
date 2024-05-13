@@ -355,7 +355,10 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'employee_details.csv';
+    const fileName = `${this.materialDetails.material.name}.csv`;
+
+
+    a.download = fileName;
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);

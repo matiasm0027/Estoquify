@@ -373,7 +373,7 @@ private convertToCsv(data: any): string {
 }
 
 
-downloadCsv(categoryName: string): void {
+downloadCsv(): void {
 
   //if there is no data in both it shows the error message
   if (!this.categoryDetails || !this.categoryDetails.materials) {
@@ -398,7 +398,10 @@ downloadCsv(categoryName: string): void {
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `Category_details.csv`;
+  const fileName = `.csv`;
+  
+
+  a.download = fileName;
   document.body.appendChild(a);
   a.click();
   window.URL.revokeObjectURL(url);

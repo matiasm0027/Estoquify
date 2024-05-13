@@ -292,12 +292,14 @@ export class EmployeeDetailsComponent implements OnInit , OnDestroy {
       console.error('No hay datos de empleado disponibles');
       return;
     }
-    const csvContent = this.convertToCsv(this.employeeDetails);
+    const csvContent = this.convertToCsv([this.employeeDetails]);
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'employee_details.csv';
+    const fileName = `${this.employeeDetails.name}_${this.employeeDetails.last_name}.csv`;
+    
+    a.download = fileName;
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);
