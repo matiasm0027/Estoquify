@@ -53,7 +53,6 @@ export class SidebarComponent implements OnInit{
           }
         },
         error => {
-          console.error('Error when obtaining data from the logged in user:', error);
         }
       );
     }

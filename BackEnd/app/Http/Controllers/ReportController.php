@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Category;
 use App\Models\CategoryReport;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 
 class ReportController extends Controller{
@@ -67,6 +68,7 @@ class ReportController extends Controller{
 
     public function listReports()
     {
+        try{
         $reports = Report::all();
          // Obtener todos los reportes con los datos del empleado asociado
         $reports = Report::with('employee')
@@ -86,6 +88,9 @@ class ReportController extends Controller{
             ];
         });
         return response()->json($reports);
+    } catch (ThrottleRequestsException $e) {
+        return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
+    }
     }
 
     public function changeReportStatus(Request $request, $id)

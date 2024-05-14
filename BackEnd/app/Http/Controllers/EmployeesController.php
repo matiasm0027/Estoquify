@@ -14,11 +14,11 @@ use Illuminate\Http\Request;
 use App\Models\Employee;
 use Illuminate\Support\Facades\Log;
 use App\Mail\ResetPassword;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 class EmployeesController extends Controller
 {
-    //El constructor del controlador define un middleware (auth:api) que
-    //protege todos los métodos del controlador, excepto el método login.
+    // El constructor del controlador define un middleware (auth:api) que protege todos los métodos del controlador, excepto el método login.
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['login', 'resetPassword', 'resetPasswordRequest']]);
@@ -26,78 +26,100 @@ class EmployeesController extends Controller
 
     public function login()
     {
-        $credentials = request(['email', 'password']);
+        try {
+            $credentials = request(['email', 'password']);
 
-        if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Credenciales inválidas'], 401);
+            if (! $token = auth()->attempt($credentials)) {
+                return response()->json(['error' => 'Credenciales inválidas'], 401);
+            }
+
+            return $this->respondWithToken($token);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
         }
-
-        return $this->respondWithToken($token);
-
     }
 
-    //devuelve los detalles del usuario autenticado actualmente.
+    // Devuelve los detalles del usuario autenticado actualmente.
     public function me()
     {
-        return response()->json(auth()->user());
+        try {
+            return response()->json(auth()->user());
+        } catch (ThrottleRequestsException $e) {
+            return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
+        }
     }
 
     public function logout()
     {
-        auth()->logout();
-        return response()->json(['message' => 'Successfully logged out']);
+        try {
+            auth()->logout();
+            return response()->json(['message' => 'Successfully logged out']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
+        }
     }
 
-    //Este método refresca un token JWT expirado.
+    // Este método refresca un token JWT expirado.
     public function refresh()
     {
-        return $this->respondWithToken(auth()->refresh());
+        try {
+            return $this->respondWithToken(auth()->refresh());
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
+        }
     }
 
-    //formato de respuesta del tokens
+    // Formato de respuesta del tokens
     protected function respondWithToken($token)
     {
-        $user = auth()->user();
-        if ($user->first_login === 1) {
-            return response()->json([
-                'first_login' => true,
-                'access_token' => $token,
-                'token_type' => 'bearer',
-                'expires_in' => auth()->factory()->getTTL() * 60
-            ]);
-        } else {
-            return response()->json([
-                'access_token' => $token,
-                'token_type' => 'bearer',
-                'expires_in' => auth()->factory()->getTTL() * 60
-            ]);
+        try {
+            $user = auth()->user();
+            if ($user->first_login === 1) {
+                return response()->json([
+                    'first_login' => true,
+                    'access_token' => $token,
+                    'token_type' => 'bearer',
+                    'expires_in' => auth()->factory()->getTTL() * 60
+                ]);
+            } else {
+                return response()->json([
+                    'access_token' => $token,
+                    'token_type' => 'bearer',
+                    'expires_in' => auth()->factory()->getTTL() * 60
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
         }
     }
 
     public function changePassword(Request $request)
     {
-        $user = auth()->user(); // Obtén el usuario autenticado
+        try {
+            $user = auth()->user(); // Obtén el usuario autenticado
 
-        if (!$user->first_login) {
-            return response()->json(['message' => 'The password has already been changed previously.'], 400);
+            if (!$user->first_login) {
+                return response()->json(['message' => 'The password has already been changed previously.'], 400);
+            }
+
+            $request->validate([
+                'newPassword' => 'required|string',
+                'confirmPassword' => 'required|string|same:newPassword',
+            ]);
+
+            $user->password = Hash::make($request->newPassword);
+            $user->first_login = false;
+            $user->save();
+
+            return response()->json(['message' => 'Password changed successfully.'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
         }
-
-        $request->validate([
-            'newPassword' => 'required|string',
-            'confirmPassword' => 'required|string|same:newPassword',
-        ]);
-
-        $user->password = Hash::make($request->newPassword);
-        $user->first_login = false;
-        $user->save();
-
-        return response()->json(['message' => 'Password changed successfully.'], 200);
     }
 
     public function resetPasswordRequest(Request $request)
     {
         try {
-
             $email = $request->input('email');
 
             $employee = Employee::where('email', $email)->first();
@@ -110,128 +132,149 @@ class EmployeesController extends Controller
 
             return response()->json(['message' => 'Reset password email sent successfully, please check your inbox.'], 200);
         } catch (\Exception $e) {
-            // Return an error response with a meaningful message
-            return response()->json(['error' => 'An unexpected error occurred while processing your request.'], 500);
+            return response()->json(['error' => 'Error interno del servidor'], 500);
         }
     }
 
 
     public function sendResetPasswordEmail($email)
     {
-        $oldToken = DB::table('password_resets')->where('email', $email)->first();
+        try {
+            $oldToken = DB::table('password_resets')->where('email', $email)->first();
 
-        if ($oldToken) {
-            return $oldToken->token;
+            if ($oldToken) {
+                return $oldToken->token;
+            }
+
+            $token = Str::random(60);
+            Mail::to($email)->send(new ResetPassword($token));
+
+            $this->saveToken($token, $email);
+
+            return $token;
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
         }
-
-        $token = Str::random(60);
-        Mail::to($email)->send(new ResetPassword($token));
-
-        $this->saveToken($token, $email);
-
-
-        return $token;
     }
 
-    public function saveToken($token, $email){
-        DB::table('password_resets')->insert([
-            "email" => $email,
-            "token" => $token,
-            "created_at" => Carbon::now()
-        ]);
+    public function saveToken($token, $email)
+    {
+        try {
+            DB::table('password_resets')->insert([
+                "email" => $email,
+                "token" => $token,
+                "created_at" => Carbon::now()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
+        }
     }
 
     public function resetPassword(Request $request)
-{
-    try {
-        $validated = $request->validate([
-            'email' => 'required',
-            'newPassword' => 'required',
-            'confirmPassword' => 'required|string|same:newPassword',
-            'resetToken' => 'required',
-        ]);
+    {
+        try {
+            $validated = $request->validate([
+                'email' => 'required',
+                'newPassword' => 'required',
+                'confirmPassword' => 'required|string|same:newPassword',
+                'resetToken' => 'required',
+            ]);
 
-        $tokenExists = $this->resetPasswordTable($validated)->exists();
+            $tokenExists = $this->resetPasswordTable($validated)->exists();
 
-        if (!$tokenExists) {
-            return $this->NotFound();
+            if (!$tokenExists) {
+                return $this->NotFound();
+            }
+
+            $this->changePasswordDB($validated);
+
+            return response()->json(['message' => 'Successfully Changed Password'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
         }
-
-        $this->changePasswordDB($validated);
-
-        return response()->json(['message' => 'Successfully Changed Password'], 200);
-    } catch (\Exception $e) {
-        // Return an error response with a meaningful message
-        return response()->json(['error' => 'An unexpected error occurred while processing your request.'], 500);
     }
-}
 
     public function resetPasswordTable($request)
     {
-        // Accede a los valores del array utilizando la sintaxis de array
-        return DB::table('password_resets')->where(['email' => $request['email'], 'token' => $request['resetToken']]);
+        try {
+            // Accede a los valores del array utilizando la sintaxis de array
+            return DB::table('password_resets')->where(['email' => $request['email'], 'token' => $request['resetToken']]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
+        }
     }
 
-    public function NotFound(){
-        return response()->json(['error' => 'Token or email incorrect'], 300);
+    public function NotFound()
+    {
+        try {
+            return response()->json(['error' => 'Token or email incorrect'], 300);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
+        }
     }
 
-    public function changePasswordDB($request){
-        $employeeCambio = 
-        $employee = Employee::whereEmail($request['email'])->first();
-        $employee->Update(['password' => bcrypt($request['newPassword'])]);
-        $this->resetPasswordTable($request)->delete();
-        //return response()->json(['message' => 'Successfully Changed Password'], 200);
-
+    public function changePasswordDB($request)
+    {
+        try {
+            $employee = Employee::whereEmail($request['email'])->first();
+            $employee->Update(['password' => bcrypt($request['newPassword'])]);
+            $this->resetPasswordTable($request)->delete();
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
+        }
     }
 
     public function listEmployees(Request $request)
     {
-        $user = $request->user()->id;
+        try {
+            $user = $request->user()->id;
 
-        $employees = Employee::with('department', 'branchOffice')
-            ->where('id', '!=', $user) // Excluir al usuario actual
-            ->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
-            ->get()
-            ->map(function ($employee) {
-                return [
-                    'id' => $employee->id,
-                    'name' => $employee->name,
-                    'last_name' => $employee->last_name,
-                    'email' => $employee->email,
-                    'department' => $employee->department ? $employee->department->name : null,
-                    'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
-                ];
-            });
+            $employees = Employee::with('department', 'branchOffice')
+                ->where('id', '!=', $user) // Excluir al usuario actual
+                ->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
+                ->get()
+                ->map(function ($employee) {
+                    return [
+                        'id' => $employee->id,
+                        'name' => $employee->name,
+                        'last_name' => $employee->last_name,
+                        'email' => $employee->email,
+                        'department' => $employee->department ? $employee->department->name : null,
+                        'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
+                    ];
+                });
 
-        return response()->json($employees);
+            return response()->json($employees);
+        } catch (ThrottleRequestsException $e) {
+            return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
+        }
     }
 
 
     public function addEmployee(Request $request)
     {
         try {
-         // Verificar si el usuario está autenticado
-         $user = $request->user();
-         //dd($user->role_id);
-         if (!$user) {
-             return response()->json(['error' => 'Usuario no autenticado'], 401);
-         }
+            // Verificar si el usuario está autenticado
+            $user = $request->user();
+            //dd($user->role_id);
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no autenticado'], 401);
+            }
 
-         // Verificar si el usuario tiene el rol permitido para editar empleados (rol '1' para administrador)
-         $this->checkUserRole(['1']);
+            // Verificar si el usuario tiene el rol permitido para editar empleados (rol '1' para administrador)
+            $this->checkUserRole(['1']);
 
-        // Validar los datos de entrada del formulario
-        $validatedData = $request->validate([
-            'nombre' => 'required',
-            'apellido' => 'required',
-            'email' => 'required',
-            'password' => 'required',
-            'departamento' => 'required',
-            'sucursal' => 'required',
-            'rol' => 'required',
-            'telefonoMovil' => 'required',
-        ]);
+            // Validar los datos de entrada del formulario
+            $validatedData = $request->validate([
+                'nombre' => 'required',
+                'apellido' => 'required',
+                'email' => 'required',
+                'password' => 'required',
+                'departamento' => 'required',
+                'sucursal' => 'required',
+                'rol' => 'required',
+                'telefonoMovil' => 'required',
+            ]);
 
 
             // Crear un nuevo objeto Employee y asignar los valores
@@ -315,21 +358,21 @@ class EmployeesController extends Controller
             if (!$user) {
                 return response()->json(['error' => 'Empleado no autenticado'], 401);
             }
-    
+
             // Verificar si el usuario tiene el rol permitido para eliminar empleados (rol '1' para administrador)
             $this->checkUserRole(['1']);
-    
+
             // Buscar al empleado por su ID
             $employee = Employee::find($id);
-    
+
             // Si no se encuentra al empleado, devuelve un error 404
             if (!$employee) {
                 return response()->json(['error' => 'Empleado no encontrado'], 404);
             }
-    
+
             // Eliminar al empleado
             $employee->delete();
-    
+
             return response()->json(['message' => 'Empleado eliminado correctamente'], 200);
         } catch (\Exception $e) {
             \Log::error('Error al eliminar empleado: ' . $e->getMessage());
@@ -339,39 +382,47 @@ class EmployeesController extends Controller
 
     public function listEmployeesByBranchOffice(Request $request, $id_branch_office)
     {
-        $user = $request->user()->id;
+        try {
+            $user = $request->user()->id;
 
-        $employees = Employee::with('department', 'branchOffice')
-            ->where('id', '!=', $user)
-            ->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
-            ->where('branch_office_id', $id_branch_office)
-            ->get()
-            ->map(function ($employee) {
-                return [
-                    'id' => $employee->id,
-                    'name' => $employee->name,
-                    'last_name' => $employee->last_name,
-                    'email' => $employee->email,
-                    'department' => $employee->department ? $employee->department->name : null,
-                    'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
-                ];
-            });
+            $employees = Employee::with('department', 'branchOffice')
+                ->where('id', '!=', $user)
+                ->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
+                ->where('branch_office_id', $id_branch_office)
+                ->get()
+                ->map(function ($employee) {
+                    return [
+                        'id' => $employee->id,
+                        'name' => $employee->name,
+                        'last_name' => $employee->last_name,
+                        'email' => $employee->email,
+                        'department' => $employee->department ? $employee->department->name : null,
+                        'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
+                    ];
+                });
 
-        return response()->json($employees);
+            return response()->json($employees);
+        } catch (ThrottleRequestsException $e) {
+            return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
+        }
     }
- 
+
     protected function checkUserRole($allowedRoles)
     {
-        if (!Auth::check()) {
-            // El usuario no está autenticado
-            abort(401, 'Unauthorized');
-        }
-    
-        $user = Auth::user();
-    
-        if (!in_array($user->role_id, $allowedRoles)) {
-            // El usuario no tiene uno de los roles permitidos
-            abort(403, 'Access denied');
+        try {
+            if (!Auth::check()) {
+                // El usuario no está autenticado
+                abort(401, 'Unauthorized');
+            }
+
+            $user = Auth::user();
+
+            if (!in_array($user->role_id, $allowedRoles)) {
+                // El usuario no tiene uno de los roles permitidos
+                abort(403, 'Access denied');
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
         }
     }
 }

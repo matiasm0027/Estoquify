@@ -19,6 +19,7 @@ export class CategoriesViewComponent implements OnInit, OnDestroy{
   successMessage!: string;
   employeeRole!: string;
   employeeId!: number;
+  cargaDatos: boolean = true;
 
   private subscriptions: Subscription[] = [];
 
@@ -53,6 +54,8 @@ export class CategoriesViewComponent implements OnInit, OnDestroy{
           inactiveMaterial: material.inactive_materials
 
         }));
+        this.cargaDatos = false;
+
       }
     );
   }
@@ -161,6 +164,8 @@ export class CategoriesViewComponent implements OnInit, OnDestroy{
         } else if (roleId === 2){
           this.employeeRole = 'manager';
         }
+        this.cargaDatos = false;
+
       },
       error => {
         console.error('Error when obtaining data from the logged in user:', error);

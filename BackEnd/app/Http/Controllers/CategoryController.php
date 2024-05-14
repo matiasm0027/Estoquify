@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Material;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 
 class CategoryController extends Controller
@@ -15,6 +16,7 @@ class CategoryController extends Controller
 
     public function categoryMaterialInfo()
 {
+    try{
     // Obtener todas las categorías con sus materiales asociados y atributos
     $categories = Category::select([
             'categories.id',
@@ -35,6 +37,9 @@ class CategoryController extends Controller
         ->get();
 
     return response()->json($categories);
+} catch (ThrottleRequestsException $e) {
+    return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
+}
 }
 
 

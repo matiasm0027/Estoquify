@@ -31,6 +31,7 @@ export class CategoryDetailsComponent implements OnInit, OnDestroy {
   searchTerm: string = '';
   errorMessage!: string;
   successMessage!: string;
+  cargaDatos: boolean = true;
 
   private subscriptions: Subscription[] = [];
 
@@ -90,7 +91,7 @@ export class CategoryDetailsComponent implements OnInit, OnDestroy {
     this.ApiRequestService.listBranchOffices().subscribe(
       (response: any[]) => {
         this.sucursales = response;
-
+        this.cargaDatos = false;
       },
       error => {
         console.error('Error al obtener sucursales:', error);
@@ -102,7 +103,7 @@ export class CategoryDetailsComponent implements OnInit, OnDestroy {
     this.ApiRequestService.listAtributos().subscribe(
       (response: any[]) => {
         this.atributos = response;
-
+        this.cargaDatos = false;
       },
       error => {
         console.error('Error al obtener sucursales:', error);
@@ -129,6 +130,7 @@ export class CategoryDetailsComponent implements OnInit, OnDestroy {
           this.detallesMaterial = categoria; // Convertir el objeto de categoría a una matriz
           this.aplicarFiltro();
           this.filtrarMateriales();
+          this.cargaDatos = false;
         },
         (error: any) => {
           console.error('Error al obtener detalles de la categoría:', error);
@@ -283,13 +285,13 @@ clearMessagesAfterDelay(): void {
       (response: any) => {
         this.employeeId = response.id;
         const roleId = response.role_id;
-
-
         if (roleId === 1) {
           this.employeeRole = 'admin';
         } else if (roleId === 2){
           this.employeeRole = 'manager';
         }
+        this.cargaDatos = false;
+
       },
       error => {
         console.error('Error when obtaining data from the logged in user:', error);

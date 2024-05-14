@@ -3,6 +3,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
+import { RequestManagerService } from 'src/app/services/requestManager/request-manager.service';
 
 @Component({
   selector: 'app-employee-details',
@@ -23,14 +24,16 @@ export class EmployeeDetailsComponent implements OnInit , OnDestroy {
     { id: 3, name: 'User' }
   ];
   successMessage!: string;
-
+  cargaDatos: boolean = true;
+  errorMessage!: string;
   private subscriptions: Subscription[] = [];
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private employeeService: ApiRequestService,
-    private router: Router
+    private router: Router,
+    private requestManager: RequestManagerService,
   ) {}
 
 
@@ -43,7 +46,7 @@ export class EmployeeDetailsComponent implements OnInit , OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.requestManager.clearSubscriptions();
   }
 
   initForm() {
@@ -71,11 +74,11 @@ export class EmployeeDetailsComponent implements OnInit , OnDestroy {
       .subscribe(
         (employee: any) => {
           this.employeeDetails = employee;
-
+          this.cargaDatos = false;
           this.initForm(); // Initialize form after employee details are fetched
         },
         (error: any) => {
-          console.error('Error al obtener detalles del empleado:', error);
+          this.errorMessage = error.error.error;
         }
       );
   }
@@ -166,9 +169,12 @@ export class EmployeeDetailsComponent implements OnInit , OnDestroy {
     this.employeeService.listDepartments().subscribe(
       (response: any[]) => {
         this.departamentos = response;
+        this.cargaDatos = false;
+
       },
       error => {
-        console.error('Error al obtener department:', error);
+        this.errorMessage = error.error.error;
+
       }
     );
   }
@@ -178,9 +184,15 @@ export class EmployeeDetailsComponent implements OnInit , OnDestroy {
     this.employeeService.listBranchOffices().subscribe(
       (response: any[]) => {
         this.sucursales = response;
+        this.cargaDatos = false;
+
       },
       error => {
-        console.error('Error al obtener sucursales:', error);
+        this.errorMessage = error.error.error;
+        console.error(error.error);
+        console.error(error.error.eror);
+
+
       }
     );
   }
@@ -251,9 +263,11 @@ export class EmployeeDetailsComponent implements OnInit , OnDestroy {
         } else if (roleId===3){
           this.employeeRole= 'usuario'
         }
+        
       },
       error => {
-        console.error('Error when obtaining data from the logged in user:', error);
+        this.errorMessage = error.error.error;
+
       }
     );
   }

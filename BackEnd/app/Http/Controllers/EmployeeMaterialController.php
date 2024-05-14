@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Employee;
 use App\Models\Material;
 use App\Models\MaterialAssignmentHistory;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 
 class EmployeeMaterialController extends Controller
@@ -17,6 +18,7 @@ class EmployeeMaterialController extends Controller
 
     public function employeeInfoAssignments($id)
     {
+        try{
         // Obtener el empleado específico con los materiales asignados activos
         $employee = Employee::with(['role', 'department', 'branchOffice', 'material' => function ($query) {
         }])->find($id);
@@ -48,10 +50,14 @@ class EmployeeMaterialController extends Controller
             }),
         ];
         return response()->json($assignments);
+    } catch (ThrottleRequestsException $e) {
+        return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
+    }
     }
 
     public function materialAssignedEmployees($materialId)
     {
+        try{
         // Obtener el material específico con los empleados asignados activos
         $material = Material::with('employee')->find($materialId);
 
@@ -79,6 +85,9 @@ class EmployeeMaterialController extends Controller
         ];
 
         return response()->json($assignedEmployees, 200);
+        } catch (ThrottleRequestsException $e) {
+            return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
+        }
     }
 
     private function getAllEmployeesInBranch($branchOfficeId, $categoryId)

@@ -30,6 +30,7 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
   successMessage2!: string;
   employeeId!:number;
   employeeRole!:string;
+  cargaDatos: boolean = true;
 
   private subscriptions: Subscription[] = [];
 
@@ -114,6 +115,7 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
         (material: any) => {
           this.materialDetails = material;
           this.attributeNames = this.materialDetails.material.attribute.map((attribute: any) => attribute.name);
+          this.cargaDatos = false;
           this.initForm();
         },
         (error: any) => {
@@ -186,6 +188,7 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
     this.materialService.listDepartments().subscribe(
       (response: any[]) => {
         this.departamentos = response;
+        this.cargaDatos = false;
       },
       error => {
         console.error('Error al obtener department:', error);
@@ -196,7 +199,8 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
   obtenerSucursales() {
     this.materialService.listBranchOffices().subscribe(
       (response: any[]) => {
-        this.sucursales = response;
+        this.sucursales = response;          
+        this.cargaDatos = false;
       },
       error => {
         console.error('Error al obtener sucursales:', error);
@@ -206,7 +210,10 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
 
   getNombreSucursal(branch_office_id: number): string {
     const sucursal = this.sucursales.find(suc => suc.id === branch_office_id);
+    this.cargaDatos = false;
+
     return sucursal ? sucursal.name : 'N/A';
+    
   }
 
   confirmDelete(material: any): void {
@@ -248,7 +255,7 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
     this.materialService.materialAsignado(id).subscribe(
       (response) => {
         this.asignado = response;
-        console.log(this.materialDetails)
+        this.cargaDatos = false;
       },
       error => {
         console.error('Error al obtener la asignación:', error);
@@ -301,12 +308,13 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
         this.employeeId = response.id;
         const roleId = response.role_id;
 
-
         if (roleId === 1) {
           this.employeeRole = 'admin';
         } else if (roleId === 2){
           this.employeeRole = 'manager';
         }
+        this.cargaDatos = false;
+
       },
       error => {
         console.error('Error when obtaining data from the logged in user:', error);

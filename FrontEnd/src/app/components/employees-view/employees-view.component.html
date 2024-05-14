@@ -30,6 +30,12 @@
                 </button>
             </div>
         </div>
+        <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center" *ngIf="cargaDatos">
+            <div role="status" class="flex flex-col items-center">
+              <span class="font-bold mt-2">Cargando..</span>
+            </div>
+          </div>
+  
         <!-- Agrega la clase "border" y "border-gray-300" para el borde -->
         <div class="table-container overflow-x-auto">
             <!-- Agrega margen superior adicional en pantallas más pequeñas -->
@@ -80,7 +86,7 @@
             <pagination-controls (pageChange)="page = $event"></pagination-controls>
         </div>
         <div *ngIf="successMessage" class="text-green-800 mensaje_exitoso fade-in-out">{{ successMessage }}</div>
-        <div *ngIf="errorMessage" class="text-red-800 mensaje_error fade-in-out">{{ errorMessage }}</div>
+        <div *ngIf="errorMessage" class="text-red-800 mensaje_error">{{ errorMessage }}</div>
     </div>
 </div>
 

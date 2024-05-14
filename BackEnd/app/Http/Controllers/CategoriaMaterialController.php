@@ -10,6 +10,7 @@ use App\Models\Material;
 use App\Models\Attribute;
 use Illuminate\Support\Facades\Auth;
 use App\Models\EmployeeMaterial;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 class CategoriaMaterialController extends Controller
 {
@@ -48,8 +49,8 @@ class CategoriaMaterialController extends Controller
             ];
 
             return response()->json($categoryInfo);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error interno del servidor'], 500);
+        } catch (ThrottleRequestsException $e) {
+            return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
         }
     }
 }

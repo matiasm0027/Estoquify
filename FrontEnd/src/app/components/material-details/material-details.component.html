@@ -28,6 +28,11 @@
           </button>
         </div>
       </div>
+      <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center" *ngIf="cargaDatos">
+        <div role="status" class="flex flex-col items-center">
+          <span class="font-bold mt-2">Cargando..</span>
+        </div>
+      </div>
       <!-- Tabla para mostrar los detalles específicos del material -->
       <table class="table-auto w-full">
         <tbody>

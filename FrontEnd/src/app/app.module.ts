@@ -21,7 +21,6 @@ import { CategoryDetailsComponent } from './components/category-details/category
 import { MaterialDetailsComponent } from './components/material-details/material-details.component';
 import { ReportesViewComponent } from './components/reportes-view/reportes-view.component';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { RequestInterceptor } from './services/request/request-interceptor.service';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { ReportesHistoryComponent } from './components/reportes-history/reportes-history.component';
 import { PasswordStrengthDirective } from './directivas/passwordRules/password-strength.directive';
@@ -59,11 +58,6 @@ import { PasswordStrengthDirective } from './directivas/passwordRules/password-s
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
     ApiRequestService
   ],
   bootstrap: [AppComponent]

@@ -14,6 +14,7 @@ export class ReportesHistoryComponent implements OnInit, OnDestroy{
   sucursales: any[] = [];
   employeeId!: number;
   employeeRole!: string;
+  cargaDatos: boolean = true;
 
   private subscriptions: Subscription[] = [];
 
@@ -41,6 +42,7 @@ export class ReportesHistoryComponent implements OnInit, OnDestroy{
         } else if (roleId === 3) {
           this.employeeRole = 'user';
         }
+        this.cargaDatos = false;
       },
       error => {
         console.error('Error when obtaining data from the logged in user:', error);
@@ -60,6 +62,8 @@ export class ReportesHistoryComponent implements OnInit, OnDestroy{
             nameempleado: reporte.employee_name,
             sucursalid: reporte.employee_id_sucursal,
           }));
+          this.cargaDatos = false;
+
       },
       error => {
         console.error('Error al obtener reportes:', error);
@@ -75,6 +79,8 @@ export class ReportesHistoryComponent implements OnInit, OnDestroy{
     this.apiRequestService.listBranchOffices().subscribe(
       (response: any[]) => {
         this.sucursales = response;
+        this.cargaDatos = false;
+
       },
       error => {
         console.error('Error al obtener sucursales:', error);

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, catchError } from 'rxjs';
 import { Employee } from '../../model/Employee';
 import { Role } from '../../model/Role';
 import { Department } from '../../model/Department';
@@ -12,6 +12,7 @@ import { BranchOffice } from '../../model/BranchOffice';
 })
 export class ApiRequestService {
   private apiUrl = 'http://localhost:8000/api';
+
 
   constructor(private http: HttpClient) {}
 
@@ -157,3 +158,4 @@ export class ApiRequestService {
     return this.http.get<any[]>(`${this.apiUrl}/auth/listEmployeesByBranchOffice/${id_branch_office}`);
   }
 }
+

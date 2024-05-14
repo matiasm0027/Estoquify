@@ -38,6 +38,7 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
   placeholder: string = "Seleccionar empleado";
   formularioMaterial: FormGroup;
   successMessage!: string;
+  cargaDatos: boolean = true;
 
   private subscriptions: Subscription[] = [];
 
@@ -85,6 +86,7 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
       (response: any) => {
         this.employeeId = response.id;
         const roleId = response.role_id;
+        this.cargaDatos = false;
 
 
         if (roleId === 1) {
@@ -317,9 +319,12 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
           id: material.id,
           name: material.name, // Cambiar a category_name
         }));
+
         this.categories.forEach(categoria => {
           this.getCategoriaDetails(categoria.id);
         });
+        this.cargaDatos = false;
+
       }
     );
   }
@@ -364,6 +369,8 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
     this.apiRequestService.listBranchOffices().subscribe(
       (response: any[]) => {
         this.sucursales = response;
+        this.cargaDatos = false;
+
       },
       error => {
         console.error('Error al obtener sucursales:', error);
@@ -375,6 +382,8 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
     this.apiRequestService.listDepartments().subscribe(
       (response: any[]) => {
         this.departamentos = response;
+        this.cargaDatos = false;
+
       },
       error => {
         console.error('Error al obtener department:', error);

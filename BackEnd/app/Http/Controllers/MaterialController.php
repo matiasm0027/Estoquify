@@ -7,6 +7,7 @@ use App\Models\Material;
 use App\Models\AttributeCategoryMaterial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 class MaterialController extends Controller
 {
@@ -118,9 +119,8 @@ class MaterialController extends Controller
 
         // Devolver los detalles del material
         return response()->json(['material' => $material], 200);
-    } catch (\Exception $e) {
-        // Capturar y manejar cualquier excepción que pueda ocurrir
-        return response()->json(['error' => 'Error al obtener detalles del material: ' . $e->getMessage()], 500);
+    } catch (ThrottleRequestsException $e) {
+        return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
     }
 }
 
