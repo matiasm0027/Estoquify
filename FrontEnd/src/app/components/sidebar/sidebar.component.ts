@@ -1,59 +1,35 @@
-import { Component, OnInit, Renderer2 } from '@angular/core';
-import { ApiRequestService } from 'src/app/services/api/api-request.service';
+import { Component, OnInit } from '@angular/core';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
+import { Employee } from 'src/app/model/Employee';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent implements OnInit{
+export class SidebarComponent implements OnInit {
 
-  message!: string;
-  employeeName!: string;
-  roleId!:string;
-  employeeRole!:string;
-  isAdminManager: boolean = true;
+  loggedInUser: Employee | null = null; // Inicializar con un valor nulo
+  userRole!: any;
+  constructor(private authControlService: UsuariosControlService) {
+  }
 
-  constructor(
-    private authControlService: UsuariosControlService,
-    private renderer: Renderer2,
-    private apiRequest: ApiRequestService,
-    ) {}
+  ngOnInit(): void {
+    this.userRole = this.authControlService.hasRole();
+    this.authControlService.getLoggedUser().subscribe(() => {
+      this.loggedInUser = this.authControlService.getStoredLoggedInUser();
+    });
+  }
 
-    ngOnInit(): void {
-      this.getLoggedUser();
+  logout(): void {
+    this.authControlService.logout();
+    window.location.reload();
+  }
+  
+  toggleSidebar(): void {
+    const sidebar = document.getElementById('logo-sidebar');
+    if (sidebar) {
+      sidebar.classList.toggle('hidden'); 
     }
-
-    logout(): void {
-      this.authControlService.logout();
-      window.location.reload();
-    }
-    
-    toggleSidebar(): void {
-      const sidebar = document.getElementById('logo-sidebar');
-      if (sidebar) {
-        sidebar.classList.toggle('hidden'); // Agrega o quita la clase 'hidden'
-      }
-    }
-
-    getLoggedUser(): void {
-      this.apiRequest.me().subscribe(
-        (response: any) => {
-          this.employeeName = response.name + ' ' + response.last_name;
-          const roleId = response.role_id;
-     
-
-          if (roleId === 1) {
-            this.isAdminManager = true;
-          } else if (roleId === 2){
-            this.isAdminManager = true;
-          } else if (roleId === 3){
-            this.isAdminManager = false;
-          }
-        },
-        error => {
-        }
-      );
-    }
+  }
 }

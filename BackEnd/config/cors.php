@@ -11,7 +11,7 @@ return [
 /*
  * Matches the request method. `[*]` allows all methods.
  */
-'allowed_methods' => ['*'],
+'allowed_methods' => ['GET, POST, PUT, DELETE, OPTIONS'],
 
 /*
  * Matches the request origin. `[*]` allows all origins.

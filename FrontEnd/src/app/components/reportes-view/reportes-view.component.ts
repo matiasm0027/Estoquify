@@ -82,7 +82,7 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
   //--------------------------------------------------------------------------FUNCIONES COMUNES-----------------------------------------------------------------
 
   getLoggedUser(): void {
-    this.apiRequestService.me().subscribe(
+    this.apiRequestService.getLoggedInUser().subscribe(
       (response: any) => {
         this.employeeId = response.id;
         const roleId = response.role_id;
@@ -505,12 +505,12 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
   }
 
   obtenerEmpleados() {
-    this.apiRequestService.listEmployees().subscribe(
+    this.apiRequestService.getEmployees().subscribe(
       (data: Employee[]) => {
         const sucursalNombre = this.obtenerNombreSucursal(this.reporteSeleccionado.sucursalid);
 
         // Filtrar empleados por nombre de sucursal
-        this.employees = data.filter(employee => employee.branch_office === sucursalNombre);
+        this.employees = data.filter(employee => employee.branch_office?.name === sucursalNombre);
 
         // Filtrar filteredEmployees por nombre de sucursal
         this.filteredEmployees = this.employees;

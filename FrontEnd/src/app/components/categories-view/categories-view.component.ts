@@ -153,7 +153,7 @@ export class CategoriesViewComponent implements OnInit, OnDestroy{
   }
 
   getLoggedUser(): void {
-    this.ApiRequestService.me().subscribe(
+    this.ApiRequestService.getLoggedInUser().subscribe(
       (response: any) => {
         this.employeeId = response.id;
         const roleId = response.role_id;

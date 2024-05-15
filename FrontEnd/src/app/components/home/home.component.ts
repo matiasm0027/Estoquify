@@ -1,6 +1,8 @@
-import { Component, NgModule, OnDestroy, OnInit } from '@angular/core';
+import { Component, NgModule, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { Employee } from 'src/app/model/Employee';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
+import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 
 
 @Component({
@@ -8,8 +10,9 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit, OnDestroy {
-
+export class HomeComponent implements OnInit {
+  
+  loggedInUser: Employee | null = null; // Inicializar con un valor nulo
   employeeRole!: string;
   employee!: any;
   reportes: any[] = [];
@@ -17,27 +20,27 @@ export class HomeComponent implements OnInit, OnDestroy {
   empleado_id!: number;
   reportes_id: any[] = [];
   cargaDatos: boolean = true;
+  userRole!: any;
 
-  private subscriptions: Subscription[] = [];
+  constructor(private ApiRequestService: ApiRequestService, private authControlService: UsuariosControlService) { }
 
-  constructor(private ApiRequestService: ApiRequestService) { }
 
   ngOnInit(): void {
-    this.getLoggedUser();
+    this.userRole = this.authControlService.hasRole();
+    console.log(this.userRole)
+    this.authControlService.getLoggedUser().subscribe(() => {
+      this.loggedInUser = this.authControlService.getStoredLoggedInUser();
+    });
+
     this.obtenerReportes();
     this.obtenerCantidadMaterial();
     this.mostrarMaterialesDisponiblesBajos();
     this.obtenerReportesDelEmpleado();
   }
 
-  ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-  }
-
   obtenerReportes() {
     this.ApiRequestService.listReportes().subscribe(
       (response: any[]) => {
-
         this.reportes = response
           .filter(reporte => reporte.state === 'pending')
           .map(reporte => ({
@@ -48,17 +51,13 @@ export class HomeComponent implements OnInit, OnDestroy {
             type: reporte.type,
             empleado: reporte.employee_id,
             nameempleado: reporte.employee_name
-
           }));
-          this.cargaDatos = false;
-
+        this.cargaDatos = false;
       },
       error => {
         console.error('Error al obtener reportes:', error);
       }
-
     );
-
   }
 
   obtenerCantidadMaterial() {
@@ -73,7 +72,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         }));
         this.mostrarMaterialesDisponiblesBajos();
         this.cargaDatos = false;
-
       }
     );
   }
@@ -101,43 +99,17 @@ export class HomeComponent implements OnInit, OnDestroy {
           mensajeDiv?.appendChild(mensajeParrafo);
         }
       });
-      if(materialesDisponiblesBajos.length === 0 ){
+      if (materialesDisponiblesBajos.length === 0) {
         const mensajeParrafo = document.createElement('p');
-          // Asignar el contenido del mensaje al elemento de párrafo
-          mensajeParrafo.textContent = `Los niveles de stock estan correctos`;
-          mensajeParrafo.style.color = 'green'; // Cambiar el color del texto a rojo
-          mensajeParrafo.style.fontSize = '16px'; // Cambiar el tamaño de la fuente
-          // Agregar el elemento de párrafo al div
-          mensajeDiv?.appendChild(mensajeParrafo);
-      }   }
-      this.cargaDatos = false;
-
-  }
-
-  getLoggedUser(): void {
-    this.ApiRequestService.me().subscribe(
-      (response: any) => {
-        const roleId = response.role_id;
-        this.empleado_id = response.id
-
-
-        if (roleId === 1) {
-          this.employeeRole = 'admin';
-        } else if (roleId === 2) {
-          this.employee = response;
-          this.employeeRole = 'manager';
-        }
-        else {
-          this.employee = response;
-          this.employeeRole = 'usuario';
-        }
-        this.cargaDatos = false;
-
-      },
-      error => {
-        console.error('Error when obtaining data from the logged in user:', error);
+        // Asignar el contenido del mensaje al elemento de párrafo
+        mensajeParrafo.textContent = `Los niveles de stock estan correctos`;
+        mensajeParrafo.style.color = 'green'; // Cambiar el color del texto a rojo
+        mensajeParrafo.style.fontSize = '16px'; // Cambiar el tamaño de la fuente
+        // Agregar el elemento de párrafo al div
+        mensajeDiv?.appendChild(mensajeParrafo);
       }
-    );
+    }
+    this.cargaDatos = false;
   }
 
   obtenerReportesDelEmpleado() {
@@ -169,15 +141,11 @@ export class HomeComponent implements OnInit, OnDestroy {
             date: reporte.date,
             update: reporte.updated
           }));
-          this.cargaDatos = false;
-
+        this.cargaDatos = false;
       },
       error => {
         console.error('Error al obtener los reportes del empleado:', error);
       }
     );
   }
-
-
-
 }

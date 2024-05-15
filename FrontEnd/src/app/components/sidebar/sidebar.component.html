@@ -1,24 +1,33 @@
 <nav class="fixed top-0 z-50 w-full bg-blue-50 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
    <div class="px-3 py-3 lg:px-5 lg:pl-3 flex justify-between items-center">
-     <div class="flex items-center">
-       <a routerLink="/home" class="flex ms-2 md:me-24">
-         <img src="../../../assets/img/logo_estoqui.jpg" class="h-8 me-3" alt="FlowBite Logo" />
-         <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">Estoquify</span>
-       </a>
-     </div>
-     <div class="flex items-center space-x-4">
-       <span class="text-sm font-medium sm:text-base whitespace-nowrap dark:text-white">Bienvenido/a {{ employeeName }}</span>
-       <button (click)="toggleSidebar()" id="hideSidebarButton" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600 bg-gray-100 dark:bg-gray-700 rounded-full lg:hidden">
-         <span class="sr-only">Hide sidebar</span>
-         <svg class="w-6 h-6 transform -rotate-180" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-           <path fill-rule="evenodd" d="M5.293 16.707a1 1 0 0 0 1.414 0l8-8a1 1 0 0 0 0-1.414l-8-8a1 1 0 0 0-1.414 1.414L13.586 10 5.293 18.293a1 1 0 0 0 0 1.414Z"></path>
-         </svg>
-       </button>
-     </div>
+      <div class="flex items-center">
+         <a routerLink="/home" class="flex ms-2 md:me-24">
+            <img src="../../../assets/img/logo_estoqui.jpg" class="h-8 me-3" alt="FlowBite Logo" />
+            <span
+               class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">Estoquify</span>
+         </a>
+      </div>
+      <div class="flex items-center space-x-4">
+         <span *ngIf="loggedInUser" class="text-sm font-medium sm:text-base whitespace-nowrap dark:text-white">
+            Bienvenido/a {{ loggedInUser.name }} {{ loggedInUser.last_name }}
+         </span>
+         <button (click)="toggleSidebar()" id="hideSidebarButton"
+            class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600 bg-gray-100 dark:bg-gray-700 rounded-full lg:hidden">
+            <span class="sr-only">Hide sidebar</span>
+            <svg class="w-6 h-6 transform -rotate-180" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
+               xmlns="http://www.w3.org/2000/svg">
+               <path fill-rule="evenodd"
+                  d="M5.293 16.707a1 1 0 0 0 1.414 0l8-8a1 1 0 0 0 0-1.414l-8-8a1 1 0 0 0-1.414 1.414L13.586 10 5.293 18.293a1 1 0 0 0 0 1.414Z">
+               </path>
+            </svg>
+         </button>
+      </div>
    </div>
- </nav>
- 
- <div id="logo-sidebar" class="sidebar fixed top-0 left-0 z-40 w-64 h-screen pt-20 bg-gray-200 border-r border-gray-200 sm:translate-x-0 dark:bg-gray-100 dark:border-gray-700" aria-label="Sidebar">
+</nav>
+
+<div id="logo-sidebar"
+   class="sidebar fixed top-0 left-0 z-40 w-64 h-screen pt-20 bg-gray-200 border-r border-gray-200 sm:translate-x-0 dark:bg-gray-100 dark:border-gray-700"
+   aria-label="Sidebar">
    <div class="h-full px-3 pb-4 overflow-y-auto dark:bg-gray-100">
       <ul class="space-y-2 font-medium">
          <li>
@@ -47,7 +56,8 @@
                <span class="flex-1 ms-3 whitespace-nowrap">Inventario</span>
             </a>
          </li>
-         <li>
+         <!-- Ocultar apartado de incidencias si eres rol user(3) -->
+         <li *ngIf="userRole !== '3'">
             <a routerLink="/reportes_view"
                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                <svg
@@ -58,10 +68,11 @@
                </svg>
                <span class="flex-1 ms-3 whitespace-nowrap">Incidencias</span>
             </a>
-        </li>        
+        </li>
+        
          <li>
             <a routerLink="/employees_view"
-               class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group" >
+               class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                <svg
                   class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                   aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
@@ -74,12 +85,15 @@
 
          <li>
             <button (click)="logout()" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white group">
-                <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 16">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 8h11m0 0L8 4m4 4-4 4m4-11h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3" />
-                </svg>
-                <span class="flex-1 ms-3 whitespace-nowrap">Log out</span>
+               <svg
+                  class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                  aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 16">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                     d="M1 8h11m0 0L8 4m4 4-4 4m4-11h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3" />
+               </svg>
+               <span class="flex-1 ms-3 whitespace-nowrap">Log out</span>
             </button>
-        </li>
+         </li>
       </ul>
    </div>
 </div>

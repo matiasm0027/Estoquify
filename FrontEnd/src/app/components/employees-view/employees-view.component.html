@@ -1,6 +1,7 @@
 <div class="flex">
     <app-sidebar></app-sidebar> <!-- Agrega ngIf para mostrar u ocultar el sidebar -->
-    <div class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-24 md:ml-12 md:mr-12 sm:mt-24 sm:ml-12 sm:mr-12 mt-24 ml-12 mr-12 box-fl container">
+    <div
+        class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-24 md:ml-12 md:mr-12 sm:mt-24 sm:ml-12 sm:mr-12 mt-24 ml-12 mr-12 box-fl container">
         <!-- Contenido de la vista principal -->
         <div class="flex justify-between items-center mb-4">
             <div class="flex items-center"> <!-- Nuevo contenedor flex para el título y el input -->
@@ -9,15 +10,16 @@
                 <div class="relative"> <!-- Contenedor relativo para el input y el icono -->
                     <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar empleado..."
                         (input)="filtrarEmpleados()"
-                        class="px-4 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500" >
+                        class="px-4 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500">
                     <!-- Añade espacio a la derecha para el icono -->
-                    <img src="assets/img/logo_search.png" class="absolute inset-y-0 right-0 flex items-center pr-3 h-6 mt-2" alt="Buscar">
+                    <img src="assets/img/logo_search.png"
+                        class="absolute inset-y-0 right-0 flex items-center pr-3 h-6 mt-2" alt="Buscar">
                 </div>
             </div>
             <div> <!-- Contenedor para los botones -->
                 <button (click)="mostrarModal()"
                     class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 md:ml-3 md:mb-2 rounded mr-2"
-                    *ngIf="employeeRole === 'admin'">
+                    *ngIf="userRole === '1'">
                     Añadir Empleado
                 </button>
                 <button (click)="downloadCsv()"
@@ -32,10 +34,10 @@
         </div>
         <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center" *ngIf="cargaDatos">
             <div role="status" class="flex flex-col items-center">
-              <span class="font-bold mt-2">Cargando..</span>
+                <span class="font-bold mt-2">Cargando..</span>
             </div>
-          </div>
-  
+        </div>
+
         <!-- Agrega la clase "border" y "border-gray-300" para el borde -->
         <div class="table-container overflow-x-auto">
             <!-- Agrega margen superior adicional en pantallas más pequeñas -->
@@ -65,17 +67,18 @@
                 </thead>
                 <tbody>
                     <!-- Filtra la lista de empleados en función del término de búsqueda -->
-                    <tr *ngFor="let employee of empleadosFiltrados | paginate: { itemsPerPage: 8, currentPage: page }">
+                    <tr *ngFor="let employees of empleadosFiltrados | paginate: { itemsPerPage: 8, currentPage: page }">
                         <td
                             class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
-                            <a [routerLink]="['/employees_details', employee.id]">{{ employee.name }}</a>
+                            <a [routerLink]="['/employees_details', employees.id]">{{ employees.name }}</a>
                         </td>
-                        <td class="px-6 py-4">{{ employee.last_name }}</td>
-                        <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ employee.department }}</td>
-                        <td class="px-6 py-4">{{ employee.branch_office }}</td>
-                        <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800 hidden lg:table-cell">{{ employee.email }}</td>
+                        <td class="px-6 py-4">{{ employees.last_name }}</td>
+                        <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ employees.department.name }}</td>
+                        <td class="px-6 py-4">{{ employees.branch_office.name }}</td>
+                        <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800 hidden lg:table-cell">{{ employees.email }}
+                        </td>
                         <td class="px-6 py-4">
-                            <a [routerLink]="['/employees_details', employee.id]"
+                            <a [routerLink]="['/employees_details', employees.id]"
                                 class="inline-block bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-white font-bold py-2 px-4 rounded border border-gray-300 dark:border-gray-700 transition duration-200 ease-in-out">
                                 Ver detalles
                             </a>
@@ -105,22 +108,22 @@
                 <form [formGroup]="formularioEmpleado" (submit)="agregarEmpleado()">
                     <div class="mb-4">
                         <label for="nombre" class="block text-gray-700">Nombre</label>
-                        <input formControlName="nombre" type="text" id="nombre" name="nombre"
+                        <input formControlName="name" type="text" id="nombre" name="nombre"
                             class="form-input mt-1 block w-full" placeholder="Ingrese el Nombre" required>
                         <!-- Error handling -->
-                        <div *ngIf="formularioEmpleado.get('nombre')?.errors?.['required'] && formularioEmpleado.get('nombre')?.touched"
+                        <div *ngIf="formularioEmpleado.get('name')?.errors?.['required'] && formularioEmpleado.get('name')?.touched"
                             class="text-red-800">
                             This field cannot be empty.
                         </div>
-                        <div *ngIf="formularioEmpleado.get('nombre')?.errors?.['minlength'] && formularioEmpleado.get('nombre')?.touched"
+                        <div *ngIf="formularioEmpleado.get('name')?.errors?.['minlength'] && formularioEmpleado.get('name')?.touched"
                             class="text-red-800">
                             The name must be at least 3 characters.
                         </div>
-                        <div *ngIf="formularioEmpleado.get('nombre')?.errors?.['maxlength'] && formularioEmpleado.get('nombre')?.touched"
+                        <div *ngIf="formularioEmpleado.get('name')?.errors?.['maxlength'] && formularioEmpleado.get('name')?.touched"
                             class="text-red-800">
                             The name cannot be more than 30 characters.
                         </div>
-                        <div *ngIf="formularioEmpleado.get('nombre')?.errors?.['pattern'] && formularioEmpleado.get('nombre')?.touched"
+                        <div *ngIf="formularioEmpleado.get('name')?.errors?.['pattern'] && formularioEmpleado.get('name')?.touched"
                             class="text-red-800">
                             The name can only contain letters.
                         </div>
@@ -128,22 +131,22 @@
 
                     <div class="mb-4">
                         <label for="apellido" class="block text-gray-700">Apellido</label>
-                        <input formControlName="apellido" type="text" id="apellido" name="apellido"
+                        <input formControlName="last_name" type="text" id="apellido" name="apellido"
                             class="form-input mt-1 block w-full" placeholder="Ingrese el Apellido" required>
                         <!-- Error handling -->
-                        <div *ngIf="formularioEmpleado.get('apellido')?.errors?.['required'] && formularioEmpleado.get('apellido')?.touched"
+                        <div *ngIf="formularioEmpleado.get('last_name')?.errors?.['required'] && formularioEmpleado.get('last_name')?.touched"
                             class="text-red-800">
                             This field cannot be empty.
                         </div>
-                        <div *ngIf="formularioEmpleado.get('apellido')?.errors?.['minlength'] && formularioEmpleado.get('nombre')?.touched"
+                        <div *ngIf="formularioEmpleado.get('last_name')?.errors?.['minlength'] && formularioEmpleado.get('last_name')?.touched"
                             class="text-red-800">
                             The last name must be at least 3 characters.
                         </div>
-                        <div *ngIf="formularioEmpleado.get('apellido')?.errors?.['maxlength'] && formularioEmpleado.get('nombre')?.touched"
+                        <div *ngIf="formularioEmpleado.get('last_name')?.errors?.['maxlength'] && formularioEmpleado.get('last_name')?.touched"
                             class="text-red-800">
                             The last name cannot be more than 30 characters.
                         </div>
-                        <div *ngIf="formularioEmpleado.get('apellido')?.errors?.['pattern'] && formularioEmpleado.get('nombre')?.touched"
+                        <div *ngIf="formularioEmpleado.get('last_name')?.errors?.['pattern'] && formularioEmpleado.get('last_name')?.touched"
                             class="text-red-800">
                             The last name can only contain letters.
                         </div>
@@ -165,6 +168,21 @@
                     </div>
 
                     <div class="mb-4">
+                        <label for="telefonoMovil" class="block text-gray-700">Telefono</label>
+                        <input formControlName="phone_number" type="tel" id="telefonoMovil" name="telefonoMovil"
+                            class="form-input mt-1 block w-full" placeholder="Ingrese el Numero de Telefono" required>
+                        <!-- Error handling -->
+                        <div *ngIf="formularioEmpleado.get('phone_number')?.errors?.['required'] && formularioEmpleado.get('phone_number')?.touched"
+                            class="text-red-800">
+                            This field cannot be empty.
+                        </div>
+                        <div *ngIf="formularioEmpleado.get('phone_number')?.errors?.['pattern'] && formularioEmpleado.get('phone_number')?.touched"
+                            class="text-red-800">
+                            Only numbers are allowed.
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
                         <label for="password" class="block text-gray-700">Contraseña</label>
                         <input formControlName="password" type="password" id="password" name="password"
                             class="form-input mt-1 block w-full" placeholder="Ingrese la Contraseña" required>
@@ -176,28 +194,14 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="telefonoMovil" class="block text-gray-700">Telefono</label>
-                        <input formControlName="telefonoMovil" type="tel" id="telefonoMovil" name="telefonoMovil"
-                            class="form-input mt-1 block w-full" placeholder="Ingrese el Numero de Telefono" required>
-                        <!-- Error handling -->
-                        <div *ngIf="formularioEmpleado.get('telefonoMovil')?.errors?.['required'] && formularioEmpleado.get('telefonoMovil')?.touched"
-                            class="text-red-800">
-                            This field cannot be empty.
-                        </div>
-                        <div *ngIf="formularioEmpleado.get('telefonoMovil')?.errors?.['pattern'] && formularioEmpleado.get('telefonoMovil')?.touched"
-                            class="text-red-800">
-                            Only numbers are allowed.
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
                         <label for="departamento" class="block text-gray-700">Departamento</label>
-                        <select formControlName="departamento" id="departamento" name="departamento"
+                        <select formControlName="department_id" id="departamento" name="departamento"
                             class="form-select mt-1 block w-full" required>
-                            <option *ngFor="let dept of departamentos" [value]="dept.id">{{ dept.name }}</option>
+                            <option *ngFor="let dept of departamentos" [value]="dept.id">{{
+                                dept.name }}</option>
                         </select>
                         <!-- Error handling -->
-                        <div *ngIf="formularioEmpleado.get('departamento')?.errors?.['required'] && formularioEmpleado.get('departamento')?.touched"
+                        <div *ngIf="formularioEmpleado.get('department_id')?.errors?.['required'] && formularioEmpleado.get('department_id')?.touched"
                             class="text-red-800">
                             Please select a department.
                         </div>
@@ -205,27 +209,25 @@
 
                     <div class="mb-4">
                         <label for="sucursal" class="block text-gray-700">Sucursal</label>
-                        <select formControlName="sucursal" id="sucursal" name="sucursal"
+                        <select formControlName="branch_office_id" id="sucursal" name="sucursal"
                             class="form-select mt-1 block w-full" required>
-                            <option *ngFor="let suc of sucursales" [value]="suc.id">{{ suc.name }}</option>
+                            <option *ngFor="let suc of sucursales" [value]="suc.id">{{
+                                suc.name }}</option>
                         </select>
                         <!-- Error handling -->
-                        <div *ngIf="formularioEmpleado.get('sucursal')?.errors?.['required'] && formularioEmpleado.get('sucursal')?.touched"
+                        <div *ngIf="formularioEmpleado.get('branch_office_id')?.errors?.['required'] && formularioEmpleado.get('branch_office_id')?.touched"
                             class="text-red-800">
                             Please select a branch office.
                         </div>
                     </div>
-
                     <div class="mb-4">
                         <label for="rol" class="block text-gray-700">Rol</label>
-                        <select formControlName="rol" id="rol" name="rol" class="form-select mt-1 block w-full"
+                        <select formControlName="role_id" id="rol" name="rol" class="form-select mt-1 block w-full"
                             required>
-                            <option value="1">Administrator</option>
-                            <option value="2">Manager</option>
-                            <option value="3">Employee</option>
+                            <option *ngFor="let role of roles" [value]="role.id">{{ role.name }}</option>
                         </select>
                         <!-- Error handling -->
-                        <div *ngIf="formularioEmpleado.get('rol')?.errors?.['required'] && formularioEmpleado.get('rol')?.touched"
+                        <div *ngIf="formularioEmpleado.get('role_id')?.errors?.['required'] && formularioEmpleado.get('role_id')?.touched"
                             class="text-red-800">
                             Please select a role.
                         </div>
@@ -269,8 +271,7 @@
                         <label for="filtroDepartamento" class="block text-gray-700">Selecciona un departamento:</label>
                         <select id="filtroDepartamento" name="filtroDepartamento" class="form-select mt-1 block w-full"
                             [(ngModel)]="filtroDepartamento">
-                            <option *ngFor="let departamento of departamentos" [value]="departamento.name">{{
-                                departamento.name }}</option>
+                            <option *ngFor="let departamento of departamentos" [value]="departamento.id">{{departamento.name }}</option>
                         </select>
                     </div>
 
@@ -279,10 +280,11 @@
                         <label for="filtroSucursal" class="block text-gray-700">Selecciona una sucursal:</label>
                         <select id="filtroSucursal" name="filtroSucursal" class="form-select mt-1 block w-full"
                             [(ngModel)]="filtroSucursal">
-                            <option *ngFor="let sucursal of sucursales" [value]="sucursal.name">{{ sucursal.name }}
+                            <option *ngFor="let sucursal of sucursales" [value]="sucursal.id">{{ sucursal.name }}
                             </option>
                         </select>
                     </div>
+
                     <div class="flex justify-end">
                         <button type="button"
                             class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2"

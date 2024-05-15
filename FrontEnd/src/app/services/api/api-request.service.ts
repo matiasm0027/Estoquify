@@ -20,22 +20,22 @@ export class ApiRequestService {
     return this.http.post<any>(`${this.apiUrl}/auth/login`, credentials);
   }
 
-  me(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/auth/me`);
+  getLoggedInUser(): Observable<Employee> {
+    return this.http.get<Employee>(`${this.apiUrl}/auth/getLoggedInUser`);
+  }
+
+  getEmployees(): Observable<Employee[]> {
+    return this.http.get<Employee[]>(`${this.apiUrl}/auth/listEmployees`);
   }
 
   refresh(): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/refresh`, {});
   }
 
-  listEmployees(): Observable<Employee[]> {
-    return this.http.get<Employee[]>(`${this.apiUrl}/auth/listEmployees`);
-  }
-
-  addEmployee(employeeData: any): Observable<any> {
+  addEmployee(employeeData: Employee): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/addEmployee`, employeeData);
   }
-
+  
   editEmployee(id: any, employeeData: any): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/auth/editEmployee/${id}`, employeeData);
   }

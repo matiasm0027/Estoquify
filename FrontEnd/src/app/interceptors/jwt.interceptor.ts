@@ -5,18 +5,14 @@ import {
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
-  HttpErrorResponse
+  HttpErrorResponse,
+  HTTP_INTERCEPTORS
 } from '@angular/common/http';
-import { Observable, catchError, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { UsuariosControlService } from '../services/usuarios/usuarios-control.service';
-import { ApiRequestService } from '../services/api/api-request.service';
 
-//https://medium.com/@insomniocode/angular-autenticaci%C3%B3n-usando-interceptors-a26c167270f4
-
-@Injectable({
-  providedIn: 'root'
-})
-
+@Injectable()
 export class JwtInterceptor implements HttpInterceptor {
 
   constructor(
@@ -46,3 +42,9 @@ export class JwtInterceptor implements HttpInterceptor {
     );
   }
 }
+
+export const JwtInterceptorProvider = {
+  provide: HTTP_INTERCEPTORS,
+  useClass: JwtInterceptor,
+  multi: true
+};

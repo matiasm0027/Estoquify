@@ -32,7 +32,7 @@ Route::group([
 
     Route::post('login', [EmployeesController::class, 'login']);
     Route::post('refresh', [EmployeesController::class, 'refresh']);
-    Route::get('me', [EmployeesController::class, 'me']);
+    Route::get('getLoggedInUser', [EmployeesController::class, 'getLoggedInUser']);
     Route::get('listEmployees', [EmployeesController::class, 'listEmployees']);
     Route::post('addEmployee', [EmployeesController::class, 'addEmployee']);
     Route::put('editEmployee/{id}', [EmployeesController::class, 'editEmployee']);
@@ -68,9 +68,6 @@ Route::group([
     Route::delete('deleteMaterial/{id}', [MaterialController::class, 'deleteMaterial']);
     Route::put('editMaterial/{id}', [MaterialController::class, 'editMaterial']);
     Route::get('materialDetails/{id}', [MaterialController::class, 'getMaterialDetails']);
-
-    
-    
 
 });
 

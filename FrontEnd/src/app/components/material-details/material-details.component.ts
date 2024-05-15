@@ -303,7 +303,7 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
   }
 
   getLoggedUser(): void {
-    this.materialService.me().subscribe(
+    this.materialService.getLoggedInUser().subscribe(
       (response: any) => {
         this.employeeId = response.id;
         const roleId = response.role_id;

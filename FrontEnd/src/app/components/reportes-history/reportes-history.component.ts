@@ -31,7 +31,7 @@ export class ReportesHistoryComponent implements OnInit, OnDestroy{
   }
 
   getLoggedUser(): void {
-    this.apiRequestService.me().subscribe(
+    this.apiRequestService.getLoggedInUser().subscribe(
       (response: any) => {
         this.employeeId = response.id;
         const roleId = response.role_id;

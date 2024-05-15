@@ -40,10 +40,14 @@ class EmployeesController extends Controller
     }
 
     // Devuelve los detalles del usuario autenticado actualmente.
-    public function me()
+    public function getLoggedInUser()
     {
         try {
-            return response()->json(auth()->user());
+            $user = auth()->user();
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no autenticado.'], 401);
+            }
+            return response()->json($user);
         } catch (ThrottleRequestsException $e) {
             return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
         }
@@ -78,6 +82,7 @@ class EmployeesController extends Controller
                 return response()->json([
                     'first_login' => true,
                     'access_token' => $token,
+                    'rol' => $user->role_id(),
                     'token_type' => 'bearer',
                     'expires_in' => auth()->factory()->getTTL() * 60
                 ]);
@@ -85,6 +90,7 @@ class EmployeesController extends Controller
                 return response()->json([
                     'access_token' => $token,
                     'token_type' => 'bearer',
+                    'rol' => $user->role_id,
                     'expires_in' => auth()->factory()->getTTL() * 60
                 ]);
             }
@@ -229,20 +235,22 @@ class EmployeesController extends Controller
         try {
             $user = $request->user()->id;
 
-            $employees = Employee::with('department', 'branchOffice')
-                ->where('id', '!=', $user) // Excluir al usuario actual
-                ->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
-                ->get()
-                ->map(function ($employee) {
-                    return [
-                        'id' => $employee->id,
-                        'name' => $employee->name,
-                        'last_name' => $employee->last_name,
-                        'email' => $employee->email,
-                        'department' => $employee->department ? $employee->department->name : null,
-                        'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
-                    ];
-                });
+            $employees = Employee::with('department', 'branchOffice', 'role')
+                ->where('id', '!=', $user)
+                ->orderBy('name')
+                ->orderBy('last_name') // Excluir al usuario actual
+                //->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
+                ->get();
+                // ->map(function ($employee) {
+                //     return [
+                //         'id' => $employee->id,
+                //         'name' => $employee->name,
+                //         'last_name' => $employee->last_name,
+                //         'email' => $employee->email,
+                //         'department' => $employee->department ? $employee->department->name : null,
+                //         'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
+                //     ];
+                // });
 
             return response()->json($employees);
         } catch (ThrottleRequestsException $e) {
@@ -266,27 +274,27 @@ class EmployeesController extends Controller
 
             // Validar los datos de entrada del formulario
             $validatedData = $request->validate([
-                'nombre' => 'required',
-                'apellido' => 'required',
+                'name' => 'required',
+                'last_name' => 'required',
                 'email' => 'required',
+                'phone_number' => 'required',
                 'password' => 'required',
-                'departamento' => 'required',
-                'sucursal' => 'required',
-                'rol' => 'required',
-                'telefonoMovil' => 'required',
+                'department_id' => 'required',
+                'role_id' => 'required',
+                'branch_office_id' => 'required',
             ]);
 
 
             // Crear un nuevo objeto Employee y asignar los valores
             $employee = new Employee();
-            $employee->name = $validatedData['nombre'];
-            $employee->last_name = $validatedData['apellido'];
+            $employee->name = $validatedData['name'];
+            $employee->last_name = $validatedData['last_name'];
             $employee->email = $validatedData['email'];
+            $employee->phone_number = $validatedData['phone_number'];
             $employee->password = bcrypt($validatedData['password']); // Encriptar la contraseña
-            $employee->department_id = $validatedData['departamento'];
-            $employee->branch_office_id = $validatedData['sucursal'];
-            $employee->role_id = $validatedData['rol'];
-            $employee->phone_number = $validatedData['telefonoMovil'];
+            $employee->department_id = $validatedData['department_id'];
+            $employee->branch_office_id = $validatedData['branch_office_id'];
+            $employee->role_id = $validatedData['role_id'];
 
             // Guardar el nuevo empleado en la base de datos
             $employee->save();

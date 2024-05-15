@@ -250,7 +250,7 @@ export class EmployeeDetailsComponent implements OnInit , OnDestroy {
 
 
   getLoggedUser(): void {
-    this.employeeService.me().subscribe(
+    this.employeeService.getLoggedInUser().subscribe(
       (response: any) => {
 
         const roleId = response.role_id;
