@@ -400,7 +400,7 @@ downloadCsv(): void {
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  const fileName = `.csv`;
+  const fileName = `${this.detallesMaterial.category_name}.csv`;
   
 
   a.download = fileName;
