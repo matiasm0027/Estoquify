@@ -24,6 +24,11 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { ReportesHistoryComponent } from './components/reportes-history/reportes-history.component';
 import { PasswordStrengthDirective } from './directivas/passwordRules/password-strength.directive';
+import { WebsocketService } from './services/websocket/websocket.service';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io'; // Importa SocketIoModule
+
+// Configuración de Socket.IO
+const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
 
 @NgModule({
   declarations: [
@@ -52,13 +57,15 @@ import { PasswordStrengthDirective } from './directivas/passwordRules/password-s
     FormsModule,
     NgxPaginationModule,
     NgSelectModule,
+    SocketIoModule.forRoot(config)
   ],
   exports: [
     PasswordStrengthDirective,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-    ApiRequestService
+    ApiRequestService,
+    WebsocketService
   ],
   bootstrap: [AppComponent]
 })
