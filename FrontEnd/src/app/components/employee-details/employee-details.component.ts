@@ -1,16 +1,15 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
-import { RequestManagerService } from 'src/app/services/requestManager/request-manager.service';
 
 @Component({
   selector: 'app-employee-details',
   templateUrl: './employee-details.component.html',
   styleUrls: ['./employee-details.component.css']
 })
-export class EmployeeDetailsComponent implements OnInit , OnDestroy {
+export class EmployeeDetailsComponent implements OnInit {
   employeeId!: number;
   employeeDetails: any = {};
   departamentos: any[] = [];
@@ -33,7 +32,6 @@ export class EmployeeDetailsComponent implements OnInit , OnDestroy {
     private route: ActivatedRoute,
     private employeeService: ApiRequestService,
     private router: Router,
-    private requestManager: RequestManagerService,
   ) {}
 
 
@@ -43,10 +41,6 @@ export class EmployeeDetailsComponent implements OnInit , OnDestroy {
     this.obtenerSucursales();
     this.getEmployeeDetails();
     this.getLoggedUser();
-  }
-
-  ngOnDestroy(): void {
-    this.requestManager.clearSubscriptions();
   }
 
   initForm() {
@@ -263,7 +257,7 @@ export class EmployeeDetailsComponent implements OnInit , OnDestroy {
         } else if (roleId===3){
           this.employeeRole= 'usuario'
         }
-        
+
       },
       error => {
         this.errorMessage = error.error.error;
@@ -312,7 +306,7 @@ export class EmployeeDetailsComponent implements OnInit , OnDestroy {
     const a = document.createElement('a');
     a.href = url;
     const fileName = `${this.employeeDetails.name}_${this.employeeDetails.last_name}.csv`;
-    
+
     a.download = fileName;
     document.body.appendChild(a);
     a.click();
