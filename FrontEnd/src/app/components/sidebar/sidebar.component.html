@@ -8,6 +8,11 @@
          </a>
       </div>
       <div class="flex items-center space-x-4">
+         <button (click)="toggleChatModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600 bg-gray-100 dark:bg-gray-700 rounded-full">
+            <span class="sr-only">Toggle chat</span>
+            <!-- Utiliza el icono de chat de texto de Font Awesome -->
+            <i class="fas fa-comment"></i>
+          </button>
          <span *ngIf="loggedInUser" class="text-sm font-medium sm:text-base whitespace-nowrap dark:text-white">
             Bienvenido/a {{ loggedInUser.name }} {{ loggedInUser.last_name }}
          </span>
@@ -24,6 +29,22 @@
       </div>
    </div>
 </nav>
+
+ <!-- Modal del chat -->
+ <div *ngIf="showChatModal" class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+   <div class="bg-white p-4 rounded-lg shadow-md w-96">
+     <!-- Historial de mensajes -->
+     <div class="h-52 overflow-y-auto mb-4">
+       
+       
+     </div>
+     <!-- Área de entrada de texto -->
+     <textarea  class="w-full h-20 border-gray-300 rounded-md mb-4"></textarea>
+     <!-- Botón para enviar mensaje -->
+     <button  class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Enviar</button>
+     <button (click)="toggleChatModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600 bg-gray-100 dark:bg-gray-700 rounded-full px-4 py-2">Cerrar</button>
+   </div>
+ </div>
 
 <div id="logo-sidebar"
    class="sidebar fixed top-0 left-0 z-40 w-64 h-screen pt-20 bg-gray-200 border-r border-gray-200 sm:translate-x-0 dark:bg-gray-100 dark:border-gray-700"
