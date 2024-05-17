@@ -4,6 +4,8 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 import { Subscription } from 'rxjs';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
 
 @Component({
   selector: 'app-material-details',
@@ -302,6 +304,13 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
     }, 2000);
   }
 
+  showOptions: boolean = false;
+
+  toggleOptions() {
+    this.showOptions = !this.showOptions;
+  }
+
+
   getLoggedUser(): void {
     this.materialService.getLoggedInUser().subscribe(
       (response: any) => {
@@ -349,6 +358,48 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
     csvRows.push(csvRow);
 
     return csvRows.join('\n');
+  }
+
+  downloadCsvOrPdf(format: string): void {
+    if (format === 'csv') {
+      this.downloadCsv();
+    } else if (format === 'pdf') {
+      this.downloadPdf();
+    } else {
+      console.error('Formato de descarga no válido.');
+    }
+  }
+
+  
+
+  downloadPdf(): void {
+    if (!this.materialDetails || !this.materialDetails.material || !this.materialDetails.material.attribute || this.materialDetails.material.attribute.length === 0) {
+      console.error('Los datos de la tabla no son válidos o están vacíos.');
+      return;
+    }
+  
+    const material = this.materialDetails.material;
+    const attributes = this.materialDetails.material.attribute.map((attribute: any) => `${attribute.name} - ${attribute.pivot.value}`).join('; ');
+    
+    const doc = new jsPDF();
+  
+    // Encabezado
+    doc.text('Lista de Materiales', 10, 10);
+  
+    // Datos del material
+    const materialData = [
+      ['ID', 'Nombre', 'Fecha Alta', 'Fecha Baja', 'Atributos', 'Sucursal', 'Estado'],
+      [material.id, material.name, material.high_date, material.low_date ?? 'N/D', attributes, this.getNombreSucursal(material.branch_office_id), material.state]
+    ];
+  
+    // Agregar tabla al PDF
+    (doc as any).autoTable({
+      head: materialData.slice(0, 1), // Solo la fila de encabezado
+      body: materialData.slice(1) // Resto de las filas de datos
+    });
+  
+    // Guardar el PDF
+    doc.save(`${material.name}.pdf`);
   }
 
 

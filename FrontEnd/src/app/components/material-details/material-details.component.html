@@ -22,9 +22,16 @@
             class="bg-white-500 hover:bg-white hover:text-gray-500 font-bold py-2 lg:px-4 md:px-2 rounded border border-gray-500">
             Volver
           </button>
-          <button (click)="downloadCsv()"
-            class="hover:bg-green hover:text-green-500 font-bold py-2 lg:px-4 md:px-2 rounded border border-green-500 md:mt-3">
-            Descargar CSV
+          <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded relative" type="button"
+                  (click)="toggleOptions()" aria-controls="dropdownMenu">
+            Descargar
+            <div *ngIf="showOptions" id="dropdownMenu" class="dropdown-nav-inner-wrapper absolute mt-2"
+                 aria-labelledby="dropdownMenuButton">
+              <button class="dropdown-item bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded"
+                      (click)="downloadCsvOrPdf('csv')">CSV</button><br>
+              <button class="dropdown-item bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded"
+                      (click)="downloadCsvOrPdf('pdf')">PDF</button>
+            </div>
           </button>
         </div>
       </div>

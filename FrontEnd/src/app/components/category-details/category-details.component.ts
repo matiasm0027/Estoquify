@@ -4,6 +4,10 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 import { Subscription } from 'rxjs';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
+
+
 
 @Component({
   selector: 'app-category-details',
@@ -85,7 +89,11 @@ export class CategoryDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  showOptions: boolean = false;
 
+  toggleOptions() {
+    this.showOptions = !this.showOptions;
+  }
 
   obtenerSucursales() {
     this.ApiRequestService.listBranchOffices().subscribe(
@@ -115,6 +123,7 @@ export class CategoryDetailsComponent implements OnInit, OnDestroy {
     const sucursal = this.sucursales.find(suc => suc.id === branch_office_id);
     return sucursal ? sucursal.name : 'N/A';
   }
+
 
   getCategoriaIdFromRoute(): void {
     this.route.params.subscribe(params => {
@@ -348,6 +357,8 @@ clearMessagesAfterDelay(): void {
     });
 }
 
+
+
 private convertToCsv(data: any): string {
   if (!data || !data.materials || !Array.isArray(data.materials) || data.materials.length === 0) {
     console.error('Los datos de la tabla no son válidos o están vacíos.');
@@ -372,6 +383,49 @@ private convertToCsv(data: any): string {
   });
 
   return csvRows.join('\n');
+}
+
+
+downloadCsvOrPdf(format: string): void {
+  if (format === 'csv') {
+    this.downloadCsv();
+  } else if (format === 'pdf') {
+    this.downloadPdf();
+  } else {
+    console.error('Formato de descarga no válido.');
+  }
+}
+
+
+downloadPdf(): void {
+  if (!this.categoryDetails || !this.categoryDetails.materials) {
+    console.error('No hay datos disponibles para descargar');
+    return;
+  }
+
+  const filteredMaterials = this.categoryDetails.materials.filter((material: any) => {
+    let cumpleFiltroFecha = true;
+    let cumpleFiltroEstado = true;
+    let cumpleFiltroSucursal = true;
+
+    return cumpleFiltroFecha && cumpleFiltroEstado && cumpleFiltroSucursal;
+  });
+
+  const pdf = new jsPDF();
+  pdf.text('Lista de Materiales', 10, 10);
+ (pdf as any).autoTable({
+    head: [['ID', 'Nombre', 'Fecha Alta', 'Fecha Baja', 'Sucursal', 'Estado']],
+    body: filteredMaterials.map((material: { id: any; name: any; high_date: any; low_date: any; branch_office_id: number; state: any; }) => [
+      material.id,
+      material.name,
+      material.high_date,
+      material.low_date ?? 'N/D',
+      this.getNombreSucursal(material.branch_office_id),
+      material.state
+    ]),
+  });
+
+  pdf.save(`${this.categoryDetails.category_name}.pdf`);
 }
 
 

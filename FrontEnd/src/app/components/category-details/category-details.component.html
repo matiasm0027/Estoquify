@@ -23,23 +23,32 @@
               alt="Buscar">
           </div>
         </div>
-        <div class="space-x-4">
-          <button (click)="mostrarModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 md:ml-4 md:mb-2 rounded "
-            *ngIf="employeeRole === 'admin'">
+        <div class="space-x-4 relative">
+          <button (click)="mostrarModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 md:ml-4 md:mb-2 rounded"
+                  *ngIf="employeeRole === 'admin'">
             Añadir Material
           </button>
           <button (click)="mostrarModalDeFiltros()"
-            class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded ">
+                  class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
             Filtro
           </button>
-          <button (click)="downloadCsv()"
-            class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 md:ml-2 md:mb-2 rounded">
-            Descargar CSV
-          </button>
-          <button (click)="volver()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded ">
+          <button (click)="volver()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
             Volver
           </button>
+        
+          <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded relative" type="button"
+                  (click)="toggleOptions()" aria-controls="dropdownMenu">
+            Descargar
+            <div *ngIf="showOptions" id="dropdownMenu" class="dropdown-nav-inner-wrapper absolute mt-2"
+                 aria-labelledby="dropdownMenuButton">
+              <button class="dropdown-item bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded"
+                      (click)="downloadCsvOrPdf('csv')">CSV</button><br>
+              <button class="dropdown-item bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded"
+                      (click)="downloadCsvOrPdf('pdf')">PDF</button>
+            </div>
+          </button>
         </div>
+        
       </div>
       <div class="table-container overflow-x-auto">
         <table
