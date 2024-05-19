@@ -11,6 +11,7 @@ use App\Http\Controllers\EmployeeMaterialController;
 use App\Http\Controllers\CategoriaMaterialController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AttributeController;
+use App\Http\Controllers\RoleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,7 +44,7 @@ Route::group([
     Route::post('resetPassword', [EmployeesController::class, 'resetPassword']);
     Route::get('listEmployeesByBranchOffice/{id_branch_office}', [EmployeesController::class, 'listEmployeesByBranchOffice']);
 
-    Route::get('employeeInfoAssignments/{id}', [EmployeeMaterialController::class, 'employeeInfoAssignments']);
+    Route::get('getEmployee/{id}', [EmployeeMaterialController::class, 'getEmployee']);
     Route::get('materialAssignedEmployees/{id}', [EmployeeMaterialController::class, 'materialAssignedEmployees']);
     Route::post('asignarMaterial/{materialId}', [EmployeeMaterialController::class, 'asignarMaterial']);
     Route::post('desasignarMaterial/{materialId}', [EmployeeMaterialController::class, 'desasignarMaterial']);
@@ -51,14 +52,14 @@ Route::group([
     Route::get('listDepartments', [DepartmentController::class, 'listDepartments']);
     Route::get('listBranchOffices', [BranchOfficeController::class, 'listBranchOffices']);
     Route::get('listAtributos', [AttributeController::class, 'listAtributos']);
-
+    Route::get('listRoles', [RoleController::class, 'listRoles']);
 
     Route::get('categoryInfoAssignments/{id}', [CategoriaMaterialController::class, 'categoryInfoAssignments']);
     Route::get('categoryMaterialInfo', [CategoryController::class, 'categoryMaterialInfo']);
     Route::post('addCategory', [CategoryController::class, 'addCategory']);
     Route::put('editCategory/{id}', [CategoryController::class, 'editCategory']);
     Route::delete('deleteCategory/{id}', [CategoryController::class, 'deleteCategory']);
-    
+
 
     Route::get('listReports', [ReportController::class, 'listReports']);
     Route::post('agregarReporte', [ReportController::class, 'sendReports']);

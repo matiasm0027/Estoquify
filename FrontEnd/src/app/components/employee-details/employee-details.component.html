@@ -15,12 +15,13 @@
         <div class="space-x-4">
           <button (click)="mostrarModal()"
             class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 lg:px-4 md:px-2 rounded border border-blue-500 md:ml-2"
-            *ngIf="employeeRole === 'admin'">
+            *ngIf="userRole === '1'">
             Editar
           </button>
-          <button (click)="confirmDelete(employeeDetails)"
+          <button
+            (click)="confirmDelete(employeeDetails[0].id, employeeDetails[0].name + ' ' + employeeDetails[0].last_name)"
             class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 lg:px-4 md:px-2 rounded border border-red-500"
-            *ngIf="employeeRole === 'admin'">
+            *ngIf="userRole === '1'">
             Eliminar
           </button>
           <button (click)="volver()"
@@ -38,122 +39,110 @@
         <tbody>
           <tr>
             <td class="py-2"><strong>Nombre:</strong></td>
-            <td class="py-2">{{ employeeDetails?.name }}</td>
+            <td class="py-2">{{ employeeDetails[0].name }}</td>
           </tr>
           <tr>
             <td class="py-2"><strong>Apellido:</strong></td>
-            <td class="py-2">{{ employeeDetails?.last_name }}</td>
+            <td class="py-2">{{ employeeDetails[0].last_name }}</td>
           </tr>
           <tr>
             <td class="py-2"><strong>Email:</strong></td>
-            <td class="py-2">{{ employeeDetails?.email }}</td>
+            <td class="py-2">{{ employeeDetails[0].email }}</td>
           </tr>
           <tr>
             <td class="py-2"><strong>Teléfono Móvil:</strong></td>
-            <td class="py-2">{{ employeeDetails?.phone_number }}</td>
+            <td class="py-2">{{ employeeDetails[0].phone_number }}</td>
           </tr>
           <tr>
             <td class="py-2"><strong>Departamento:</strong></td>
-            <td class="py-2">{{ employeeDetails?.department }}</td>
+            <td class="py-2">{{ employeeDetails[0].department?.name }}</td>
           </tr>
           <tr>
             <td class="py-2"><strong>Rol:</strong></td>
-            <td class="py-2">{{ employeeDetails?.role?.charAt(0).toUpperCase() +
-              employeeDetails?.role?.slice(1) }}</td>
+            <td class="py-2">{{ employeeDetails[0].role?.name }}</td>
           </tr>
           <tr>
             <td class="py-2"><strong>Sucursal:</strong></td>
-            <td class="py-2">{{ employeeDetails?.branch_office }}</td>
+            <td class="py-2">{{ employeeDetails[0].branch_office?.name }}</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Tabla para mostrar los materiales asignados al empleado -->
-    <div class="bg-white p-6 rounded shadow" *ngIf="employeeDetails">
+    <div class="bg-white p-6 rounded shadow" *ngIf="employeeMaterial">
       <h2 class="text-2xl font-bold my-4">Materiales Asignados</h2>
-      <!-- Iterar sobre las categorías y sus materiales asignados -->
-      <div *ngIf="employeeDetails.materials && employeeDetails.materials.length > 0" class="grid grid-cols-3 gap-4">
-        <ng-container *ngFor="let material of employeeDetails.materials">
+      <div *ngIf="employeeMaterial" class="grid grid-cols-3 gap-4">
+        <ng-container *ngFor="let material of employeeMaterial">
           <div class="bg-white p-4 rounded shadow col-span-1">
-            <p><strong>Categoría:</strong> {{ material.category_name }}</p>
-            <p><strong>Material:</strong> {{ material.material_name ? material.material_name : 'Material no asignado' }}
-            </p>
-            <button (click)="desasignarMaterial(employeeDetails.employee_id, material.material_id)"
-              class="bg-white hover:bg-red-200 text-red-500 py-1 px-3 rounded border mt-2"
-              *ngIf="employeeRole === 'admin'">
+            <p><strong>Categoria:</strong> {{ material.category[0].name }}</p>
+            <p><strong>Material:</strong> {{ material.name }}</p>
+            <button (click)="desasignarMaterial(employeeDetails[0].id, material.id)"
+              class="bg-white hover:bg-red-200 text-red-500 py-1 px-3 rounded border mt-2" *ngIf="userRole === '1'">
               Desasignar
             </button>
           </div>
         </ng-container>
       </div>
-      <div *ngIf="!employeeDetails.materials || employeeDetails.materials.length === 0">
+      <div *ngIf="employeeMaterial.length === 0">
         <p>No hay materiales asignados.</p>
       </div>
     </div>
 
-
-
-
     <div *ngIf="mostrarModalEditar" class="fixed z-10 inset-0 overflow-y-auto">
       <div class="flex items-center justify-center min-h-screen px-4">
-        <!-- Contenido del modal -->
         <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full">
-          <!-- Encabezado del modal -->
           <div class="px-4 py-2 bg-gray-200">
             <h3 class="text-lg font-bold">Editar Empleado</h3>
           </div>
-          <!-- Cuerpo del modal (aquí va el formulario) -->
           <div class="p-4">
-            <!-- Formulario aquí -->
             <form [formGroup]="formularioEmpleado" (submit)="editarEmpleado()">
               <div class="mb-4">
                 <label for="nombre" class="block text-gray-700">Nombre</label>
-                <input formControlName="nombre" type="text" id="nombre" name="nombre"
-                  class="form-input mt-1 block w-full" placeholder="Ingrese el nombre" required>
+                <input formControlName="name" type="text" id="nombre" name="nombre" class="form-input mt-1 block w-full"
+                  placeholder="Ingrese el nombre" required>
                 <div
-                  *ngIf="formularioEmpleado.get('nombre')?.errors?.['required'] && formularioEmpleado.get('nombre')?.touched"
-                  class="error_form mensaje_error">
+                  *ngIf="formularioEmpleado.get('name')?.errors?.['required'] && formularioEmpleado.get('name')?.touched"
+                  class="text-red-800">
                   This field cannot be empty.
                 </div>
                 <div
-                  *ngIf="formularioEmpleado.get('nombre')?.errors?.['minlength'] && formularioEmpleado.get('nombre')?.touched"
-                  class="error_form mensaje_error">
+                  *ngIf="formularioEmpleado.get('name')?.errors?.['minlength'] && formularioEmpleado.get('name')?.touched"
+                  class="text-red-800">
                   The name must be at least 3 characters.
                 </div>
                 <div
-                  *ngIf="formularioEmpleado.get('nombre')?.errors?.['maxlength'] && formularioEmpleado.get('nombre')?.touched"
-                  class="error_form mensaje_error">
+                  *ngIf="formularioEmpleado.get('name')?.errors?.['maxlength'] && formularioEmpleado.get('name')?.touched"
+                  class="text-red-800">
                   The name cannot be more than 30 characters.
                 </div>
                 <div
-                  *ngIf="formularioEmpleado.get('nombre')?.errors?.['pattern'] && formularioEmpleado.get('nombre')?.touched"
-                  class="error_form mensaje_error">
+                  *ngIf="formularioEmpleado.get('name')?.errors?.['pattern'] && formularioEmpleado.get('name')?.touched"
+                  class="text-red-800">
                   The name can only contain letters.
                 </div>
               </div>
               <div class="mb-4">
                 <label for="apellido" class="block text-gray-700">Apellido</label>
-                <input formControlName="apellido" type="text" id="apellido" name="apellido"
+                <input formControlName="last_name" type="text" id="apellido" name="apellido"
                   class="form-input mt-1 block w-full" placeholder="Ingrese el apellido" required>
                 <div
-                  *ngIf="formularioEmpleado.get('apellido')?.errors?.['required'] && formularioEmpleado.get('apellido')?.touched"
-                  class="error_form mensaje_error">
+                  *ngIf="formularioEmpleado.get('last_name')?.errors?.['required'] && formularioEmpleado.get('last_name')?.touched"
+                  class="text-red-800">
                   This field cannot be empty.
                 </div>
                 <div
-                  *ngIf="formularioEmpleado.get('apellido')?.errors?.['minlength'] && formularioEmpleado.get('nombre')?.touched"
-                  class="error_form mensaje_error">
+                  *ngIf="formularioEmpleado.get('last_name')?.errors?.['minlength'] && formularioEmpleado.get('last_name')?.touched"
+                  class="text-red-800">
                   The last name must be at least 3 characters.
                 </div>
                 <div
-                  *ngIf="formularioEmpleado.get('apellido')?.errors?.['maxlength'] && formularioEmpleado.get('nombre')?.touched"
-                  class="error_form mensaje_error">
+                  *ngIf="formularioEmpleado.get('last_name')?.errors?.['maxlength'] && formularioEmpleado.get('last_name')?.touched"
+                  class="text-red-800">
                   The last name cannot be more than 30 characters.
                 </div>
                 <div
-                  *ngIf="formularioEmpleado.get('apellido')?.errors?.['pattern'] && formularioEmpleado.get('nombre')?.touched"
-                  class="error_form mensaje_error">
+                  *ngIf="formularioEmpleado.get('last_name')?.errors?.['pattern'] && formularioEmpleado.get('last_name')?.touched"
+                  class="text-red-800">
                   The last name can only contain letters.
                 </div>
               </div>
@@ -163,78 +152,77 @@
                   placeholder="Ingrese el correo electrónico" required>
                 <div
                   *ngIf="formularioEmpleado.get('email')?.errors?.['required'] && formularioEmpleado.get('email')?.touched"
-                  class="error_form mensaje_error">
+                  class="text-red-800">
                   This field cannot be empty.
                 </div>
                 <div
                   *ngIf="formularioEmpleado.get('email')?.errors?.['pattern'] && formularioEmpleado.get('email')?.touched"
-                  class="error_form mensaje_error">
+                  class="text-red-800">
                   Invalid email format.
                 </div>
               </div>
               <div class="mb-4">
                 <label for="telefonoMovil" class="block text-gray-700">Teléfono Móvil</label>
-                <input formControlName="telefonoMovil" type="tel" id="telefonoMovil" name="telefonoMovil"
+                <input formControlName="phone_number" type="tel" id="telefonoMovil" name="telefonoMovil"
                   class="form-input mt-1 block w-full" placeholder="Ingrese el teléfono móvil">
                 <div
-                  *ngIf="formularioEmpleado.get('telefonoMovil')?.errors?.['required'] && formularioEmpleado.get('telefonoMovil')?.touched"
-                  class="error_form mensaje_error">
+                  *ngIf="formularioEmpleado.get('phone_number')?.errors?.['required'] && formularioEmpleado.get('phone_number')?.touched"
+                  class="text-red-800">
                   This field cannot be empty.
                 </div>
-                <div *ngIf="formularioEmpleado.get('telefonoMovil')?.errors?.['pattern']"
-                  class="error_form mensaje_error">
+                <div
+                  *ngIf="formularioEmpleado.get('phone_number')?.errors?.['pattern'] && formularioEmpleado.get('phone_number')?.touched"
+                  class="text-red-800">
                   Only numbers are allowed.
                 </div>
               </div>
 
               <div class="mb-4">
                 <label for="departamento" class="block text-gray-700">Departamento</label>
-                <select formControlName="departamento" id="departamento" name="departamento"
-                  class="form-select mt-1 block w-full" required [(ngModel)]="employeeDetails.department_id">
+                <select formControlName="department_id" id="departamento" name="departamento"
+                  class="form-select mt-1 block w-full" required>
                   <ng-container *ngFor="let dept of departamentos">
-                    <option [value]="dept.id" [selected]="dept.name === employeeDetails.department">
+                    <option [value]="dept.id" [selected]="dept.name === employeeDetails[0].department?.name">
                       {{ dept.name }}</option>
                   </ng-container>
                 </select>
                 <div
-                  *ngIf="formularioEmpleado.get('departamento')?.errors?.['required'] && formularioEmpleado.get('departamento')?.touched"
-                  class="error_form mensaje_error">
+                  *ngIf="formularioEmpleado.get('department_id')?.errors?.['required'] && formularioEmpleado.get('department_id')?.touched"
+                  class="text-red-800">
                   Please select a department.
                 </div>
               </div>
 
               <div class="mb-4">
                 <label for="sucursal" class="block text-gray-700">Sucursal</label>
-                <select formControlName="sucursal" id="sucursal" name="sucursal" class="form-select mt-1 block w-full"
-                  required [(ngModel)]="employeeDetails.branch_office_id">
+                <select formControlName="branch_office_id" id="sucursal" name="sucursal"
+                  class="form-select mt-1 block w-full" required>
                   <ng-container *ngFor="let suc of sucursales">
-                    <option [value]="suc.id" [selected]="suc.name === employeeDetails.branch_office">
+                    <option [value]="suc.id" [selected]="suc.name === employeeDetails[0].branch_office?.name">
                       {{ suc.name }}</option>
                   </ng-container>
                 </select>
                 <div
-                  *ngIf="formularioEmpleado.get('sucursal')?.errors?.['required'] && formularioEmpleado.get('sucursal')?.touched"
-                  class="error_form mensaje_error">
+                  *ngIf="formularioEmpleado.get('branch_office_id')?.errors?.['required'] && formularioEmpleado.get('branch_office_id')?.touched"
+                  class="text-red-800">
                   Please select a branch office.
                 </div>
               </div>
 
               <div class="mb-4">
                 <label for="rol" class="block text-gray-700">Rol</label>
-                <select formControlName="rol" id="rol" name="rol" class="form-select mt-1 block w-full" required
-                  [(ngModel)]="employeeDetails.role_id">
+                <select formControlName="role_id" id="rol" name="rol" class="form-select mt-1 block w-full" required>
                   <ng-container *ngFor="let rol of roles">
-                    <option [value]="rol.id" [selected]="rol.name === employeeDetails.role">
+                    <option [value]="rol.id" [selected]="rol.name === employeeDetails[0].role?.name">
                       {{ rol.name }}</option>
                   </ng-container>
                 </select>
                 <div
-                  *ngIf="formularioEmpleado.get('rol')?.errors?.['required'] && formularioEmpleado.get('rol')?.touched"
-                  class="error_form mensaje_error">
+                  *ngIf="formularioEmpleado.get('role_id')?.errors?.['required'] && formularioEmpleado.get('role_id')?.touched"
+                  class="text-red-800">
                   Please select a role.
                 </div>
               </div>
-              <!-- Botones -->
               <div class="flex justify-end">
                 <button type="submit"
                   class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar
@@ -242,12 +230,13 @@
                 <button (click)="cerrarModal()"
                   class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
               </div>
+              <div *ngIf="errorMessage2" class="text-red-800 fade-in-out">{{ errorMessage2 }}</div>
             </form>
           </div>
         </div>
       </div>
     </div>
-    <div *ngIf="successMessage" class="text-green-800 mensaje_exitoso fade-in-out">{{ successMessage }}</div>
-    <div *ngIf="errorMessage" class="text-red-800 mensaje_exitoso">{{ errorMessage }}</div>
+    <div *ngIf="successMessage" class="text-green-800 fade-in-out">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="text-red-800 fade-in-out">{{ errorMessage }}</div>
   </div>
 </div>

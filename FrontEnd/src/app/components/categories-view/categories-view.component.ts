@@ -1,15 +1,15 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Employee } from 'src/app/model/Employee';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
+import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 
 @Component({
   selector: 'app-categories-view',
   templateUrl: './categories-view.component.html',
   styleUrls: ['./categories-view.component.css']
 })
-export class CategoriesViewComponent implements OnInit, OnDestroy{
+export class CategoriesViewComponent implements OnInit{
   categoryForm: FormGroup;
   materials: any[] = [];
   mostrarModalAgregar: boolean = false;
@@ -17,14 +17,13 @@ export class CategoriesViewComponent implements OnInit, OnDestroy{
   categoryID: string = "" ;
   errorMessage!: string;
   successMessage!: string;
-  employeeRole!: string;
-  employeeId!: number;
   cargaDatos: boolean = true;
-
-  private subscriptions: Subscription[] = [];
+  userRole!: any;
+  loggedInUser: Employee | null = null;
 
   constructor(
     private ApiRequestService: ApiRequestService,
+    private authControlService: UsuariosControlService,
     private fb: FormBuilder,
     )
   {
@@ -34,12 +33,11 @@ export class CategoriesViewComponent implements OnInit, OnDestroy{
   }
 
   ngOnInit(): void {
+    this.userRole = this.authControlService.hasRole();
+    this.authControlService.getLoggedUser().subscribe(() => {
+      this.loggedInUser = this.authControlService.getStoredLoggedInUser();
+    });
     this.obtenerCantidadMaterial();
-    this.getLoggedUser();
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   obtenerCantidadMaterial(){
@@ -52,10 +50,8 @@ export class CategoriesViewComponent implements OnInit, OnDestroy{
           activeMaterial: material.active_materials,
           availableMaterial: material.available_materials,
           inactiveMaterial: material.inactive_materials
-
         }));
         this.cargaDatos = false;
-
       }
     );
   }
@@ -67,11 +63,9 @@ export class CategoriesViewComponent implements OnInit, OnDestroy{
         (response: any) => {
           this.cerrarModal();
           this.successMessage = response.message;
-          this.clearMessagesAfterDelay();
         },
         (error: any) => {
           this.errorMessage = error.error.error;
-          this.clearMessagesAfterDelay();
         }
       );
     }
@@ -89,11 +83,9 @@ export class CategoriesViewComponent implements OnInit, OnDestroy{
       (response) => {
         this.successMessage = response.message;
         this.obtenerCantidadMaterial();
-        this.clearMessagesAfterDelay();
       },
       error => {
         this.errorMessage = error.error.error;
-        this.clearMessagesAfterDelay();
       }
     );
   }
@@ -109,11 +101,9 @@ export class CategoriesViewComponent implements OnInit, OnDestroy{
           this.successMessage = response.message;
           this.cerrarModalEdit();
           this.obtenerCantidadMaterial();
-          this.clearMessagesAfterDelay();
         },
         (error: any) => {
           this.errorMessage = error.error.error;
-          this.clearMessagesAfterDelay();
         }
       );
     } else {
@@ -121,14 +111,6 @@ export class CategoriesViewComponent implements OnInit, OnDestroy{
       console.error('Formulario inválido');
     }
   }
-
-  clearMessagesAfterDelay(): void {
-    setTimeout(() => {
-      this.successMessage = '';
-      this.errorMessage = '';
-    }, 2000);
-  }
-
 
   mostrarModal() {
     this.mostrarModalAgregar = true;
@@ -151,28 +133,6 @@ export class CategoriesViewComponent implements OnInit, OnDestroy{
     this.obtenerCantidadMaterial();
     this.categoryForm.reset();
   }
-
-  getLoggedUser(): void {
-    this.ApiRequestService.getLoggedInUser().subscribe(
-      (response: any) => {
-        this.employeeId = response.id;
-        const roleId = response.role_id;
-
-
-        if (roleId === 1) {
-          this.employeeRole = 'admin';
-        } else if (roleId === 2){
-          this.employeeRole = 'manager';
-        }
-        this.cargaDatos = false;
-
-      },
-      error => {
-        console.error('Error when obtaining data from the logged in user:', error);
-      }
-    );
-  }
-
 }
 
 

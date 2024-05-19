@@ -18,6 +18,7 @@ export class UsuariosControlService {
   usuarioSeleccionado: any;
   private numero!: number;
   private loggedInUser!: Employee;
+  private employeeData!: Employee;
 
   constructor(private ApiRequestService: ApiRequestService) {
     //this.checkLocalStorage();
@@ -44,6 +45,18 @@ export class UsuariosControlService {
     return localStorage.getItem('rol');
   }
 
+  cargarRoles() {
+    return this.ApiRequestService.listRoles();
+  }
+
+  cargarDepartamentos() {
+    return this.ApiRequestService.listDepartments();
+  }
+
+  cargarSucursales() {
+    return this.ApiRequestService.listBranchOffices();
+  }
+
   setNumero(valor: number) {
     this.numero = valor;
   }
@@ -55,6 +68,14 @@ export class UsuariosControlService {
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('itsLoged');
+  }
+
+  setEmployeeData(data: Employee) {
+    this.employeeData = data;
+  }
+
+  getEmployeeData(): Employee | null {
+    return this.employeeData;
   }
 }
 

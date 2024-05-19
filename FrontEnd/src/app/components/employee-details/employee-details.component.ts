@@ -1,8 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, ElementRef } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { forkJoin } from 'rxjs';
+import { Employee } from 'src/app/model/Employee';
+import { Material } from 'src/app/model/Material';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
+import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 
 @Component({
   selector: 'app-employee-details',
@@ -10,83 +13,91 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
   styleUrls: ['./employee-details.component.css']
 })
 export class EmployeeDetailsComponent implements OnInit {
-  employeeId!: number;
-  employeeDetails: any = {};
-  departamentos: any[] = [];
-  sucursales: any[] = [];
+  employeeDetails!: Employee[];
+  employeeMaterial: Material[] = [];
+  roles: { id: number; name: string; }[] = [];
+  departamentos: { id: number; name: string; }[] = [];
+  sucursales: { id: number; name: string; }[] = [];
   mostrarModalEditar: boolean = false;
   formularioEmpleado!: FormGroup;
-  employeeRole!:string;
-  roles: any[] = [
-    { id: 1, name: 'Administrador' },
-    { id: 2, name: 'Manager' },
-    { id: 3, name: 'User' }
-  ];
   successMessage!: string;
-  cargaDatos: boolean = true;
+  cargaDatos: boolean = false;
   errorMessage!: string;
-  private subscriptions: Subscription[] = [];
+  errorMessage2!: string;
+  userRole!: any;
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
-    private employeeService: ApiRequestService,
+    private ApiRequestService: ApiRequestService,
+    private authControlService: UsuariosControlService,
     private router: Router,
-  ) {}
-
+  ) { }
 
   ngOnInit(): void {
-    this.getEmployeeIdFromRoute();
-    this.obtenerDepartamento();
-    this.obtenerSucursales();
+    this.userRole = this.authControlService.hasRole();
     this.getEmployeeDetails();
-    this.getLoggedUser();
+    this.cargarOpiones();
   }
 
   initForm() {
     this.formularioEmpleado = this.fb.group({
-      nombre: [this.employeeDetails.name, Validators.required],
-      apellido: [this.employeeDetails.last_name, Validators.required],
-      email: [this.employeeDetails.email, [Validators.required, Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'),]],
-      departamento: [this.employeeDetails.department, Validators.required],
-      sucursal: [this.employeeDetails.branch_office, Validators.required],
-      rol: [this.employeeDetails.role, Validators.required],
-      telefonoMovil: [this.employeeDetails.phone_number, Validators.required]
+      name: [this.employeeDetails[0].name, [Validators.required, Validators.minLength(3), Validators.maxLength(30), Validators.pattern('^[a-zA-Z ]*$')]],
+      last_name: [this.employeeDetails[0].last_name, [Validators.required, Validators.minLength(3), Validators.maxLength(30), Validators.pattern('^[a-zA-Z ]*$')]],
+      email: [this.employeeDetails[0].email, [Validators.required, Validators.email]],
+      phone_number: [this.employeeDetails[0].phone_number, [Validators.required, Validators.pattern('^[0-9]*$')]],
+      department_id: [this.employeeDetails[0].department_id, Validators.required],
+      branch_office_id: [this.employeeDetails[0].branch_office_id, Validators.required],
+      role_id: [this.employeeDetails[0].role_id, Validators.required],
     });
-  }
-
-  getEmployeeIdFromRoute(): void {
-    this.route.params.subscribe(params => {
-      this.employeeId = +params['id'];
-    });
-
   }
 
   getEmployeeDetails(): void {
-    this.getEmployeeIdFromRoute();
-    this.employeeService.getEmployeeDetails(this.employeeId)
-      .subscribe(
-        (employee: any) => {
-          this.employeeDetails = employee;
-          this.cargaDatos = false;
-          this.initForm(); // Initialize form after employee details are fetched
-        },
-        (error: any) => {
-          this.errorMessage = error.error.error;
+    this.route.paramMap.subscribe(params => {
+      const idParam = params.get('id');
+      if (idParam !== null) {
+        const id: number = +idParam;
+        try {
+          this.ApiRequestService.getEmployee(id).subscribe(employee => {
+            this.employeeDetails = [employee];
+            // Obtener los materiales asignados al empleado
+            const material = this.employeeDetails[0].material;
+            // Verificar si se obtuvieron materiales
+            if (material) {
+              // Verificar si 'material' es un array
+              if (Array.isArray(material)) {
+                // Si 'material' es un array, asignarlo directamente a 'employeeMaterial'
+                this.employeeMaterial = material;
+              } else {
+                // Si 'material' no es un array, colocarlo en un array de un solo elemento antes de asignarlo a 'employeeMaterial'
+                this.employeeMaterial = [material];
+              }
+            } else {
+              // Si no se obtuvieron materiales, asignar un array vacío a 'employeeMaterial'
+              this.employeeMaterial = [];
+            }
+            this.cargaDatos = false;
+            this.initForm();
+          },
+            (error: any) => {
+              this.errorMessage = error.error.error;
+            });
+        } catch (error) {
+          console.error('Error al obtener empleados:', error);
         }
-      );
+      } else {
+        this.errorMessage = 'ID del empleado no encontrado.';
+      }
+    });
   }
-
 
   volver() {
     this.router.navigate(['/employees_view']);
   }
 
-
   mostrarModal() {
     this.mostrarModalEditar = true;
   }
-
 
   cerrarModal() {
     this.mostrarModalEditar = false;
@@ -94,118 +105,57 @@ export class EmployeeDetailsComponent implements OnInit {
     this.formularioEmpleado.reset();
   }
 
-
-  editarEmpleado(): void {
-    if (this.formularioEmpleado.valid) {
-        // Obtener el ID del departamento
-        let departamentoId = this.formularioEmpleado.value.departamento;
-        if (!isNaN(parseInt(departamentoId))) {
-            departamentoId = parseInt(departamentoId);
-        } else {
-            const departamentoEncontrado = this.departamentos.find(dept => dept.name === departamentoId);
-            if (departamentoEncontrado) {
-                departamentoId = departamentoEncontrado.id;
-            }
-        }
-
-        // Obtener el ID de la sucursal
-        let sucursalId = this.formularioEmpleado.value.sucursal;
-        if (!isNaN(parseInt(sucursalId))) {
-            sucursalId = parseInt(sucursalId);
-        } else {
-            const sucursalEncontrada = this.sucursales.find(suc => suc.name === sucursalId);
-            if (sucursalEncontrada) {
-                sucursalId = sucursalEncontrada.id;
-            }
-        }
-
-        // Obtener el ID del rol
-        let rolId = this.formularioEmpleado.value.rol;
-        if (!isNaN(parseInt(rolId))) {
-            rolId = parseInt(rolId);
-        } else {
-            const rolEncontrado = this.roles.find(rol => rol.name === rolId);
-            if (rolEncontrado) {
-                rolId = rolEncontrado.id;
-            }
-        }
-
-        const empleadoEditado = {
-            id: this.employeeId,
-            nombre: this.formularioEmpleado.value.nombre,
-            apellido: this.formularioEmpleado.value.apellido,
-            email: this.formularioEmpleado.value.email,
-            departamento: departamentoId,
-            sucursal: sucursalId,
-            rol: rolId,
-            telefonoMovil: this.formularioEmpleado.value.telefonoMovil
-        };
-
-
-        this.employeeService.editEmployee(this.employeeId, empleadoEditado).subscribe(
-          (response: any) => {
-            this.successMessage = response.message;
-            this.cerrarModal();
-            this.getEmployeeDetails();
-          },
-          (error: any) => {
-            console.error('Error al editar empleado:', error);
-          }
-        );
-    } else {
-        console.error('Formulario inválido');
-    }
-
-  }
-
-
-  obtenerDepartamento() {
-    this.employeeService.listDepartments().subscribe(
-      (response: any[]) => {
-        this.departamentos = response;
-        this.cargaDatos = false;
-
-      },
-      error => {
-        this.errorMessage = error.error.error;
-
-      }
-    );
-  }
-
-
-  obtenerSucursales() {
-    this.employeeService.listBranchOffices().subscribe(
-      (response: any[]) => {
-        this.sucursales = response;
-        this.cargaDatos = false;
-
-      },
-      error => {
-        this.errorMessage = error.error.error;
-        console.error(error.error);
-        console.error(error.error.eror);
-
-
-      }
-    );
-  }
-
-
-  confirmDelete(employee: any): void {
-    const confirmacion = confirm(`¿Estás seguro de que quieres eliminar a ${employee.name}?`);
+  confirmDelete(id:number, name:string): void {
+    const confirmacion = confirm(`¿Estás seguro de que quieres eliminar a ${name}?`);
     if (confirmacion) {
       this.router.navigate(['/employees_view']);
-      this.deleteEmployee(employee.employee_id);
-      alert(`El empleado ${employee.name} ha sido eliminado.`);
+      this.deleteEmployee(id);
+      alert(`El empleado ${name} ha sido eliminado.`);
     }
   }
 
+  cargarOpiones() {
+    forkJoin([
+      this.authControlService.cargarRoles(),
+      this.authControlService.cargarDepartamentos(),
+      this.authControlService.cargarSucursales()
+    ]).subscribe(
+      ([roles, departamentos, sucursales]) => {
+        this.roles = roles;
+        this.departamentos = departamentos;
+        this.sucursales = sucursales;
+      },
+      (error) => {
+        console.error('Error al cargar datos:', error);
+      }
+    );
+  }
+
+  editarEmpleado(): void {
+    this.successMessage='';
+    this.errorMessage2='';
+    if (this.formularioEmpleado.valid) {
+      const empleadoEditado = this.formularioEmpleado.value;
+      empleadoEditado.id = this.employeeDetails[0].id;
+      this.ApiRequestService.editEmployee(this.employeeDetails[0].id, empleadoEditado).subscribe(
+        (response: any) => {
+          this.successMessage = response.message;
+          this.cerrarModal();
+          this.getEmployeeDetails();
+        },
+        (error: any) => {
+          this.errorMessage2=error.error.error;
+        }
+      );
+    } else {
+      this.errorMessage2 = 'Formulario inválido. Por favor, complete todos los campos requeridos.';
+    }
+  }
 
   deleteEmployee(id: number): void {
 
     // Llamar al servicio para eliminar al empleado
-    this.employeeService.deleteEmployees(id).subscribe(
+    this.ApiRequestService.deleteEmployees(id).subscribe(
       (response) => {
         // Navegar a la vista de empleados después de eliminar con éxito
       },
@@ -216,12 +166,11 @@ export class EmployeeDetailsComponent implements OnInit {
     );
   }
 
-
-  desasignarMaterial(employeeId: number, materialId: number){
+  desasignarMaterial(employeeId: number, materialId: number) {
     // Lógica para desasignar el material del empleado actualmente asignado
 
     // Llama al servicio para desasignar el material
-    this.employeeService.desasignarMaterial(materialId, employeeId).subscribe(
+    this.ApiRequestService.desasignarMaterial(materialId, employeeId).subscribe(
       (response) => {
         // Actualiza la vista después de desasignar el material
         this.getEmployeeDetails();
@@ -233,39 +182,6 @@ export class EmployeeDetailsComponent implements OnInit {
       }
     );
   }
-
-
-  clearMessagesAfterDelay(): void {
-    setTimeout(() => {
-      this.successMessage = '';
-      //this.errorMessage = '';
-    }, 2000);
-  }
-
-
-  getLoggedUser(): void {
-    this.employeeService.getLoggedInUser().subscribe(
-      (response: any) => {
-
-        const roleId = response.role_id;
-
-
-        if (roleId === 1) {
-          this.employeeRole = 'admin';
-        } else if (roleId === 2){
-          this.employeeRole = 'manager';
-        } else if (roleId===3){
-          this.employeeRole= 'usuario'
-        }
-
-      },
-      error => {
-        this.errorMessage = error.error.error;
-
-      }
-    );
-  }
-
 
   private convertToCsv(data: any): string {
     if (!data || typeof data !== 'object') {
@@ -305,7 +221,7 @@ export class EmployeeDetailsComponent implements OnInit {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const fileName = `${this.employeeDetails.name}_${this.employeeDetails.last_name}.csv`;
+    const fileName = `${this.employeeDetails[0].name}_${this.employeeDetails[0].last_name}.csv`;
 
     a.download = fileName;
     document.body.appendChild(a);

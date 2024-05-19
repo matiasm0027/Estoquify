@@ -1,5 +1,6 @@
 import { BranchOffice } from "./BranchOffice";
 import { Department } from "./Department";
+import { Material } from "./Material";
 import { Role } from "./Role";
 
 export interface Employee {
@@ -12,8 +13,9 @@ export interface Employee {
   department_id: number;
   role_id: number;
   branch_office_id: number;
-  department?: Department; 
-  role?: Role; 
-  branch_office?: BranchOffice; 
+  department?: Department;
+  role?: Role;
+  branch_office?: BranchOffice;
+  material?: Material;
   fullname?: string;
 }

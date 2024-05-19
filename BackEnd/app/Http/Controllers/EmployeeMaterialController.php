@@ -16,43 +16,19 @@ use Illuminate\Http\Exceptions\ThrottleRequestsException;
 class EmployeeMaterialController extends Controller
 {
 
-    public function employeeInfoAssignments($id)
+    public function getEmployee($id)
     {
-        try{
-        // Obtener el empleado específico con los materiales asignados activos
-        $employee = Employee::with(['role', 'department', 'branchOffice', 'material' => function ($query) {
-        }])->find($id);
-
-        if (!$employee) {
-            return response()->json(['message' => 'Empleado no encontrado'], 404);
+        try {
+            $employee = Employee::with(['role', 'department', 'branchOffice', 'material' => function ($query) {
+                $query->with('category');
+            }])->find($id);
+            if (!$employee) {
+                return response()->json(['message' => 'Empleado no encontrado'], 404);
+            }
+            return response()->json($employee);
+        } catch (ThrottleRequestsException $e) {
+            return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
         }
-
-        $assignments = [
-            'employee_id' => $employee->id,
-            'name' => $employee->name,
-            'last_name' => $employee->last_name,
-            'email' => $employee->email,
-            'phone_number' => $employee->phone_number,
-            'role' => $employee->role ? $employee->role->name : null,
-            'department' => $employee->department ? $employee->department->name : null,
-            'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
-            'role_id' => $employee->role ? $employee->role->id : null,
-            'department_id' => $employee->department ? $employee->department->id : null,
-            'branch_office_id' => $employee->branchOffice ? $employee->branchOffice->id : null,
-            'materials' => $employee->material->map(function ($material){
-            $material->wherePivot('state', 'active'); 
-            $categoryName = $material->category->first()->name ?? null;
-                return [
-                    'category_name' => $categoryName,
-                    'material_id' => $material->id,
-                    'material_name' => $material->name,
-                ];
-            }),
-        ];
-        return response()->json($assignments);
-    } catch (ThrottleRequestsException $e) {
-        return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
-    }
     }
 
     public function materialAssignedEmployees($materialId)
@@ -70,7 +46,7 @@ class EmployeeMaterialController extends Controller
             'material_name' => $material->name,
             'category_name' => $material->category->isNotEmpty() ? $material->category->first()->name : null,
             $category_id = $material->category->isNotEmpty() ? $material->category->first()->id : null,
-            'assigned_employees' => $material->employee->isEmpty() ? 
+            'assigned_employees' => $material->employee->isEmpty() ?
                 $this->getAllEmployeesInBranch($material->branch_office_id, $category_id) :
                 $material->employee->map(function ($employee) {
                     return [
@@ -103,7 +79,7 @@ class EmployeeMaterialController extends Controller
 
 
     // Obtener todos los empleados en la sucursal especificada
-    
+
     $allEmployees = Employee::whereIn('id', $assignedEmployeeIds) // Filtrar por IDs de empleados
     ->where('branch_office_id', $branchOfficeId) // Filtrar por ID de sucursal
     ->get();
@@ -133,7 +109,7 @@ class EmployeeMaterialController extends Controller
             if (!$user) {
                 return response()->json(['error' => 'Usuario no autenticado'], 401);
             }
-    
+
             // Verificar si el usuario tiene el rol permitido
             $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
             // Validar el ID del empleado
@@ -169,7 +145,7 @@ class EmployeeMaterialController extends Controller
             if (!$user) {
                 return response()->json(['error' => 'Usuario no autenticado'], 401);
             }
-    
+
             // Verificar si el usuario tiene el rol permitido
             $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
             // Validar el ID del empleado

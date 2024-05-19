@@ -1,5 +1,22 @@
-.mensaje_exitoso {
-    color: green;
+.box-fl{
+  width: calc(100%);
+
+}
+
+.fade-in-out {
+  animation: fadeInOut 2s ease forwards;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 .ng-select {

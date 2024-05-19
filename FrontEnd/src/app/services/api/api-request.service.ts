@@ -28,6 +28,10 @@ export class ApiRequestService {
     return this.http.get<Employee[]>(`${this.apiUrl}/auth/listEmployees`);
   }
 
+  getEmployee(id: number): Observable<Employee> {
+    return this.http.get<Employee>(`${this.apiUrl}/auth/getEmployee/${id}`);
+  }
+
   refresh(): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/refresh`, {});
   }
@@ -35,7 +39,7 @@ export class ApiRequestService {
   addEmployee(employeeData: Employee): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/addEmployee`, employeeData);
   }
-  
+
   editEmployee(id: any, employeeData: any): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/auth/editEmployee/${id}`, employeeData);
   }
@@ -66,10 +70,6 @@ export class ApiRequestService {
 
   changePassword(newPassword: string, confirmPassword: string): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/auth/changePassword`, { newPassword, confirmPassword });
-  }
-
-  getEmployeeDetails(employeeId: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/auth/employeeInfoAssignments/${employeeId}`);
   }
 
   getCategoriaDetails(categoryId: number): Observable<any> {

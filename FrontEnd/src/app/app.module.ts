@@ -24,7 +24,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { ReportesHistoryComponent } from './components/reportes-history/reportes-history.component';
 import { PasswordStrengthDirective } from './directivas/passwordRules/password-strength.directive';
-
+import { UsuariosControlService } from './services/usuarios/usuarios-control.service';
 
 @NgModule({
   declarations: [
@@ -42,8 +42,7 @@ import { PasswordStrengthDirective } from './directivas/passwordRules/password-s
     MaterialDetailsComponent,
     ReportesViewComponent,
     ReportesHistoryComponent,
-    PasswordStrengthDirective
-    
+    PasswordStrengthDirective,
   ],
   imports: [
     BrowserModule,
@@ -60,6 +59,7 @@ import { PasswordStrengthDirective } from './directivas/passwordRules/password-s
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     ApiRequestService,
+    UsuariosControlService
   ],
   bootstrap: [AppComponent]
 })

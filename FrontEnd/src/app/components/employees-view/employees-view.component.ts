@@ -3,18 +3,20 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { Employee } from '../../model/Employee';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-employees-view',
   templateUrl: './employees-view.component.html',
   styleUrls: ['./employees-view.component.css']
 })
+
 export class EmployeesViewComponent implements OnInit {
   page: number = 1;
 
   employees!: Employee[];
-  roles: { id: number; name: string; }[] = []; 
-  departamentos: { id: number; name: string; }[] = []; 
+  roles: { id: number; name: string; }[] = [];
+  departamentos: { id: number; name: string; }[] = [];
   sucursales: { id: number; name: string; }[] = [];
   empleadosFiltrados: any[] = [];
 
@@ -35,17 +37,19 @@ export class EmployeesViewComponent implements OnInit {
   ];
 
   formularioEmpleado: FormGroup;
-  
+
   employeeId!: number;
   cargaDatos: boolean = true;
-  
-  errorMessage!: string;
-  successMessage!: string;
-  
+
+  errorMessage: string = '';
+  errorMessage2: string = '';
+  successMessage: string = '';
+
   constructor(
     private fb: FormBuilder,
     private ApiRequestService: ApiRequestService,
-    private authControlService: UsuariosControlService
+    private authControlService: UsuariosControlService,
+    private router: Router
   ) {
     this.formularioEmpleado = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30), Validators.pattern('^[a-zA-Z]+$')]],
@@ -75,8 +79,14 @@ export class EmployeesViewComponent implements OnInit {
         empleado.last_name.toLowerCase().includes(searchTermTrimmed.toLowerCase()) ||
         empleado.email.toLowerCase().includes(searchTermTrimmed.toLowerCase())
       );
+      this.successMessage = "";
+      // Verificar si no se encontraron empleados
+      if (this.empleadosFiltrados.length === 0) {
+        // Mostrar mensaje en pantalla
+        this.successMessage = "No hay ningún empleado con esos datos.";
+      }
     }
-  }   
+  }
 
   opcionSeleccionada(opcion: string): boolean {
     return this.opcionesFiltro.find(item => item.valor === opcion)?.seleccionado ?? false;
@@ -104,11 +114,11 @@ export class EmployeesViewComponent implements OnInit {
     this.empleadosFiltrados = this.employees.filter(empleado => {
       const filtroDepartamentoSeleccionado = this.opcionSeleccionada('departamento');
       const filtroSucursalSeleccionado = this.opcionSeleccionada('sucursal');
-  
+
       if (filtroDepartamentoSeleccionado && filtroSucursalSeleccionado) {
         return empleado.department && empleado.branch_office &&
-               empleado.department.id === Number(this.filtroDepartamento) &&
-               empleado.branch_office.id === Number(this.filtroSucursal);
+          empleado.department.id === Number(this.filtroDepartamento) &&
+          empleado.branch_office.id === Number(this.filtroSucursal);
       } else if (filtroDepartamentoSeleccionado) {
         return empleado.department && empleado.department.id === Number(this.filtroDepartamento);
       } else if (filtroSucursalSeleccionado) {
@@ -118,7 +128,11 @@ export class EmployeesViewComponent implements OnInit {
       }
     });
   }
-  
+
+  viewDetails(employee: number) {
+    this.router.navigate(['/employees_details', employee]);
+  }
+
   obtenerEmpleados() {
     try {
       this.ApiRequestService.getEmployees().subscribe(employees => {
@@ -126,7 +140,7 @@ export class EmployeesViewComponent implements OnInit {
         this.obtenerDepartamentosUnicos();
         this.obtenerSucursalesUnicas();
         this.obtenerRolesUnicos();
-        this.aplicarFiltro(); // Llamar al método de filtrado después de obtener los empleados
+        this.aplicarFiltro();
         this.cargaDatos = false;
       });
     } catch (error) {
@@ -143,7 +157,7 @@ export class EmployeesViewComponent implements OnInit {
     });
     this.roles = Array.from(rolesMap, ([id, name]) => ({ id, name }));
   }
-  
+
   obtenerDepartamentosUnicos() {
     const departamentosMap = new Map<number, string>();
     this.employees.forEach(empleado => {
@@ -153,7 +167,7 @@ export class EmployeesViewComponent implements OnInit {
     });
     this.departamentos = Array.from(departamentosMap, ([id, name]) => ({ id, name }));
   }
-  
+
   obtenerSucursalesUnicas() {
     const sucursalesMap = new Map<number, string>();
     this.employees.forEach(empleado => {
@@ -163,11 +177,12 @@ export class EmployeesViewComponent implements OnInit {
     });
     this.sucursales = Array.from(sucursalesMap, ([id, name]) => ({ id, name }));
   }
-  
+
   agregarEmpleado(): void {
+    this.errorMessage2 = "";
+    this.successMessage = "";
     if (this.formularioEmpleado.valid) {
       const nuevoEmpleado: Employee = this.formularioEmpleado.value;
-      console.log(nuevoEmpleado)
       try {
         this.ApiRequestService.addEmployee(nuevoEmpleado).subscribe(
           (response: any) => {
@@ -175,16 +190,19 @@ export class EmployeesViewComponent implements OnInit {
             this.cerrarModal();
           },
           (error: any) => {
-            this.errorMessage = error.error.error;
+            this.errorMessage2 = error.error.error;
+            // No realizar ninguna acción adicional en caso de error
           }
         );
       } catch (error) {
-        console.error('Error al agregar empleado:', error);
+        this.errorMessage2 = 'Error al agregar empleado:', error;
+        // No realizar ninguna acción adicional en caso de error
       }
     } else {
-      console.error('Formulario inválido. Por favor, complete todos los campos requeridos.');
+      this.errorMessage2 = 'Formulario inválido. Por favor, complete todos los campos requeridos.';
     }
-  }
+}
+
 
   private convertToCsv(data: any[]): string {
     if (!Array.isArray(data) || data.length === 0) {

@@ -238,19 +238,8 @@ class EmployeesController extends Controller
             $employees = Employee::with('department', 'branchOffice', 'role')
                 ->where('id', '!=', $user)
                 ->orderBy('name')
-                ->orderBy('last_name') // Excluir al usuario actual
-                //->select('id', 'name', 'last_name', 'email', 'department_id', 'branch_office_id')
+                ->orderBy('last_name')
                 ->get();
-                // ->map(function ($employee) {
-                //     return [
-                //         'id' => $employee->id,
-                //         'name' => $employee->name,
-                //         'last_name' => $employee->last_name,
-                //         'email' => $employee->email,
-                //         'department' => $employee->department ? $employee->department->name : null,
-                //         'branch_office' => $employee->branchOffice ? $employee->branchOffice->name : null,
-                //     ];
-                // });
 
             return response()->json($employees);
         } catch (ThrottleRequestsException $e) {
@@ -264,7 +253,6 @@ class EmployeesController extends Controller
         try {
             // Verificar si el usuario está autenticado
             $user = $request->user();
-            //dd($user->role_id);
             if (!$user) {
                 return response()->json(['error' => 'Usuario no autenticado'], 401);
             }
@@ -276,7 +264,7 @@ class EmployeesController extends Controller
             $validatedData = $request->validate([
                 'name' => 'required',
                 'last_name' => 'required',
-                'email' => 'required',
+                'email' => 'required|email',
                 'phone_number' => 'required',
                 'password' => 'required',
                 'department_id' => 'required',
@@ -284,6 +272,10 @@ class EmployeesController extends Controller
                 'branch_office_id' => 'required',
             ]);
 
+            // Verificar si el correo electrónico ya está en uso
+            if (Employee::where('email', $validatedData['email'])->exists()) {
+                return response()->json(['error' => 'Email is already in use. Please enter a different email.'], 400);
+            }
 
             // Crear un nuevo objeto Employee y asignar los valores
             $employee = new Employee();
@@ -302,61 +294,66 @@ class EmployeesController extends Controller
             // Devolver una respuesta de éxito
             return response()->json(['message' => 'Empleado añadido con éxito'], 201);
         } catch (\Exception $e) {
-            // Capturar y manejar cualquier excepción que pueda ocurrir
+            // Capturar y manejar cualquier otra excepción que pueda ocurrir
             return response()->json(['error' => 'Error al agregar empleado: ' . $e->getMessage()], 500);
         }
     }
 
     public function editEmployee(Request $request, $id)
-    {
-        try {
-            // Verificar si el usuario está autenticado
-            $user = $request->user();
-            //dd($user->role_id);
-            if (!$user) {
-                return response()->json(['error' => 'Usuario no autenticado'], 401);
-            }
-
-            // Verificar si el usuario tiene el rol permitido para editar empleados (rol '1' para administrador)
-            $this->checkUserRole(['1']);
-
-            // Validar los datos de entrada del formulario utilizando validate
-            $validatedData = $request->validate([
-                'nombre' => 'required',
-                'apellido' => 'required',
-                'email' => 'required|email',
-                'departamento' => 'required',
-                'sucursal' => 'required',
-                'rol' => 'required',
-                'telefonoMovil' => 'required',
-            ]);
-
-            // Buscar al empleado por ID
-            $employee = Employee::find($id);
-
-            if (!$employee) {
-                return response()->json(['error' => 'Empleado no encontrado'], 404);
-            }
-
-            // Actualizar los datos del empleado con los valores validados
-            $employee->name = $validatedData['nombre'];
-            $employee->last_name = $validatedData['apellido'];
-            $employee->email = $validatedData['email'];
-            $employee->department_id = $validatedData['departamento'];
-            $employee->branch_office_id = $validatedData['sucursal'];
-            $employee->role_id = $validatedData['rol'];
-            $employee->phone_number = $validatedData['telefonoMovil'];
-
-            // Guardar los cambios en la base de datos
-            $employee->save();
-
-            // Devolver una respuesta de éxito
-            return response()->json(['message' => 'Empleado editado con éxito'], 200);
-        } catch (\Exception $e) {
-            // Capturar y manejar cualquier excepción que pueda ocurrir
-            return response()->json(['error' => 'Error al editar empleado: ' . $e->getMessage()], 500);
+{
+    try {
+        // Verificar si el usuario está autenticado
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['error' => 'Usuario no autenticado'], 401);
         }
+
+        // Verificar si el usuario tiene el rol permitido para editar empleados (rol '1' para administrador)
+        $this->checkUserRole(['1']);
+
+        // Validar los datos de entrada del formulario utilizando validate
+        $validatedData = $request->validate([
+            'name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required|email',
+            'phone_number' => 'required',
+            'department_id' => 'required',
+            'role_id' => 'required',
+            'branch_office_id' => 'required',
+        ]);
+
+        // Buscar al empleado por ID
+        $employee = Employee::find($id);
+
+        if (!$employee) {
+            return response()->json(['error' => 'Empleado no encontrado'], 404);
+        }
+
+        // Verificar si el correo electrónico ya está en uso por otro empleado
+        if ($validatedData['email'] !== $employee->email && Employee::where('email', $validatedData['email'])->exists()) {
+            return response()->json(['error' => 'Email is already in use. Please enter a different email.'], 400);
+        }
+
+        // Actualizar los datos del empleado con los valores validados
+        $employee->name = $validatedData['name'];
+        $employee->last_name = $validatedData['last_name'];
+        $employee->email = $validatedData['email'];
+        $employee->department_id = $validatedData['department_id'];
+        $employee->branch_office_id = $validatedData['branch_office_id'];
+        $employee->role_id = $validatedData['role_id'];
+        $employee->phone_number = $validatedData['phone_number'];
+
+        // Guardar los cambios en la base de datos
+        $employee->save();
+
+        // Devolver una respuesta de éxito
+        return response()->json(['message' => 'Empleado editado con éxito'], 200);
+    } catch (\Exception $e) {
+        // Capturar y manejar cualquier excepción que pueda ocurrir
+        return response()->json(['error' => 'Error al editar empleado: ' . $e->getMessage()], 500);
     }
+}
+
 
     public function deleteEmployee(Request $request, $id)
     {

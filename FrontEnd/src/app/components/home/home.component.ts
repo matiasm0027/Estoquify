@@ -11,7 +11,7 @@ import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-contr
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  
+
   loggedInUser: Employee | null = null; // Inicializar con un valor nulo
   employeeRole!: string;
   employee!: any;
@@ -24,10 +24,8 @@ export class HomeComponent implements OnInit {
 
   constructor(private ApiRequestService: ApiRequestService, private authControlService: UsuariosControlService) { }
 
-
   ngOnInit(): void {
     this.userRole = this.authControlService.hasRole();
-    console.log(this.userRole)
     this.authControlService.getLoggedUser().subscribe(() => {
       this.loggedInUser = this.authControlService.getStoredLoggedInUser();
     });
