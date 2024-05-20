@@ -442,8 +442,19 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
 
   agregarEmpleado() {
     if (this.formularioEmpleado.valid) {
-      const nuevoEmpleado = this.formularioEmpleado.value;
-      this.apiRequestService.addEmployee(nuevoEmpleado).subscribe(
+      const empleado: Employee = {
+        name: this.formularioEmpleado.value.nombre,
+        last_name: this.formularioEmpleado.value.apellido,
+        email: this.formularioEmpleado.value.email,
+        password: this.formularioEmpleado.value.password,
+        department_id: this.formularioEmpleado.value.departamento,
+        branch_office_id: this.formularioEmpleado.value.sucursal,
+        role_id: this.formularioEmpleado.value.rol,
+        phone_number: this.formularioEmpleado.value.telefonoMovil,
+        id: 0
+      };
+
+      this.apiRequestService.addEmployee(empleado).subscribe(
         (response: any) => {
           this.cerrarModal_Agregar();
 
