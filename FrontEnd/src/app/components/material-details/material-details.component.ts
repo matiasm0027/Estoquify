@@ -33,6 +33,7 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
   employeeId!:number;
   employeeRole!:string;
   cargaDatos: boolean = true;
+  categoryName!: string;
 
   private subscriptions: Subscription[] = [];
 
@@ -51,7 +52,7 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
     this.obtenerDepartamento();
     this.obtenerSucursales();
     this.getMaterialDetails();
-    this.getCategoriaID();
+    //this.getCategoriaID();
     this.obtenerAtributos();
     this.getLoggedUser();
     this.obtenerEmpleadoAsignado(this.materialId);
@@ -61,9 +62,9 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  getCategoriaID(){
-    this.categoria_id = this.controlUsuario.getNumero();
-  }
+  // getCategoriaID(){
+  //   this.categoria_id = this.controlUsuario.getNumero();
+  // }
 
   initForm() {
     const formControls: { [key: string]: any } = {
@@ -97,6 +98,10 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
   getMaterialIdFromRoute(): void {
     this.route.params.subscribe(params => {
       this.materialId = +params['id'];
+    });
+    this.route.queryParams.subscribe(params => {
+      this.categoryName = params['categoryName'];
+      this.cargaDatos = false;
     });
   }
 
@@ -188,7 +193,7 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
 
   obtenerDepartamento() {
     this.materialService.listDepartments().subscribe(
-      (response: any[]) => {
+      (response: any) => {
         this.departamentos = response;
         this.cargaDatos = false;
       },
@@ -200,8 +205,8 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
 
   obtenerSucursales() {
     this.materialService.listBranchOffices().subscribe(
-      (response: any[]) => {
-        this.sucursales = response;          
+      (response: any) => {
+        this.sucursales = response;
         this.cargaDatos = false;
       },
       error => {
@@ -215,7 +220,7 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
     this.cargaDatos = false;
 
     return sucursal ? sucursal.name : 'N/A';
-    
+
   }
 
   confirmDelete(material: any): void {
@@ -370,34 +375,34 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  
+
 
   downloadPdf(): void {
     if (!this.materialDetails || !this.materialDetails.material || !this.materialDetails.material.attribute || this.materialDetails.material.attribute.length === 0) {
       console.error('Los datos de la tabla no son válidos o están vacíos.');
       return;
     }
-  
+
     const material = this.materialDetails.material;
     const attributes = this.materialDetails.material.attribute.map((attribute: any) => `${attribute.name} - ${attribute.pivot.value}`).join('; ');
-    
+
     const doc = new jsPDF();
-  
+
     // Encabezado
     doc.text('Lista de Materiales', 10, 10);
-  
+
     // Datos del material
     const materialData = [
       ['ID', 'Nombre', 'Fecha Alta', 'Fecha Baja', 'Atributos', 'Sucursal', 'Estado'],
       [material.id, material.name, material.high_date, material.low_date ?? 'N/D', attributes, this.getNombreSucursal(material.branch_office_id), material.state]
     ];
-  
+
     // Agregar tabla al PDF
     (doc as any).autoTable({
       head: materialData.slice(0, 1), // Solo la fila de encabezado
       body: materialData.slice(1) // Resto de las filas de datos
     });
-  
+
     // Guardar el PDF
     doc.save(`${material.name}.pdf`);
   }

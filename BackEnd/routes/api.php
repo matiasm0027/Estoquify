@@ -38,7 +38,7 @@ Route::group([
     Route::post('addEmployee', [EmployeesController::class, 'addEmployee']);
     Route::put('editEmployee/{id}', [EmployeesController::class, 'editEmployee']);
     Route::put('changePassword', [EmployeesController::class, 'changePassword']);
-    Route::delete('deleteEmployee/{id}', [EmployeesController::class, 'deleteEmployee']);
+    Route::delete('deleteEmployees/{id}', [EmployeesController::class, 'deleteEmployees']);
     Route::get('listEmployeeMaterial/{id}', [EmployeesController::class, 'listEmployeeMaterial']);
     Route::post('resetPasswordRequest', [EmployeesController::class, 'resetPasswordRequest']);
     Route::post('resetPassword', [EmployeesController::class, 'resetPassword']);
@@ -54,7 +54,7 @@ Route::group([
     Route::get('listAtributos', [AttributeController::class, 'listAtributos']);
     Route::get('listRoles', [RoleController::class, 'listRoles']);
 
-    Route::get('categoryInfoAssignments/{id}', [CategoriaMaterialController::class, 'categoryInfoAssignments']);
+    Route::get('categoryInfoAssignments/{id}', [CategoryController::class, 'categoryInfoAssignments']);
     Route::get('categoryMaterialInfo', [CategoryController::class, 'categoryMaterialInfo']);
     Route::post('addCategory', [CategoryController::class, 'addCategory']);
     Route::put('editCategory/{id}', [CategoryController::class, 'editCategory']);

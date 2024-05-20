@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Material;
+use App\Models\EmployeeMaterial;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
@@ -16,35 +17,51 @@ class CategoryController extends Controller
 
     public function categoryMaterialInfo()
 {
-    try{
-    // Obtener todas las categorías con sus materiales asociados y atributos
-    $categories = Category::select([
-            'categories.id',
-            'categories.name',
-            DB::raw('(SELECT COUNT(DISTINCT(materials.id)) FROM materials 
-                      JOIN attribute_category_material ON materials.id = attribute_category_material.material_id 
-                      WHERE attribute_category_material.category_id = categories.id) as total_materials'),
-            DB::raw('(SELECT COUNT(DISTINCT(materials.id)) FROM materials
-                      JOIN attribute_category_material ON materials.id = attribute_category_material.material_id 
-                      WHERE attribute_category_material.category_id = categories.id AND materials.state = "active") as active_materials'),
-            DB::raw('(SELECT COUNT(DISTINCT(materials.id)) FROM materials
-                      JOIN attribute_category_material ON materials.id = attribute_category_material.material_id 
-                      WHERE attribute_category_material.category_id = categories.id AND materials.state = "available") as available_materials'),
-            DB::raw('(SELECT COUNT(DISTINCT(materials.id)) FROM materials
-                      JOIN attribute_category_material ON materials.id = attribute_category_material.material_id 
-                      WHERE attribute_category_material.category_id = categories.id AND materials.state = "inactive") as inactive_materials'),
-        ])
-        ->get();
+    try {
+        // Obtener todas las categorías con sus materiales y atributos
+        $categories = Category::with(['attributeCategoryMaterials.attribute', 'attributeCategoryMaterials.material.branchOffice'])->get();
 
-    return response()->json($categories);
-} catch (ThrottleRequestsException $e) {
-    return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
+        $result = $categories->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'name' => $category->name,
+                'attributeCategoryMaterials' => $category->attributeCategoryMaterials->map(function ($attributeCategoryMaterial) {
+                    return [
+                        'id' => $attributeCategoryMaterial->id,
+                        'material_id' => $attributeCategoryMaterial->material_id,
+                        'attribute_id' => $attributeCategoryMaterial->attribute_id,
+                        'category_id' => $attributeCategoryMaterial->category_id,
+                        'value' => $attributeCategoryMaterial->value,
+                        'attribute' => [
+                            'id' => $attributeCategoryMaterial->attribute->id,
+                            'name' => $attributeCategoryMaterial->attribute->name,
+                        ],
+                        'category' => $attributeCategoryMaterial->category,
+                        'material' => [
+                            'id' => $attributeCategoryMaterial->material->id,
+                            'name' => $attributeCategoryMaterial->material->name,
+                            'low_date' => $attributeCategoryMaterial->material->low_date,
+                            'high_date' => $attributeCategoryMaterial->material->high_date,
+                            'state' => $attributeCategoryMaterial->material->state,
+                            'branch_office_id' => $attributeCategoryMaterial->material->branch_office_id,
+                            'attributes' => $attributeCategoryMaterial->material->attributeCategoryMaterials->map(function ($materialAttribute) {
+                                return [
+                                    'id' => $materialAttribute->attribute->id,
+                                    'name' => $materialAttribute->attribute->name,
+                                    'value' => $materialAttribute->value,
+                                ];
+                            }),
+                        ],
+                    ];
+                }),
+            ];
+        });
+
+        return response()->json($result);
+    } catch (ThrottleRequestsException $e) {
+        return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
+    }
 }
-}
-
-
-
-
 
 
     public function addCategory(Request $request)
@@ -148,6 +165,53 @@ class CategoryController extends Controller
             return response()->json(['error' => 'Error interno del servidor'], 500);
         }
     }
+
+    public function categoryInfoAssignments($id)
+{
+    try {
+        // Buscar la categoría por su ID junto con los materiales asociados y los atributos
+        $category = Category::with(['material'])->find($id);
+
+        if (!$category) {
+            return response()->json(['error' => 'Categoría no encontrada'], 404);
+        }
+
+        foreach ($category->material as $material) {
+            // Verificar si el material no tiene un registro en la tabla pivot employee_material
+            $employeeMaterial = EmployeeMaterial::where('material_id', $material->id)->first();
+            if (!$employeeMaterial && $material->state == 'active' && $material->low_date === null) {
+                // Cambiar el estado del material a "disponible"
+                $material->state = 'available';
+                $material->save();
+            } else if ($employeeMaterial && $material->state == 'available') {
+                $material->state = 'active';
+                $material->save();
+            } else if ($material->low_date !== null) {
+                $material->state = 'inactive';
+                $material->save();
+            }
+        }
+
+        $materials = [];
+        $uniqueMaterials = $category->material->unique('id');
+        foreach ($uniqueMaterials as $material) {
+            $materialData = [
+                'id' => $material->id,
+                'name' => $material->name,
+                'low_date' => $material->low_date,
+                'high_date' => $material->high_date,
+                'state' => $material->state,
+                'branch_office_id' => $material->branch_office_id,
+            ];
+            $materials[] = $materialData;
+        }
+        return response()->json($materials);
+    } catch (ThrottleRequestsException $e) {
+        return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
+    }
+}
+
+
 
     protected function checkUserRole($allowedRoles)
     {

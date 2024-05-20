@@ -1,64 +1,70 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
-import { Subscription } from 'rxjs';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
-
-
+import { Material } from 'src/app/model/Material';
+import { Attribute } from 'src/app/model/Attribute';
+import { BranchOffice } from 'src/app/model/BranchOffice';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-category-details',
   templateUrl: './category-details.component.html',
   styleUrls: ['./category-details.component.css']
 })
-export class CategoryDetailsComponent implements OnInit, OnDestroy {
+
+export class CategoryDetailsComponent implements OnInit {
   page: number = 1;
   categoryId!: number;
-  categoryDetails: any = {};
+
   mostrarModalAgregar: boolean = false;
   mostrarModalFiltros: boolean = false;
-  sucursales: any[] = [];
-  atributos: any[] = [];
+
+  roles: { id: number; name: string; }[] = [];
+  departamentos: { id: number; name: string; }[] = [];
+  sucursales: { id: number; name: string; }[] = [];  atributos: Attribute[] | null = null;
+  atributosAdicionales: any[] = [];
+  materialData: Material[] = [];
+  materialFiltrados: any[] = [];
+
   formularioMaterial!: FormGroup;
-  categories: any[] = [];
+
   fechaInicio: string = '';
   fechaFin: string = '';
   filtroEstado: string = '';
   filtroSucursal: string = '';
-  detallesMaterial: any = {};
-  atributosAdicionales: any[] = [];
-  employeeId!: number;
-  employeeRole!: string;
   searchTerm: string = '';
+
+  employeeId!: number;
+  userRole!: any;
+
   errorMessage!: string;
   successMessage!: string;
+
   cargaDatos: boolean = true;
 
-  private subscriptions: Subscription[] = [];
+  categoryName!: string;
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private ApiRequestService: ApiRequestService,
     private router: Router,
-    private controlUsuario: UsuariosControlService
-  ) {}
+    private authControlService: UsuariosControlService
+  ) { }
 
   ngOnInit(): void {
+    this.userRole = this.authControlService.hasRole();
+
+    this.cargarOpciones();
     this.getCategoriaIdFromRoute();
     this.getCategoriaDetails();
-    this.obtenerSucursales();
-    this.obtenerAtributos();
+    this.filtrarMateriales();
+
     this.initForm();
-    this.getLoggedUser();
-
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   initForm() {
@@ -71,80 +77,63 @@ export class CategoryDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  filtrarMateriales() {
-    const uniqueMaterials = this.detallesMaterial.materials.reduce((acc: any[], current: any) => {
-      const found = acc.some((item: any) => item.id === current.id);
-      if (!found) {
-          acc.push(current);
-      }
-      return acc;
-  }, []);
-    if (!this.searchTerm.trim()) {
-      // Si el término de búsqueda está vacío, muestra todos los empleados
-      this.categoryDetails.materials = uniqueMaterials;
-    } else {
-      this.categoryDetails.materials = uniqueMaterials.filter((material: any) =>
-      material.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-    }
-  }
-
-  showOptions: boolean = false;
-
-  toggleOptions() {
-    this.showOptions = !this.showOptions;
-  }
-
-  obtenerSucursales() {
-    this.ApiRequestService.listBranchOffices().subscribe(
-      (response: any[]) => {
-        this.sucursales = response;
-        this.cargaDatos = false;
-      },
-      error => {
-        console.error('Error al obtener sucursales:', error);
+cargarOpciones() {
+    forkJoin([
+    //this.atributos = this.authControlService.getAttributes();
+    this.authControlService.cargarSucursales()
+    ]).subscribe(
+      ([sucursales]) => {
+        this.sucursales = sucursales;
       }
     );
   }
-
-  obtenerAtributos() {
-    this.ApiRequestService.listAtributos().subscribe(
-      (response: any[]) => {
-        this.atributos = response;
-        this.cargaDatos = false;
-      },
-      error => {
-        console.error('Error al obtener sucursales:', error);
-      }
-    );
-  }
-
-  getNombreSucursal(branch_office_id: number): string {
-    const sucursal = this.sucursales.find(suc => suc.id === branch_office_id);
-    return sucursal ? sucursal.name : 'N/A';
-  }
-
 
   getCategoriaIdFromRoute(): void {
     this.route.params.subscribe(params => {
-      this.categoryId = +params['id'];
-      this.controlUsuario.setNumero(this.categoryId)
+      this.categoryId = +params['category'];
+      this.cargaDatos = false;
+    });
+    this.route.queryParams.subscribe(params => {
+      this.categoryName = params['categoryName'];
+      this.cargaDatos = false;
     });
   }
 
-  getCategoriaDetails(): void {
-    this.ApiRequestService.getCategoriaDetails(this.categoryId)
-      .subscribe(
-        (categoria: any) => {
-          this.detallesMaterial = categoria; // Convertir el objeto de categoría a una matriz
+  getCategoriaDetails() {
+    try {
+      this.ApiRequestService.getCategoriaDetails(this.categoryId)
+        .subscribe(response => {
+          this.materialData = response;
+          // Llama a otros métodos que necesites para procesar los datos
           this.aplicarFiltro();
-          this.filtrarMateriales();
           this.cargaDatos = false;
-        },
-        (error: any) => {
-          console.error('Error al obtener detalles de la categoría:', error);
-        }
+        });
+    } catch (error) {
+      console.error('Error al obtener empleados:', error);
+    }
+  }
+
+
+  filtrarMateriales() {
+    const searchTermTrimmed = this.searchTerm.trim();
+    if (!searchTermTrimmed) {
+      this.materialFiltrados = this.materialData;
+    } else {
+      this.materialFiltrados = this.materialData.filter((material) =>
+      material.name.toLowerCase().includes(searchTermTrimmed.toLowerCase())
       );
+      this.successMessage = "";
+      // Verificar si no se encontraron empleados
+      if (this.materialFiltrados.length === 0) {
+        // Mostrar mensaje en pantalla
+        this.successMessage = "No hay ningún material con esos datos.";
+      }
+    }
+  }
+
+  getNombreSucursal(branch_office_id: number): string {
+    const sucursal = this.sucursales?.find(suc => suc?.id === branch_office_id);
+    return sucursal ? sucursal.name : 'N/A';
   }
 
   agregarAtributo() {
@@ -162,7 +151,7 @@ export class CategoryDetailsComponent implements OnInit, OnDestroy {
     const controlNameValor = `valor${index + 2}`;
     this.formularioMaterial.removeControl(controlNameAtributo);
     this.formularioMaterial.removeControl(controlNameValor);
-}
+  }
 
   volver() {
     this.router.navigate(['/categories_view']);
@@ -176,7 +165,7 @@ export class CategoryDetailsComponent implements OnInit, OnDestroy {
     this.mostrarModalFiltros = true;
   }
 
-  cerrarModalFiltros(){
+  cerrarModalFiltros() {
     this.mostrarModalFiltros = false;
   }
 
@@ -186,50 +175,43 @@ export class CategoryDetailsComponent implements OnInit, OnDestroy {
     this.formularioMaterial.reset();
   }
 
-  agregarMaterial() {
-    if (this.formularioMaterial.valid) {
-        const nombreBase = this.formularioMaterial.value.nombre;
-        const cantidad = parseInt(this.formularioMaterial.value.cantidad, 10);
-        const sucursal = this.formularioMaterial.value.sucursal;
-        const atributoId = this.formularioMaterial.value.atributo; // Obtener el ID del atributo seleccionado
-        const nombreAtributo = this.atributos.find(atributo => atributo.id === atributoId)?.name;
-        const atributoPrincipal = this.construirAtributoPrincipal(atributoId, nombreAtributo);
-        const atributosExtras = this.construirAtributosExtras();
+    agregarMaterial() {
+      if (this.formularioMaterial.valid) {
+          const nombreBase = this.formularioMaterial.value.nombre;
+          const cantidad = parseInt(this.formularioMaterial.value.cantidad, 10);
+          const sucursal = this.formularioMaterial.value.sucursal;
+          const atributoId = this.formularioMaterial.value.atributo; // Obtener el ID del atributo seleccionado
+          const nombreAtributo = this.atributos?.find(atributo => atributo.id === atributoId)?.name ?? 'Valor predeterminado';
+          const atributoPrincipal = this.construirAtributoPrincipal(atributoId, nombreAtributo);
+          const atributosExtras = this.construirAtributosExtras();
 
-        // Crear múltiples materiales con nombres secuenciales
-        for (let i = 1; i <= cantidad; i++) {
-            //const nombreMaterial = `${nombreBase}_${i.toString().padStart(2, '0')}`;
-            const nuevoMaterial = this.construirObjetoMaterial(nombreBase, sucursal, atributoPrincipal, atributosExtras);
+          // Crear múltiples materiales con nombres secuenciales
+          for (let i = 1; i <= cantidad; i++) {
+              //const nombreMaterial = `${nombreBase}_${i.toString().padStart(2, '0')}`;
+              const nuevoMaterial = this.construirObjetoMaterial(nombreBase, sucursal, atributoPrincipal, atributosExtras);
 
-            // Llamar al servicio para agregar el material
-            this.ApiRequestService.agregarMaterial(nuevoMaterial).subscribe(
-                (response: any) => {
-                    // Cerrar el modal y limpiar el formulario después de agregar cada material
-                    this.successMessage= response.message;
-                    if (i === cantidad) {
-                        this.cerrarModal();
-                    }
-                },
-                (error: any) => {
-                    console.error('Error al agregar el material:', error);
-                    this.errorMessage = error.error.error;
-                    this.clearMessagesAfterDelay()
-                }
-            );
-        }
-    } else {
-        // Marcar los campos inválidos
-        this.formularioMaterial.markAllAsTouched();
-        this.errorMessage = "Formulario invalido";
-        this.clearMessagesAfterDelay()
-    }
-}
+              // Llamar al servicio para agregar el material
+              this.ApiRequestService.agregarMaterial(nuevoMaterial).subscribe(
+                  (response: any) => {
+                      // Cerrar el modal y limpiar el formulario después de agregar cada material
+                      this.successMessage= response.message;
+                      if (i === cantidad) {
+                          this.cerrarModal();
+                      }
+                  },
+                  (error: any) => {
+                      console.error('Error al agregar el material:', error);
+                      this.errorMessage = error.error.error;
+                  }
+              );
+          }
+      } else {
+          // Marcar los campos inválidos
+          this.formularioMaterial.markAllAsTouched();
+          this.errorMessage = "Formulario invalido";
+      }
+  }
 
-clearMessagesAfterDelay(): void {
-  setTimeout(() => {
-    this.errorMessage = '';
-  }, 2000);
-}
 
   // Función para construir el atributo principal
   construirAtributoPrincipal(atributoId: number, nombreAtributo: string): any {
@@ -250,13 +232,13 @@ clearMessagesAfterDelay(): void {
     for (let i = 0; i < this.atributosAdicionales.length; i++) {
       const atributoExtraId = this.formularioMaterial.value[`atributo${i + 2}`];
       const valorExtra = this.formularioMaterial.value[`valor${i + 2}`];
-      const nombreAtributoExtra = this.atributos.find(atributo => atributo.id === atributoExtraId)?.name;
+      const nombreAtributoExtra = this.atributos?.find(atributo => atributo.id === atributoExtraId)?.name;
 
       const atributoExtra = {
 
-          category_id: this.categoryId,
-          attribute_id: atributoExtraId,
-          value: valorExtra
+        category_id: this.categoryId,
+        attribute_id: atributoExtraId,
+        value: valorExtra
 
       };
 
@@ -285,192 +267,168 @@ clearMessagesAfterDelay(): void {
       },
       category_id: this.categoryId,
       category_name: "",
-
     };
   }
 
-  getLoggedUser(): void {
-    this.ApiRequestService.getLoggedInUser().subscribe(
-      (response: any) => {
-        this.employeeId = response.id;
-        const roleId = response.role_id;
-        if (roleId === 1) {
-          this.employeeRole = 'admin';
-        } else if (roleId === 2){
-          this.employeeRole = 'manager';
-        }
-        this.cargaDatos = false;
+  aplicarFiltro(): void {
+      // Obtener los filtros seleccionados
+      const filtroFechaInicio = this.fechaInicio;
+      const filtroFechaFin = this.fechaFin;
+      const filtroEstadoSeleccionado = this.filtroEstado;
+      const filtroSucursalSeleccionado = parseInt(this.filtroSucursal, 10); // Convertir a entero
+       // Eliminar duplicados de materiales basados en material.id
 
-      },
-      error => {
-        console.error('Error when obtaining data from the logged in user:', error);
-      }
-    );
+
+      // Aplicar los filtros
+      this.materialFiltrados= this.materialData.filter((material: any) => {
+          let cumpleFiltroFecha = true;
+          let cumpleFiltroEstado = true;
+          let cumpleFiltroSucursal = true;
+
+          // Filtrar por fecha de alta
+          if (filtroFechaInicio && filtroFechaFin) {
+              const fechaMaterial = new Date(material.high_date).getTime();
+              const fechaInicio = new Date(filtroFechaInicio).getTime();
+              const fechaFin = new Date(filtroFechaFin).getTime();
+
+              if (isNaN(fechaMaterial) || isNaN(fechaInicio) || isNaN(fechaFin)) {
+                  throw new Error('Error al convertir las fechas');
+              }
+
+              cumpleFiltroFecha = fechaMaterial >= fechaInicio && fechaMaterial <= fechaFin;
+          }
+
+          // Filtrar por estado
+          if (filtroEstadoSeleccionado) {
+              cumpleFiltroEstado = material.state === filtroEstadoSeleccionado;
+          }
+
+          // Filtrar por sucursal
+          if (filtroSucursalSeleccionado) { // Verificar si el filtro es un número válido
+              cumpleFiltroSucursal = material.branch_office_id === filtroSucursalSeleccionado;
+          }
+
+          // Devolver verdadero si el material cumple todos los filtros
+          return cumpleFiltroFecha && cumpleFiltroEstado && cumpleFiltroSucursal;
+      });
   }
 
-  aplicarFiltro(): void {
-    // Obtener los filtros seleccionados
-    const filtroFechaInicio = this.fechaInicio;
-    const filtroFechaFin = this.fechaFin;
-    const filtroEstadoSeleccionado = this.filtroEstado;
-    const filtroSucursalSeleccionado = parseInt(this.filtroSucursal, 10); // Convertir a entero
-     // Eliminar duplicados de materiales basados en material.id
-     const uniqueMaterials = this.detallesMaterial.materials.reduce((acc: any[], current: any) => {
-      const found = acc.some((item: any) => item.id === current.id);
-      if (!found) {
-          acc.push(current);
-      }
-      return acc;
-  }, []);
+  showOptions: boolean = false;
+  toggleOptions() {
+    this.showOptions = !this.showOptions;
+  }
+  private convertToCsv(data: any): string {
+    if (!data || !data.materials || !Array.isArray(data.materials) || data.materials.length === 0) {
+      console.error('Los datos de la tabla no son válidos o están vacíos.');
+      return '';
+    }
 
-    // Aplicar los filtros
-    this.categoryDetails.materials = uniqueMaterials.filter((material: any) => {
+    const csvRows = [];
+    const headers = ['ID', 'Nombre', 'Fecha Alta', 'Fecha Baja', 'Sucursal', 'Estado']; // Define los encabezados
+    csvRows.push(headers.join(','));
+
+    data.materials.forEach((material: any) => {
+      const values = [
+        material.id,
+        this.escapeCsvValue(material.name),
+        material.high_date,
+        material.low_date ?? 'N/D',
+        this.getNombreSucursal(material.branch_office_id),
+        material.state
+      ];
+      const csvRow = values.map(value => this.escapeCsvValue(value)).join(',');
+      csvRows.push(csvRow);
+    });
+
+    return csvRows.join('\n');
+  }
+
+
+  downloadCsvOrPdf(format: string): void {
+    if (format === 'csv') {
+      this.downloadCsv();
+    } else if (format === 'pdf') {
+      this.downloadPdf();
+    } else {
+      console.error('Formato de descarga no válido.');
+    }
+  }
+
+
+  downloadPdf(): void {
+      if (!this.materialData) {
+        console.error('No hay datos disponibles para descargar');
+        return;
+      }
+
+      const filteredMaterials = this.materialData.filter((material: any) => {
         let cumpleFiltroFecha = true;
         let cumpleFiltroEstado = true;
         let cumpleFiltroSucursal = true;
 
-        // Filtrar por fecha de alta
-        if (filtroFechaInicio && filtroFechaFin) {
-            const fechaMaterial = new Date(material.high_date).getTime();
-            const fechaInicio = new Date(filtroFechaInicio).getTime();
-            const fechaFin = new Date(filtroFechaFin).getTime();
-
-            if (isNaN(fechaMaterial) || isNaN(fechaInicio) || isNaN(fechaFin)) {
-                throw new Error('Error al convertir las fechas');
-            }
-
-            cumpleFiltroFecha = fechaMaterial >= fechaInicio && fechaMaterial <= fechaFin;
-        }
-
-        // Filtrar por estado
-        if (filtroEstadoSeleccionado) {
-            cumpleFiltroEstado = material.state === filtroEstadoSeleccionado;
-        }
-
-        // Filtrar por sucursal
-        if (filtroSucursalSeleccionado) { // Verificar si el filtro es un número válido
-            cumpleFiltroSucursal = material.branch_office_id === filtroSucursalSeleccionado;
-        }
-
-        // Devolver verdadero si el material cumple todos los filtros
         return cumpleFiltroFecha && cumpleFiltroEstado && cumpleFiltroSucursal;
+      });
+
+      const pdf = new jsPDF();
+      pdf.text('Lista de Materiales', 10, 10);
+     (pdf as any).autoTable({
+        head: [['ID', 'Nombre', 'Fecha Alta', 'Fecha Baja', 'Sucursal', 'Estado']],
+        body: filteredMaterials.map((material) => [
+          material.id,
+          material.name,
+          material.high_date,
+          material.low_date !== undefined ? material.low_date : 'N/D',
+          this.getNombreSucursal(material.branch_office_id),
+          material.state
+        ]),
+
+      });
+
+      //pdf.save(`${this.materialData[0].category}.pdf`);
+  }
+
+
+  downloadCsv(): void {
+    //if there is no data in both it shows the error message
+    if (!this.materialData) {
+      console.error('No hay datos disponibles para descargar');
+      return;
+    }
+
+    // To know the material that is downloaded depending on whether it is filtered or not
+    const filteredMaterials = this.materialData.filter((material: any) => {
+      let cumpleFiltroFecha = true;
+      let cumpleFiltroEstado = true;
+      let cumpleFiltroSucursal = true;
+
+     return cumpleFiltroFecha && cumpleFiltroEstado && cumpleFiltroSucursal;
     });
-}
+
+    // Convertir los materiales filtrados a formato CSV
+    const csvContenido = this.convertToCsv({ materials: filteredMaterials });
+
+    // Crear el archivo CSV y descargarlo
+    const blob = new Blob([csvContenido], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const fileName = `${this.materialData}.csv`;
 
 
-
-private convertToCsv(data: any): string {
-  if (!data || !data.materials || !Array.isArray(data.materials) || data.materials.length === 0) {
-    console.error('Los datos de la tabla no son válidos o están vacíos.');
-    return '';
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
   }
 
-  const csvRows = [];
-  const headers = ['ID', 'Nombre', 'Fecha Alta', 'Fecha Baja', 'Sucursal', 'Estado']; // Define los encabezados
-  csvRows.push(headers.join(','));
-
-  data.materials.forEach((material: any)=> {
-    const values = [
-      material.id,
-      this.escapeCsvValue(material.name),
-      material.high_date,
-      material.low_date ?? 'N/D',
-      this.getNombreSucursal(material.branch_office_id),
-      material.state
-    ];
-    const csvRow = values.map(value => this.escapeCsvValue(value)).join(',');
-    csvRows.push(csvRow);
-  });
-
-  return csvRows.join('\n');
-}
-
-
-downloadCsvOrPdf(format: string): void {
-  if (format === 'csv') {
-    this.downloadCsv();
-  } else if (format === 'pdf') {
-    this.downloadPdf();
-  } else {
-    console.error('Formato de descarga no válido.');
-  }
-}
-
-
-downloadPdf(): void {
-  if (!this.categoryDetails || !this.categoryDetails.materials) {
-    console.error('No hay datos disponibles para descargar');
-    return;
+  private escapeCsvValue(value: any): string {
+    if (typeof value === 'string') {
+      return `"${value.replace(/"/g, '""')}"`;
+    }
+    return value;
   }
 
-  const filteredMaterials = this.categoryDetails.materials.filter((material: any) => {
-    let cumpleFiltroFecha = true;
-    let cumpleFiltroEstado = true;
-    let cumpleFiltroSucursal = true;
-
-    return cumpleFiltroFecha && cumpleFiltroEstado && cumpleFiltroSucursal;
-  });
-
-  const pdf = new jsPDF();
-  pdf.text('Lista de Materiales', 10, 10);
- (pdf as any).autoTable({
-    head: [['ID', 'Nombre', 'Fecha Alta', 'Fecha Baja', 'Sucursal', 'Estado']],
-    body: filteredMaterials.map((material: { id: any; name: any; high_date: any; low_date: any; branch_office_id: number; state: any; }) => [
-      material.id,
-      material.name,
-      material.high_date,
-      material.low_date ?? 'N/D',
-      this.getNombreSucursal(material.branch_office_id),
-      material.state
-    ]),
-  });
-
-  pdf.save(`${this.categoryDetails.category_name}.pdf`);
 }
-
-
-downloadCsv(): void {
-
-  //if there is no data in both it shows the error message
-  if (!this.categoryDetails || !this.categoryDetails.materials) {
-    console.error('No hay datos disponibles para descargar');
-    return;
-  }
-
-  // To know the material that is downloaded depending on whether it is filtered or not
-  const filteredMaterials = this.categoryDetails.materials.filter((material: any) => {
-    let cumpleFiltroFecha = true;
-    let cumpleFiltroEstado = true;
-    let cumpleFiltroSucursal = true;
-
-   return cumpleFiltroFecha && cumpleFiltroEstado && cumpleFiltroSucursal;
-  });
-
-  // Convertir los materiales filtrados a formato CSV
-  const csvContenido = this.convertToCsv({ materials: filteredMaterials });
-
-  // Crear el archivo CSV y descargarlo
-  const blob = new Blob([csvContenido], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  const fileName = `${this.detallesMaterial.category_name}.csv`;
-  
-
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.click();
-  window.URL.revokeObjectURL(url);
-  document.body.removeChild(a);
-}
-
-private escapeCsvValue(value: any): string {
-  if (typeof value === 'string') {
-    return `"${value.replace(/"/g, '""')}"`;
-  }
-  return value;
-}
-
-  }
 
 

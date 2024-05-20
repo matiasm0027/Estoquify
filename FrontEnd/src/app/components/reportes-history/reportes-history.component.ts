@@ -77,7 +77,7 @@ export class ReportesHistoryComponent implements OnInit, OnDestroy{
 
   obtenerSucursales() {
     this.apiRequestService.listBranchOffices().subscribe(
-      (response: any[]) => {
+      (response: any) => {
         this.sucursales = response;
         this.cargaDatos = false;
 

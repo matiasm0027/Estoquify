@@ -1,5 +1,4 @@
 import { Component, NgModule, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { Employee } from 'src/app/model/Employee';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
@@ -12,7 +11,7 @@ import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-contr
 })
 export class HomeComponent implements OnInit {
 
-  loggedInUser: Employee | null = null; // Inicializar con un valor nulo
+  loggedInUser!: Employee | null;  // Inicializar con un valor nulo
   employeeRole!: string;
   employee!: any;
   reportes: any[] = [];
@@ -26,10 +25,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.userRole = this.authControlService.hasRole();
-    this.authControlService.getLoggedUser().subscribe(() => {
-      this.loggedInUser = this.authControlService.getStoredLoggedInUser();
-    });
-
+    this.loggedInUser = this.authControlService.getStoredLoggedInUser();
     this.obtenerReportes();
     this.obtenerCantidadMaterial();
     this.mostrarMaterialesDisponiblesBajos();

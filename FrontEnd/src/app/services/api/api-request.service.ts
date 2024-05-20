@@ -5,6 +5,9 @@ import { Employee } from '../../model/Employee';
 import { Role } from '../../model/Role';
 import { Department } from '../../model/Department';
 import { BranchOffice } from '../../model/BranchOffice';
+import { Attribute } from 'src/app/model/Attribute';
+import { Category } from 'src/app/model/Category';
+import { Material } from 'src/app/model/Material';
 
 
 @Injectable({
@@ -16,68 +19,13 @@ export class ApiRequestService {
 
   constructor(private http: HttpClient) {}
 
+  //credenciales
   login(credentials: { email: string, password: string }): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/login`, credentials);
   }
 
-  getLoggedInUser(): Observable<Employee> {
-    return this.http.get<Employee>(`${this.apiUrl}/auth/getLoggedInUser`);
-  }
-
-  getEmployees(): Observable<Employee[]> {
-    return this.http.get<Employee[]>(`${this.apiUrl}/auth/listEmployees`);
-  }
-
-  getEmployee(id: number): Observable<Employee> {
-    return this.http.get<Employee>(`${this.apiUrl}/auth/getEmployee/${id}`);
-  }
-
-  refresh(): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/auth/refresh`, {});
-  }
-
-  addEmployee(employeeData: Employee): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/auth/addEmployee`, employeeData);
-  }
-
-  editEmployee(id: any, employeeData: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/auth/editEmployee/${id}`, employeeData);
-  }
-
-  listDepartments(): Observable<Department[]> {
-    return this.http.get<Department[]>(`${this.apiUrl}/auth/listDepartments`);
-  }
-
-  listBranchOffices(): Observable<BranchOffice[]> {
-    return this.http.get<BranchOffice[]>(`${this.apiUrl}/auth/listBranchOffices`);
-  }
-
-  listRoles(): Observable<Role[]> {
-    return this.http.get<Role[]>(`${this.apiUrl}/auth/listRoles`);
-  }
-
-  listAtributos(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/auth/listAtributos`);
-  }
-
-  listReportes(): Observable<any[]>{
-    return this.http.get<any[]>(`${this.apiUrl}/auth/listReports`);
-  }
-
-  categoryMaterialInfo(): Observable<any[]>{
-    return this.http.get<any[]>(`${this.apiUrl}/auth/categoryMaterialInfo`);
-  }
-
   changePassword(newPassword: string, confirmPassword: string): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/auth/changePassword`, { newPassword, confirmPassword });
-  }
-
-  getCategoriaDetails(categoryId: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/auth/categoryInfoAssignments/${categoryId}`);
-  }
-
-  deleteEmployees(id: any): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/auth/deleteEmployee/${id}`);
   }
 
   resetPasswordRequest(email: string): Observable<any> {
@@ -93,6 +41,60 @@ export class ApiRequestService {
       resetToken: resetToken
     };
     return this.http.post<any>(`${this.apiUrl}/auth/resetPassword`, requestData);
+  }
+
+
+  //listar a si mismo
+  getLoggedInUser(): Observable<Employee> {
+    return this.http.get<Employee>(`${this.apiUrl}/auth/getLoggedInUser`);
+  }
+
+  //listar empleados
+  getEmployees(): Observable<Employee[]> {
+    return this.http.get<Employee[]>(`${this.apiUrl}/auth/listEmployees`);
+  }
+
+  getEmployee(id: number): Observable<Employee> {
+    return this.http.get<Employee>(`${this.apiUrl}/auth/getEmployee/${id}`);
+  }
+
+  addEmployee(employeeData: Employee): Observable<Employee> {
+    return this.http.post<Employee>(`${this.apiUrl}/auth/addEmployee`, employeeData);
+  }
+
+  editEmployee(id: any, employeeData: Employee): Observable<Employee> {
+    return this.http.put<Employee>(`${this.apiUrl}/auth/editEmployee/${id}`, employeeData);
+  }
+
+  deleteEmployees(id: any): Observable<Employee> {
+    return this.http.delete<Employee>(`${this.apiUrl}/auth/deleteEmployees/${id}`);
+  }
+
+
+  //listado de tablas genericas
+  listDepartments(): Observable<Department[]> {
+    return this.http.get<Department[]>(`${this.apiUrl}/auth/listDepartments`);
+  }
+
+  listBranchOffices(): Observable<BranchOffice[]> {
+    return this.http.get<BranchOffice[]>(`${this.apiUrl}/auth/listBranchOffices`);
+  }
+
+  listRoles(): Observable<Role[]> {
+    return this.http.get<Role[]>(`${this.apiUrl}/auth/listRoles`);
+  }
+
+  listAtributos(): Observable<Attribute[]> {
+    return this.http.get<Attribute[]>(`${this.apiUrl}/auth/listAtributos`);
+  }
+
+
+  //lista de categoria
+  categoryMaterialInfo(): Observable<any[]>{
+    return this.http.get<any[]>(`${this.apiUrl}/auth/categoryMaterialInfo`);
+  }
+  getCategoriaDetails(categoryId: number): Observable<Material[]> {
+    return this.http.get<Material[]>(`${this.apiUrl}/auth/categoryInfoAssignments/${categoryId}`);
   }
 
   getCategoryDetails(employeeId: number): Observable<any> {
@@ -135,14 +137,22 @@ export class ApiRequestService {
     return this.http.get<any>(`${this.apiUrl}/auth/materialAssignedEmployees/${materialId}`);
   }
 
-  desasignarMaterial(materialId: number, employee_id: number): Observable<any> {
+  desasignarMaterial(materialId: any, employee_id: any): Observable<any> {
     const requestBody = { employee_id: employee_id };
+    console.log(requestBody)
     return this.http.post<any>(`${this.apiUrl}/auth/desasignarMaterial/${materialId}`, requestBody);
   }
 
   asignarMaterial(materialId: number, employee_id: number): Observable<any> {
     const requestBody = { employee_id: employee_id };
     return this.http.post<any>(`${this.apiUrl}/auth/asignarMaterial/${materialId}`, requestBody);
+  }
+
+
+
+  //lista de incidencias
+  listReportes(): Observable<any[]>{
+    return this.http.get<any[]>(`${this.apiUrl}/auth/listReports`);
   }
 
   agregarReporte(reporte: any): Observable<any> {
@@ -157,5 +167,6 @@ export class ApiRequestService {
   listEmployeesByBranchOffice(id_branch_office : number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/auth/listEmployeesByBranchOffice/${id_branch_office}`);
   }
+
 }
 

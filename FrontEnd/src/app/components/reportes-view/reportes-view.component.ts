@@ -367,7 +367,7 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
 
   obtenerSucursales() {
     this.apiRequestService.listBranchOffices().subscribe(
-      (response: any[]) => {
+      (response: any) => {
         this.sucursales = response;
         this.cargaDatos = false;
 
@@ -380,7 +380,7 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
 
   obtenerDepartamento() {
     this.apiRequestService.listDepartments().subscribe(
-      (response: any[]) => {
+      (response: any) => {
         this.departamentos = response;
         this.cargaDatos = false;
 

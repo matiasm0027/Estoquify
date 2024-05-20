@@ -22,21 +22,26 @@ class Employee extends Authenticatable implements JWTSubject
         return $this->belongsTo(Role::class);
     }
 
-    public function branchOffice()
-    {
-        return $this->belongsTo(BranchOffice::class);
-    }
-
     public function department()
     {
         return $this->belongsTo(Department::class);
     }
 
-    public function material()
+    public function branchOffice()
     {
-        return $this->belongsToMany(Material::class, 'employee_material', 'employee_id', 'material_id')
-            ->withPivot('assignment_date', 'return_date');
+        return $this->belongsTo(BranchOffice::class);
     }
+
+    public function employeeMaterials()
+    {
+        return $this->hasMany(EmployeeMaterial::class);
+    }
+
+    // public function material()
+    // {
+    //     return $this->belongsToMany(Material::class, 'employee_material', 'employee_id', 'material_id')
+    //         ->withPivot('assignment_date', 'return_date');
+    // }
 
     public function report()
     {

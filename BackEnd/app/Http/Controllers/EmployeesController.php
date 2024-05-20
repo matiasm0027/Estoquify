@@ -355,7 +355,7 @@ class EmployeesController extends Controller
 }
 
 
-    public function deleteEmployee(Request $request, $id)
+    public function deleteEmployees(Request $request, $id)
     {
         try {
             // Verificar si el usuario está autenticado
@@ -374,13 +374,12 @@ class EmployeesController extends Controller
             if (!$employee) {
                 return response()->json(['error' => 'Empleado no encontrado'], 404);
             }
-
+            $employeeName = $employee->name . ' ' . $employee->last_name;
             // Eliminar al empleado
             $employee->delete();
 
-            return response()->json(['message' => 'Empleado eliminado correctamente'], 200);
+            return response()->json(['message' => "Empleado {$employeeName} eliminado correctamente"], 200);
         } catch (\Exception $e) {
-            \Log::error('Error al eliminar empleado: ' . $e->getMessage());
             return response()->json(['error' => 'Error interno del servidor'], 500);
         }
     }

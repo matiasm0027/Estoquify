@@ -18,7 +18,7 @@
             *ngIf="employeeRole === 'admin'">
             Eliminar
           </button>
-          <button (click)="volver()"
+          <button [routerLink]="['/categories_details', this.materialDetails.material.category[0].id]" [queryParams]="{ categoryName: categoryName }"
             class="bg-white-500 hover:bg-white hover:text-gray-500 font-bold py-2 lg:px-4 md:px-2 rounded border border-gray-500">
             Volver
           </button>
