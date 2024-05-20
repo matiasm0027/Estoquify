@@ -54,7 +54,7 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
       departamento: ['', Validators.required],
       sucursal: ['', Validators.required],
       rol: ['', Validators.required],
-      telefonoMovil: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+      telefonoMovil: ['', [Validators.required, Validators.pattern('(6|7)[ -]*([0-9][ -]*){8}')]],
     });
     this.formularioMaterial = this.fb.group({
       fullname: [, Validators.required],
