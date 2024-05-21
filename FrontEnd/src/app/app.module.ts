@@ -25,6 +25,7 @@ import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { ReportesHistoryComponent } from './components/reportes-history/reportes-history.component';
 import { PasswordStrengthDirective } from './directivas/passwordRules/password-strength.directive';
 import { UsuariosControlService } from './services/usuarios/usuarios-control.service';
+import { FaqsComponent } from './components/faqs/faqs.component';
 
 @NgModule({
   declarations: [
@@ -43,6 +44,7 @@ import { UsuariosControlService } from './services/usuarios/usuarios-control.ser
     ReportesViewComponent,
     ReportesHistoryComponent,
     PasswordStrengthDirective,
+    FaqsComponent,
   ],
   imports: [
     BrowserModule,

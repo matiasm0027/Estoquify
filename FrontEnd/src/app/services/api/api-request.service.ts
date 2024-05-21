@@ -157,5 +157,20 @@ export class ApiRequestService {
   listEmployeesByBranchOffice(id_branch_office : number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/auth/listEmployeesByBranchOffice/${id_branch_office}`);
   }
-}
 
+  getFaqsDetails(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/getFaqsDetails`);
+  }
+
+  addFaq(faqData: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/addFaq`, faqData);
+  }
+
+  editFaq(faqId: number, faqData: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/editFaq/${faqId}`, faqData);
+  }
+
+  deleteFaq(faqId: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/deleteFaq/${faqId}`);
+  }
+}

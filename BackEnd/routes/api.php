@@ -12,6 +12,7 @@ use App\Http\Controllers\CategoriaMaterialController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\FaqController;
 
 /*
 |--------------------------------------------------------------------------
@@ -70,7 +71,10 @@ Route::group([
     Route::put('editMaterial/{id}', [MaterialController::class, 'editMaterial']);
     Route::get('materialDetails/{id}', [MaterialController::class, 'getMaterialDetails']);
 
+
+    Route::get('getFaqsDetails', [FaqController::class, 'getFaqsDetails']);
+    Route::post('addFaq', [FaqController::class, 'create']);
+    Route::put('editFaq/{id}', [FaqController::class, 'edit']);
+    Route::delete('deleteFaq/{id}', [FaqController::class, 'delete']);
+
 });
-
-
-

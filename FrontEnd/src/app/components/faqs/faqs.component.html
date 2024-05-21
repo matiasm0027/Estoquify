@@ -1,0 +1,17 @@
+<!-- faq.component.html -->
+<div class="flex">
+<app-sidebar></app-sidebar>
+
+<div  class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-24 md:ml-12 md:mr-12 sm:mt-24 sm:ml-12 sm:mr-12 mt-24 ml-12 mr-12 box-fl container">
+  <div *ngIf="faqs.length > 0; else noFaqs">
+    <div *ngFor="let faq of faqs" class="faq-item">
+      <h3>{{ faq.titulo }}</h3>
+      <p>{{ faq.descripcion }}</p>
+    </div>
+  </div>
+  <ng-template #noFaqs>
+    <p>No FAQs available at the moment.</p>
+  </ng-template>
+  </div>
+</div>
+  

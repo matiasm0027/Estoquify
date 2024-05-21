@@ -15,6 +15,8 @@ import { CategoryDetailsComponent } from './components/category-details/category
 import { MaterialDetailsComponent } from './components/material-details/material-details.component';
 import { ReportesViewComponent } from './components/reportes-view/reportes-view.component';
 import { ReportesHistoryComponent } from './components/reportes-history/reportes-history.component';
+import { FaqsComponent } from './components/faqs/faqs.component';
+
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -31,6 +33,7 @@ const routes: Routes = [
   { path: 'material_details/:id', component: MaterialDetailsComponent, canActivate: [MyGuardGuard, ]},
   { path: 'reportes_view', component: ReportesViewComponent, canActivate: [MyGuardGuard, ]},
   { path: 'reportes_history', component: ReportesHistoryComponent, canActivate: [MyGuardGuard, ]},
+  { path: 'faqs', component: FaqsComponent, canActivate:[MyGuardGuard]},
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', component: NotFoundComponent }
 

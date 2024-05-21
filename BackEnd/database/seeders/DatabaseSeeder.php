@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             BranchOfficeSeeder::class,
             CategorySeeder::class,
             AttributeSeeder::class,
+            FaqSeeder::class,
         ]);
 
         // Crear registros utilizando factories
@@ -59,6 +60,7 @@ class DatabaseSeeder extends Seeder
         Report::factory(10)->create();
         Material::factory(300)->create();
         CategoryReport::factory(10)->create();
+        Faq::factory(5)->create();
 
         // Llamar a otros seeders después de crear registros
         $this->call([
