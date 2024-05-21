@@ -4,11 +4,11 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
 import { Material } from 'src/app/model/Material';
 import { Attribute } from 'src/app/model/Attribute';
-import { BranchOffice } from 'src/app/model/BranchOffice';
-import { forkJoin } from 'rxjs';
+import { forkJoin, map } from 'rxjs';
+import { Category } from 'src/app/model/Category';
+import { AttributeCategoryMaterial } from 'src/app/model/AttributeCategoryMaterial';
 
 @Component({
   selector: 'app-category-details',
@@ -25,11 +25,12 @@ export class CategoryDetailsComponent implements OnInit {
 
   roles: { id: number; name: string; }[] = [];
   departamentos: { id: number; name: string; }[] = [];
-  sucursales: { id: number; name: string; }[] = [];  atributos: Attribute[] | null = null;
+  sucursales: { id: number; name: string; }[] = [];
+  atributos: Attribute[] | null = null;
   atributosAdicionales: any[] = [];
-  materialData: Material[] = [];
-  materialFiltrados: any[] = [];
-
+  materialData!: Material[];
+  category!: Category;
+  materialFiltrados: Material[] = [];
   formularioMaterial!: FormGroup;
 
   fechaInicio: string = '';
@@ -47,7 +48,6 @@ export class CategoryDetailsComponent implements OnInit {
   cargaDatos: boolean = true;
 
   categoryName!: string;
-
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -61,10 +61,17 @@ export class CategoryDetailsComponent implements OnInit {
 
     this.cargarOpciones();
     this.getCategoriaIdFromRoute();
-    this.getCategoriaDetails();
     this.filtrarMateriales();
 
     this.initForm();
+    console.log(this.category)
+    if (!this.category) {
+      this.getCategoriaDetails();
+    } else {
+      this.extractMaterials();
+      this.aplicarFiltro()
+    }
+    console.log(this.materialFiltrados)
   }
 
   initForm() {
@@ -90,21 +97,30 @@ cargarOpciones() {
 
   getCategoriaIdFromRoute(): void {
     this.route.params.subscribe(params => {
-      this.categoryId = +params['category'];
+      this.categoryId = +params['id'];
       this.cargaDatos = false;
-    });
-    this.route.queryParams.subscribe(params => {
-      this.categoryName = params['categoryName'];
-      this.cargaDatos = false;
-    });
+
+    this.category = this.authControlService.getCategory();
+    this.cargaDatos = false;
+  });
+  }
+
+  extractMaterials(): void {
+    if (this.category && this.category.attributeCategoryMaterials) {
+      // Convertir attributeCategoryMaterials a un array
+      const attributeCategoryMaterialsArray = Object.values(this.category.attributeCategoryMaterials);
+
+      this.materialData = attributeCategoryMaterialsArray.map((acm: AttributeCategoryMaterial) => acm.material).filter(material => material != null) as Material[];
+      console.log('Extracted materials: ', this.materialData);
+    }
   }
 
   getCategoriaDetails() {
     try {
       this.ApiRequestService.getCategoriaDetails(this.categoryId)
         .subscribe(response => {
-          this.materialData = response;
-          // Llama a otros métodos que necesites para procesar los datos
+          this.category = response;
+          this.extractMaterials();         // Llama a otros métodos que necesites para procesar los datos
           this.aplicarFiltro();
           this.cargaDatos = false;
         });
@@ -119,9 +135,9 @@ cargarOpciones() {
     if (!searchTermTrimmed) {
       this.materialFiltrados = this.materialData;
     } else {
-      this.materialFiltrados = this.materialData.filter((material) =>
-      material.name.toLowerCase().includes(searchTermTrimmed.toLowerCase())
-      );
+      this.materialFiltrados = this.materialData.filter((material: any) => {
+        material.name.toLowerCase().includes(searchTermTrimmed.toLowerCase())
+      });
       this.successMessage = "";
       // Verificar si no se encontraron empleados
       if (this.materialFiltrados.length === 0) {
@@ -154,6 +170,9 @@ cargarOpciones() {
   }
 
   volver() {
+    // if (this.category) {
+    //   this.authControlService.setCategory(this.category);
+    // }
     this.router.navigate(['/categories_view']);
   }
 
@@ -171,7 +190,7 @@ cargarOpciones() {
 
   cerrarModal() {
     this.mostrarModalAgregar = false;
-    this.getCategoriaDetails();
+    //this.getCategoriaDetails();
     this.formularioMaterial.reset();
   }
 
@@ -356,7 +375,7 @@ cargarOpciones() {
 
 
   downloadPdf(): void {
-      if (!this.materialData) {
+      if (!this.category) {
         console.error('No hay datos disponibles para descargar');
         return;
       }
@@ -373,14 +392,14 @@ cargarOpciones() {
       pdf.text('Lista de Materiales', 10, 10);
      (pdf as any).autoTable({
         head: [['ID', 'Nombre', 'Fecha Alta', 'Fecha Baja', 'Sucursal', 'Estado']],
-        body: filteredMaterials.map((material) => [
-          material.id,
-          material.name,
-          material.high_date,
-          material.low_date !== undefined ? material.low_date : 'N/D',
-          this.getNombreSucursal(material.branch_office_id),
-          material.state
-        ]),
+        // body: filteredMaterials.map((material) => [
+        //   material.material?.id,
+        //   material.name,
+        //   material.,
+        //   material.low_date !== undefined ? material.low_date : 'N/D',
+        //   this.getNombreSucursal(material.branch_office_id),
+        //   material.state
+        // ]),
 
       });
 
@@ -390,7 +409,7 @@ cargarOpciones() {
 
   downloadCsv(): void {
     //if there is no data in both it shows the error message
-    if (!this.materialData) {
+    if (!this.category) {
       console.error('No hay datos disponibles para descargar');
       return;
     }
@@ -412,7 +431,7 @@ cargarOpciones() {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const fileName = `${this.materialData}.csv`;
+    const fileName = `${this.category}.csv`;
 
 
     a.download = fileName;

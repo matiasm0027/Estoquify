@@ -90,23 +90,23 @@ export class ApiRequestService {
 
 
   //lista de categoria
-  categoryMaterialInfo(): Observable<any[]>{
-    return this.http.get<any[]>(`${this.apiUrl}/auth/categoryMaterialInfo`);
+  categoryMaterialInfo(): Observable<Category[]>{
+    return this.http.get<Category[]>(`${this.apiUrl}/auth/categoryMaterialInfo`);
   }
-  getCategoriaDetails(categoryId: number): Observable<Material[]> {
-    return this.http.get<Material[]>(`${this.apiUrl}/auth/categoryInfoAssignments/${categoryId}`);
-  }
-
-  getCategoryDetails(employeeId: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/auth/employeeInfoAssignments/${employeeId}`);
+  getCategoriaDetails(categoryId: number): Observable<Category> {
+    return this.http.get<Category>(`${this.apiUrl}/auth/categoryInfoAssignments/${categoryId}`);
   }
 
-  addCategory(category: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/auth/addCategory`, category);
+  getCategoryDetails(employeeId: number): Observable<Category> {
+    return this.http.get<Category>(`${this.apiUrl}/auth/employeeInfoAssignments/${employeeId}`);
   }
 
-  editCategory(id: any, category: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/auth/editCategory/${id}`, category);
+  addCategory(category: any): Observable<Category> {
+    return this.http.post<Category>(`${this.apiUrl}/auth/addCategory`, category);
+  }
+
+  editCategory(id: any, category: any): Observable<Category> {
+    return this.http.put<Category>(`${this.apiUrl}/auth/editCategory/${id}`, category);
   }
 
   deleteCategory(id: any): Observable<any> {

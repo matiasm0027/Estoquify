@@ -61,9 +61,7 @@ export class EmployeeDetailsComponent implements OnInit {
           this.ApiRequestService.getEmployee(id).subscribe(
             (employee: Employee) => {
               this.employeeDetails = [employee];
-              console.log(this.employeeDetails[0].employee_materials)
-              // Usando el operador de encadenamiento opcional para manejar valores undefined
-              console.log(this.employeeDetails)
+
               this.cargaDatos = false;
               this.initForm();
             },

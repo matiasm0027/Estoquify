@@ -43,7 +43,8 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
                 <!-- <a [routerLink]="['/categories_details', category.name]">{{ category.name }}</a> -->
-                <a [routerLink]="['/categories_details', category.id]" [queryParams]="{ categoryName: category.name }">{{ category.name }}</a>
+                <button (click)="enviarObjeto(category.id, category)">{{
+                  category.name }}</button>
               </span>
             </th>
             <td class="px-6 py-4">

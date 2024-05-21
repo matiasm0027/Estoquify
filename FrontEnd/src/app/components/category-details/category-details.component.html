@@ -13,7 +13,7 @@
     <div class="bg-white p-6 rounded shadow" *ngIf="materialFiltrados">
       <div class="flex justify-between items-center mb-4">
         <div class="flex items-center"> <!-- Nuevo contenedor flex para el título y el input -->
-          <h1 class="text-2xl font-bold mr-4">{{categoryName}}</h1>
+          <h1 class="text-2xl font-bold mr-4">{{category.name}}</h1>
           <!-- Añade margen a la derecha para separar el título del input -->
           <div class="relative"> <!-- Contenedor relativo para el input y el icono -->
             <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar material..." (input)="filtrarMateriales()"
@@ -81,11 +81,11 @@
                     class="h-4 w-4 mr-1 ">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                   </svg>
-                  <a [routerLink]="['/material_details', material.id]" [queryParams]="{ categoryName: categoryName }"><strong>{{ material.name}}</strong></a>
+                  <a [routerLink]="['/material_details', material.id]"><strong>{{ material.name}}</strong></a>
                 </span>
               </td>
               <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ material.high_date }}</td>
-              <td class="px-6 py-4">{{ material.low_date ?? 'N/D'}}</td>
+              <td class="px-6 py-4">{{ material.low_date ? material.low_date : 'N/D' }}</td>
               <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{
                 getNombreSucursal(material.branch_office_id) }}</td>
               <td class="px-6 py-4">

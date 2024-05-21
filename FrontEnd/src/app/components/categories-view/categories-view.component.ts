@@ -5,6 +5,9 @@ import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 import { Category } from 'src/app/model/Category';
 import { Material } from 'src/app/model/Material';
+import { AttributeCategoryMaterial } from 'src/app/model/AttributeCategoryMaterial';
+import 'jspdf-autotable';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-categories-view',
@@ -16,7 +19,7 @@ export class CategoriesViewComponent implements OnInit{
   categories: Category[] = [];
   mostrarModalAgregar: boolean = false;
   mostrarModalEdit: boolean = false;
-  categoryID: string = "" ;
+  categoryID!: number;
   errorMessage!: string;
   errorMessage2!: string;
   successMessage!: string;
@@ -28,6 +31,7 @@ export class CategoriesViewComponent implements OnInit{
     private ApiRequestService: ApiRequestService,
     private authControlService: UsuariosControlService,
     private fb: FormBuilder,
+    private router: Router,
     )
   {
     this.categoryForm = this.fb.group({
@@ -48,6 +52,7 @@ export class CategoriesViewComponent implements OnInit{
   obtenerCantidadMaterial(){
     this.ApiRequestService.categoryMaterialInfo().subscribe(category => {
       this.categories = category;
+      console.log(this.categories[0])
         this.calcularTotales();
         this.cargaDatos = false;
       }
@@ -66,27 +71,32 @@ export class CategoriesViewComponent implements OnInit{
         };
       }
 
-      // if (categoria.materials) {
-      //   Object.values(categoria.materials).forEach((material: Material) => {
-      //     switch (material.state) {
-      //       case "available":
-      //         this.totales[categoria.name].available++;
-      //         this.totales[categoria.name].totalMateriales++;
-      //         break;
-      //       case "active":
-      //         this.totales[categoria.name].active++;
-      //         this.totales[categoria.name].totalMateriales++;
-      //         break;
-      //       case "inactive":
-      //         this.totales[categoria.name].inactive++;
-      //         this.totales[categoria.name].totalMateriales++;
-      //         break;
-      //       default:
-      //         break;
-      //     }
-      //   });
-      // }
+      if (categoria.attributeCategoryMaterials) {
+        Object.values(categoria.attributeCategoryMaterials).forEach((material: AttributeCategoryMaterial) => {
+          switch (material.material?.state) {
+            case "available":
+              this.totales[categoria.name].available++;
+              this.totales[categoria.name].totalMateriales++;
+              break;
+            case "active":
+              this.totales[categoria.name].active++;
+              this.totales[categoria.name].totalMateriales++;
+              break;
+            case "inactive":
+              this.totales[categoria.name].inactive++;
+              this.totales[categoria.name].totalMateriales++;
+              break;
+            default:
+              break;
+          }
+        });
+      }
     });
+  }
+
+  enviarObjeto(id: number, category: Category) {
+    this.authControlService.setCategory(category);
+    this.router.navigate(['/categories_details', id]);
   }
 
   categoryAdd() {
@@ -161,7 +171,7 @@ export class CategoriesViewComponent implements OnInit{
   cerrarModalEdit() {
     this.mostrarModalEdit = false;
     this.obtenerCantidadMaterial();
-    this.categoryID = "";
+    this.categoryID = 0;
     this.categoryForm.reset();
   }
 

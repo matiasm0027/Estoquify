@@ -26,24 +26,4 @@ class Material extends Model
     {
         return $this->hasMany(EmployeeMaterial::class);
     }
-    // public function category()
-    // {
-    //     return $this->belongsToMany(Category::class, 'attribute_category_material')
-    //                 ->withPivot('attribute_id', 'value')
-    //                 ->withTimestamps();
-    // }
-
-    // public function attribute()
-    // {
-    //     return $this->belongsToMany(Attribute::class, 'attribute_category_material')
-    //                 ->withPivot('category_id', 'value')
-    //                 ->withTimestamps();
-    // }
-
-
-    // public function employee()
-    // {
-    //     return $this->belongsToMany(Employee::class, 'employee_material', 'material_id', 'employee_id')
-    //         ->withPivot('assignment_date', 'return_date');
-    // }
 }
