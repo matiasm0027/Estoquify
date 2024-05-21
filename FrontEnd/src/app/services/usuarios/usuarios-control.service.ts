@@ -55,6 +55,10 @@ export class UsuariosControlService {
     return this.ApiRequestService.listBranchOffices();
   }
 
+  cargarAtributos() {
+    return this.ApiRequestService.listAtributos();
+  }
+
   hasRole(): any {
     return localStorage.getItem('rol');
   }

@@ -87,7 +87,7 @@
               <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ material.high_date }}</td>
               <td class="px-6 py-4">{{ material.low_date ? material.low_date : 'N/D' }}</td>
               <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{
-                getNombreSucursal(material.branch_office_id) }}</td>
+                material.branch_office?.name}}</td>
               <td class="px-6 py-4">
                 <span
                   [ngClass]="{'text-green-500 dark:text-green-800': material.state === 'available', 'text-red-500 dark:text-red-800': material.state === 'inactive', 'text-blue-500 dark:text-blue-800': material.state === 'active'}">{{

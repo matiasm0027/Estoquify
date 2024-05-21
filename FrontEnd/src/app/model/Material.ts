@@ -5,18 +5,17 @@ import { EmployeeMaterial } from "./EmployeeMaterial";
 export class Material {
   id: number;
   name: string;
-  low_date: Date;
+  low_date: Date | null;
   high_date: Date;
   state: string;
   branch_office_id: number;
   branch_office?: BranchOffice; // Relación con la tabla 'branch_office'
   attributeCategoryMaterials?: AttributeCategoryMaterial[]; // Relación con la tabla 'attribute_category_material'
   employee_materials?: EmployeeMaterial[]; // Relación con la tabla 'employee_material'
-
   constructor(
     id: number,
     name: string,
-    low_date: Date,
+    low_date: Date | null,
     high_date: Date,
     state: string,
     branch_office_id: number,

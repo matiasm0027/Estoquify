@@ -37,7 +37,7 @@ class CategoryController extends Controller
                                 'low_date' => $attributeCategoryMaterial->material->low_date,
                                 'high_date' => $attributeCategoryMaterial->material->high_date,
                                 'state' => $attributeCategoryMaterial->material->state,
-                                'branch_office_id' => $attributeCategoryMaterial->material->branch_office_id,
+                                'branch_office' => $attributeCategoryMaterial->material->branchOffice,
                                 'attributeCategoryMaterials' => [
                                     'attributes' => $attributeCategoryMaterial->material->attributeCategoryMaterials->map(function ($materialAttribute) {
                                         return [
@@ -180,7 +180,7 @@ class CategoryController extends Controller
                             'low_date' => $material->low_date,
                             'high_date' => $material->high_date,
                             'state' => $material->state,
-                            'branch_office_id' => $material->branch_office_id,
+                            'branch_office' => $material->branchOffice,
                             'attributeCategoryMaterials' => [
                                 'attributes' => $material->attributeCategoryMaterials->map(function ($materialAttribute) {
                                     return [

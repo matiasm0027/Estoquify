@@ -12,76 +12,77 @@ use Illuminate\Http\Exceptions\ThrottleRequestsException;
 class MaterialController extends Controller
 {
     public function addMaterial(Request $request)
-{
-    try {
-        // Verificar si el usuario está autenticado
-        $user = $request->user();
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no autenticado'], 401);
+    {
+        try {
+            // Verificar si el usuario está autenticado
+            $user = $request->user();
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no autenticado'], 401);
+            }
+
+            // Verificar si el usuario tiene el rol permitido
+            $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
+
+            // Validar los datos de entrada del formulario
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string',
+                'high_date' => 'required|date',
+                'branch_office_id' => 'required|exists:branch_offices,id',
+                'state' => 'required|string',
+                'attributeCategoryMaterials.*.category_id' => 'required|exists:categories,id',
+                'attributeCategoryMaterials.*.attribute_id' => 'required|exists:attributes,id',
+                'attributeCategoryMaterials.*.value' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 400);
+            }
+
+            // Convertir la fecha al formato adecuado para la base de datos
+            $high_date = date('Y-m-d', strtotime($request->input('high_date')));
+
+            // Obtener el prefijo del nombre del material
+            $nameMaterial = substr($request->input('name'), 0, 4);
+
+            // Obtener la cantidad de materiales con el mismo prefijo
+            $count = Material::where('name', 'like', $nameMaterial . '_%')->count() + 1;
+
+            // Verificar si ya existe un material con el mismo nombre
+            $existingMaterial = Material::where('name', $request->input('name'))->first();
+            if ($existingMaterial) {
+                return response()->json(['error' => 'Ya existe un material con el mismo nombre'], 400);
+            }
+
+            // Crear una nueva instancia del material y asignar los valores
+            $material = new Material();
+            $material->name = ucfirst($request->input('name') . '_' . str_pad($count, 3, '0', STR_PAD_LEFT));
+            $material->high_date = $high_date;
+            $material->branch_office_id = $request->input('branch_office_id');
+            $material->state = $request->input('state');
+
+            // Guardar el material en la base de datos
+            $material->save();
+
+            // Obtener los valores de los atributos y asociarlos al material
+            $attributes = [];
+            foreach ($request->input('attributeCategoryMaterials') as $pivotData) {
+                $attributes[] = new AttributeCategoryMaterial([
+                    'category_id' => $pivotData['category_id'],
+                    'attribute_id' => $pivotData['attribute_id'],
+                    'value' => $pivotData['value']
+                ]);
+            }
+
+            // Guardar los atributos asociados al material
+            $material->attributeCategoryMaterials()->saveMany($attributes);
+
+            // Devolver una respuesta de éxito
+            return response()->json(['message' => 'Material agregado con éxito'], 201);
+        } catch (\Exception $e) {
+            // Capturar y manejar cualquier excepción que pueda ocurrir
+            return response()->json(['error' => 'Error al agregar material: ' . $e->getMessage()], 500);
         }
-
-        // Verificar si el usuario tiene el rol permitido
-        $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
-
-        // Validar los datos de entrada del formulario
-        $validator = Validator::make($request->all(), [
-            'material.name' => 'required|string',
-            'material.high_date' => 'required|date',
-            'material.branch_office_id' => 'required|exists:branch_offices,id',
-            'material.state' => 'required',
-            'material.pivot.*.category_id' => 'required|exists:categories,id',
-            'material.pivot.*.attribute_id' => 'required|exists:attributes,id',
-            'material.pivot.*.value' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 400);
-        }
-
-        // Convertir la fecha al formato adecuado para la base de datos
-        $high_date = date('Y-m-d H:i:s', strtotime($request->input('material.high_date')));
-        // Obtener la categoría del material
-        $nameMaterial=  substr($request->input('material.name'), 0, 4);
-        // Obtener la cantidad de materiales con el mismo prefijo
-        $count = Material::where('name', 'like', $nameMaterial . '_%')->count() + 1;
-
-        // Verificar si ya existe un material con el mismo nombre
-        $existingMaterial = Material::where('name', $request->input('material.name'))->first();
-        if ($existingMaterial) {
-            return response()->json(['error' => 'Ya existe un material con el mismo nombre'], 400);
-        }
-
-        // Crear una nueva instancia del material y asignar los valores
-        $material = new Material();
-        $material->name = ucfirst($request->input('material.name').'_'. str_pad($count, 3, '0', STR_PAD_LEFT));
-        $material->high_date = $high_date;
-        $material->branch_office_id = $request->input('material.branch_office_id');
-        $material->state = $request->input('material.state');
-
-        // Guardar el material en la base de datos
-        $material->save();
-
-        // Obtener los valores de los atributos y asociarlos al material
-        $attributes = [];
-        foreach ($request->input('material.pivot') as $pivotData) {
-            $attributes[] = [
-                'category_id' => $pivotData['category_id'],
-                'attribute_id' => $pivotData['attribute_id'],
-                'value' => $pivotData['value']
-            ];
-        }
-
-        // Asociar todos los atributos al material creado
-        $material->category()->attach($attributes);
-
-        // Devolver una respuesta de éxito
-        return response()->json(['message' => 'Material agregado con éxito'], 201);
-    } catch (\Exception $e) {
-        // Capturar y manejar cualquier excepción que pueda ocurrir
-        return response()->json(['error' => 'Error al agregar material: ' . $e->getMessage()], 500);
     }
-}
-
 
     protected function checkUserRole($allowedRoles)
     {

@@ -113,11 +113,12 @@ export class ApiRequestService {
     return this.http.delete<any>(`${this.apiUrl}/auth/deleteCategory/${id}`);
   }
 
+  //listado material
   MaterialDetails(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/auth/employeeInfoAssignments`);
   }
 
-  agregarMaterial(nuevoMaterial: any): Observable<any> {
+  agregarMaterial(nuevoMaterial: Material): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/addMaterial`, nuevoMaterial);
   }
 

@@ -26,7 +26,7 @@ export class CategoryDetailsComponent implements OnInit {
   roles: { id: number; name: string; }[] = [];
   departamentos: { id: number; name: string; }[] = [];
   sucursales: { id: number; name: string; }[] = [];
-  atributos: Attribute[] | null = null;
+  atributos: { id: number; name: string; }[] = [];
   atributosAdicionales: any[] = [];
   materialData!: Material[];
   category!: Category;
@@ -84,16 +84,21 @@ export class CategoryDetailsComponent implements OnInit {
     });
   }
 
-cargarOpciones() {
+  cargarOpciones() {
     forkJoin([
-    //this.atributos = this.authControlService.getAttributes();
-    this.authControlService.cargarSucursales()
+      this.authControlService.cargarSucursales(),
+      this.authControlService.cargarAtributos()
     ]).subscribe(
-      ([sucursales]) => {
+      ([sucursales, atributos]) => {
         this.sucursales = sucursales;
+        this.atributos = atributos;
+      },
+      (error) => {
+        console.error('Error loading options', error);
       }
     );
   }
+  
 
   getCategoriaIdFromRoute(): void {
     this.route.params.subscribe(params => {
@@ -107,9 +112,7 @@ cargarOpciones() {
 
   extractMaterials(): void {
     if (this.category && this.category.attributeCategoryMaterials) {
-      // Convertir attributeCategoryMaterials a un array
       const attributeCategoryMaterialsArray = Object.values(this.category.attributeCategoryMaterials);
-
       this.materialData = attributeCategoryMaterialsArray.map((acm: AttributeCategoryMaterial) => acm.material).filter(material => material != null) as Material[];
       console.log('Extracted materials: ', this.materialData);
     }
@@ -120,7 +123,7 @@ cargarOpciones() {
       this.ApiRequestService.getCategoriaDetails(this.categoryId)
         .subscribe(response => {
           this.category = response;
-          this.extractMaterials();         // Llama a otros métodos que necesites para procesar los datos
+          this.extractMaterials();     
           this.aplicarFiltro();
           this.cargaDatos = false;
         });
@@ -170,9 +173,6 @@ cargarOpciones() {
   }
 
   volver() {
-    // if (this.category) {
-    //   this.authControlService.setCategory(this.category);
-    // }
     this.router.navigate(['/categories_view']);
   }
 
@@ -190,77 +190,71 @@ cargarOpciones() {
 
   cerrarModal() {
     this.mostrarModalAgregar = false;
-    //this.getCategoriaDetails();
+    this.getCategoriaDetails();
     this.formularioMaterial.reset();
   }
 
-    agregarMaterial() {
-      if (this.formularioMaterial.valid) {
-          const nombreBase = this.formularioMaterial.value.nombre;
-          const cantidad = parseInt(this.formularioMaterial.value.cantidad, 10);
-          const sucursal = this.formularioMaterial.value.sucursal;
-          const atributoId = this.formularioMaterial.value.atributo; // Obtener el ID del atributo seleccionado
-          const nombreAtributo = this.atributos?.find(atributo => atributo.id === atributoId)?.name ?? 'Valor predeterminado';
-          const atributoPrincipal = this.construirAtributoPrincipal(atributoId, nombreAtributo);
-          const atributosExtras = this.construirAtributosExtras();
+  agregarMaterial() {
+    if (this.formularioMaterial.valid) {
+      const nombreBase = this.formularioMaterial.value.nombre;
+      const cantidad = parseInt(this.formularioMaterial.value.cantidad, 10);
+      const sucursal = this.formularioMaterial.value.sucursal;
+      const atributoId = this.formularioMaterial.value.atributo; // Obtener el ID del atributo seleccionado
+      const nombreAtributo = this.atributos?.find(atributo => atributo.id === atributoId)?.name ?? 'Valor predeterminado';
+      const atributoPrincipal = this.construirAtributoPrincipal(atributoId, nombreAtributo);
+      const atributosExtras = this.construirAtributosExtras();
 
-          // Crear múltiples materiales con nombres secuenciales
-          for (let i = 1; i <= cantidad; i++) {
-              //const nombreMaterial = `${nombreBase}_${i.toString().padStart(2, '0')}`;
-              const nuevoMaterial = this.construirObjetoMaterial(nombreBase, sucursal, atributoPrincipal, atributosExtras);
-
-              // Llamar al servicio para agregar el material
-              this.ApiRequestService.agregarMaterial(nuevoMaterial).subscribe(
-                  (response: any) => {
-                      // Cerrar el modal y limpiar el formulario después de agregar cada material
-                      this.successMessage= response.message;
-                      if (i === cantidad) {
-                          this.cerrarModal();
-                      }
-                  },
-                  (error: any) => {
-                      console.error('Error al agregar el material:', error);
-                      this.errorMessage = error.error.error;
-                  }
-              );
+      // Crear múltiples materiales con nombres secuenciales
+      for (let i = 1; i <= cantidad; i++) {
+        const nuevoMaterial = this.construirObjetoMaterial(nombreBase, sucursal, atributoPrincipal, atributosExtras);
+        console.log(nuevoMaterial)
+        // Llamar al servicio para agregar el material
+        this.ApiRequestService.agregarMaterial(nuevoMaterial).subscribe(
+          (response: any) => {
+            // Cerrar el modal y limpiar el formulario después de agregar cada material
+            this.successMessage = response.message;
+            if (i === cantidad) {
+              this.cerrarModal();
+            }
+          },
+          (error: any) => {
+            console.error('Error al agregar el material:', error);
+            this.errorMessage = error.error.error;
           }
-      } else {
-          // Marcar los campos inválidos
-          this.formularioMaterial.markAllAsTouched();
-          this.errorMessage = "Formulario invalido";
+        );
       }
+    } else {
+      // Marcar los campos inválidos
+      this.formularioMaterial.markAllAsTouched();
+      this.errorMessage = "Formulario inválido";
+    }
   }
 
-
   // Función para construir el atributo principal
-  construirAtributoPrincipal(atributoId: number, nombreAtributo: string): any {
-    return {
-      name: nombreAtributo,
-      pivot: {
-        category_id: this.categoryId,
-        attribute_id: atributoId,
-        value: this.formularioMaterial.value.value
-      }
-    };
+  construirAtributoPrincipal(atributoId: number, nombreAtributo: string): AttributeCategoryMaterial {
+    return new AttributeCategoryMaterial(
+      0, // id será asignado por el servidor
+      0, // material_id será asignado cuando se cree el material
+      atributoId,
+      this.categoryId,
+      this.formularioMaterial.value.value
+    );
   }
 
   // Función para construir los atributos extras
-  construirAtributosExtras(): any[] {
-    const atributosExtras = [];
+  construirAtributosExtras(): AttributeCategoryMaterial[] {
+    const atributosExtras: AttributeCategoryMaterial[] = [];
 
     for (let i = 0; i < this.atributosAdicionales.length; i++) {
       const atributoExtraId = this.formularioMaterial.value[`atributo${i + 2}`];
       const valorExtra = this.formularioMaterial.value[`valor${i + 2}`];
-      const nombreAtributoExtra = this.atributos?.find(atributo => atributo.id === atributoExtraId)?.name;
-
-      const atributoExtra = {
-
-        category_id: this.categoryId,
-        attribute_id: atributoExtraId,
-        value: valorExtra
-
-      };
-
+      const atributoExtra = new AttributeCategoryMaterial(
+        0, // id será asignado por el servidor
+        0, // material_id será asignado cuando se cree el material
+        atributoExtraId,
+        this.categoryId,
+        valorExtra
+      );
       atributosExtras.push(atributoExtra);
     }
 
@@ -268,25 +262,21 @@ cargarOpciones() {
   }
 
   // Función para construir el objeto del material
-  construirObjetoMaterial(nombre: string, sucursal: number, atributoPrincipal: any, atributosExtras: any[]): any {
-    return {
-      material: {
-        name: nombre,
-        high_date: new Date().toISOString(), // Obtener la fecha actual
-        branch_office_id: sucursal,
-        pivot: [
-          { ...atributoPrincipal.pivot },
-          ...atributosExtras.map(atributoExtra => ({
-            category_id: atributoExtra.category_id,
-            attribute_id: atributoExtra.attribute_id,
-            value: atributoExtra.value
-          }))
-        ],
-        state: "available"
-      },
-      category_id: this.categoryId,
-      category_name: "",
-    };
+  construirObjetoMaterial(nombre: string, sucursal: number, atributoPrincipal: AttributeCategoryMaterial, atributosExtras: AttributeCategoryMaterial[]): Material {
+    return new Material(
+      0, // id será asignado por el servidor
+      nombre,
+      null, // low_date inicial es null
+      new Date(), // high_date es la fecha actual
+      "available",
+      sucursal,
+      undefined, // branch_office se puede definir si es necesario
+      [
+        atributoPrincipal,
+        ...atributosExtras
+      ],
+      undefined // employee_materials se puede definir si es necesario
+    );
   }
 
   aplicarFiltro(): void {
@@ -392,18 +382,18 @@ cargarOpciones() {
       pdf.text('Lista de Materiales', 10, 10);
      (pdf as any).autoTable({
         head: [['ID', 'Nombre', 'Fecha Alta', 'Fecha Baja', 'Sucursal', 'Estado']],
-        // body: filteredMaterials.map((material) => [
-        //   material.material?.id,
-        //   material.name,
-        //   material.,
-        //   material.low_date !== undefined ? material.low_date : 'N/D',
-        //   this.getNombreSucursal(material.branch_office_id),
-        //   material.state
-        // ]),
+        body: filteredMaterials.map((material) => [
+          material.id,
+          material.name,
+          material.high_date,
+          material.low_date ? material.low_date : 'N/D',
+          material.branch_office?.name,
+          material.state
+        ]),
 
       });
 
-      //pdf.save(`${this.materialData[0].category}.pdf`);
+      pdf.save(`${this.category.name}.pdf`);
   }
 
 
@@ -431,7 +421,7 @@ cargarOpciones() {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const fileName = `${this.category}.csv`;
+    const fileName = `${this.category.name}.csv`;
 
 
     a.download = fileName;

@@ -127,6 +127,8 @@ export class CategoriesViewComponent implements OnInit{
   }
 
   deleteCategory(id: number): void {
+    this.successMessage='';
+    this.errorMessage='';
     this.ApiRequestService.deleteCategory(id).subscribe(
       (response) => {
         this.successMessage = response.message;
