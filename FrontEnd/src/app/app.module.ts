@@ -26,6 +26,7 @@ import { ReportesHistoryComponent } from './components/reportes-history/reportes
 import { PasswordStrengthDirective } from './directivas/passwordRules/password-strength.directive';
 import { UsuariosControlService } from './services/usuarios/usuarios-control.service';
 import { FaqsComponent } from './components/faqs/faqs.component';
+import { ChatViewComponent } from './components/chat-view/chat-view.component';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import { FaqsComponent } from './components/faqs/faqs.component';
     ReportesHistoryComponent,
     PasswordStrengthDirective,
     FaqsComponent,
+    ChatViewComponent,
   ],
   imports: [
     BrowserModule,

@@ -13,6 +13,7 @@ use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\FaqController;
+use App\Http\Controllers\ChatController;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,8 +73,7 @@ Route::group([
     Route::get('materialDetails/{id}', [MaterialController::class, 'getMaterialDetails']);
 
     Route::post('crearconexion', [ChatController::class, 'crearConexion']);
-
-
+    Route::delete('eliminarConexion/{id}', [ChatController::class, 'eliminarConexion']);
 
     Route::get('getFaqsDetails', [FaqController::class, 'getFaqsDetails']);
     Route::middleware('auth:api')->get('getFaqsDetails', [FaqController::class, 'getFaqsDetails']);
