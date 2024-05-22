@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError } from 'rxjs';
+import { Observable, catchError, throwError } from 'rxjs';
 import { Employee } from '../../model/Employee';
 import { Role } from '../../model/Role';
 import { Department } from '../../model/Department';
@@ -159,18 +159,18 @@ export class ApiRequestService {
   }
 
   getFaqsDetails(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/getFaqsDetails`);
+    return this.http.get<any>(`${this.apiUrl}/auth/getFaqsDetails`);
   }
 
-  addFaq(faqData: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/addFaq`, faqData);
+  createFaq(nuevaFaq: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/createFaq`, nuevaFaq);
   }
 
-  editFaq(faqId: number, faqData: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/editFaq/${faqId}`, faqData);
+  deleteFaq(eliminarFaq: any) : Observable<any>{
+    return this.http.post<any>(`${this.apiUrl}/auth/deleteFaq`, eliminarFaq);
   }
 
-  deleteFaq(faqId: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/deleteFaq/${faqId}`);
+  editFaq(faqID:number , faqData: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/auth/editFaq/${faqID}`, faqData);
   }
 }

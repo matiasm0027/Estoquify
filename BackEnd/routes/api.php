@@ -73,8 +73,10 @@ Route::group([
 
 
     Route::get('getFaqsDetails', [FaqController::class, 'getFaqsDetails']);
-    Route::post('addFaq', [FaqController::class, 'create']);
-    Route::put('editFaq/{id}', [FaqController::class, 'edit']);
-    Route::delete('deleteFaq/{id}', [FaqController::class, 'delete']);
+    Route::middleware('auth:api')->get('getFaqsDetails', [FaqController::class, 'getFaqsDetails']);
+    Route::post('createFaq',[FaqController::class,'createFaq']);
+    // Route::post('addFaq', [FaqController::class, 'create']);
+    // Route::put('editFaq/{id}', [FaqController::class, 'edit']);
+    // Route::delete('deleteFaq/{id}', [FaqController::class, 'delete']);
 
 });

@@ -20,7 +20,7 @@ class FaqController extends Controller
             }
     
             // Verificar si el usuario tiene el rol permitido
-            $this->checkUserRole(['1']);
+        $this->checkUserRole(['1']);
     
             // Obtener todas las FAQs
             $faqs = Faq::all(['titulo', 'descripcion']);

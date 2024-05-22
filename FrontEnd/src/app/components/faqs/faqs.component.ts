@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 import { Router } from '@angular/router';
-import { Title } from '@angular/platform-browser';
-import { Faq } from 'src/app/model/Faq';
+
+
 
 
 @Component({
@@ -11,117 +13,142 @@ import { Faq } from 'src/app/model/Faq';
   styleUrls: ['./faqs.component.css']
 })
 export class FaqsComponent implements OnInit{
-  faqsDetails!: Faq[];
-  faqs: { titulo: string, descripcion: string }[] = [];
-  sidebarVisible: boolean = true;
-  sidebarWidth: number = 250;
-  employeeRole!:string;
-  employeeId!:number;
-  cargaDatos: boolean = true;
+  page: number = 1;
 
-  userRole!: any;
+  faqs: any [] = [];
+  error: string | null = null;
+  cargaDatos: boolean = false;
+  employeeRole: string = '';
+  employeeId: any;
+  FaqID: number = 0 ;
+
+  faqForm: FormGroup;
 
   mostrarModalAgregar: boolean = false;
+  mostrarModalEdit: boolean = false;
+
+  errorMessage!: string;
+  errorMessage2: string | null = null; // Declarar errorMessage2 aquí
   
-  
-  errorMessage: string = '';
-  errorMessage2: string = '';
-  successMessage: string = '';
-  apiService: any;
-  formularioFaq: any;
-  faqDetails: any;
+  successMessage: string | null = null; 
+  userRole!: any;
 
   constructor(
 
-    private apiRequestService: ApiRequestService
+    private apiRequestService: ApiRequestService,
+    private fb: FormBuilder,
+    private authControlService: UsuariosControlService,
+    private router: Router
   
-  ) {}
-
-
-  initForm(){
-    Title:[this.]
+  ) {
+    this.faqForm = this.fb.group({
+      titulo: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
+      descripcion: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]]
+    });
   }
 
   ngOnInit(): void {
-    this.getFaqsDetails();
-
+    this.userRole = this.authControlService.hasRole();
   }
 
-  getFaqsDetails(): void {
-    this.apiService.getFaqsDetails().subscribe(
-      (response) => {
-        this.faqs = response.faqs;
-      },
-      (error: any) => {
-        this.error = error.error ? error.error : 'An error occurred while fetching FAQs';
-      }
-    );
+  loadFaqsDetails(): void {
+    this.cargaDatos = true;
+    this.apiRequestService.getFaqsDetails().subscribe(data => {
+      this.faqs = data.faqs;
+      this.cargaDatos = false;
+    }, error => {
+      console.error('Error al cargar los detalles de las FAQs:', error);
+      this.cargaDatos = false;
+    });
   }
 
-  addFaq():void {
-    const faqData = {
-      titulo: 'Example Title',
-      descripcion: 'Example Description'
-    };
-
-    this.apiService.addFaq(faqData).subscribe(
-      (response) => {
-        console.log('FAQ added successfully:', response);
-        // Handle success, if needed
-      },
-      (error) => {
-        console.error('Error adding FAQ:', error);
-        // Handle error, if needed
-      }
-    );
+  mostrarModalEditar(id:any) {
+    this.mostrarModalEdit = true;
+    this.FaqID = id;
   }
 
-  editarFaq(): void {
-    this.successMessage = '';
-    this.errorMessage = '';
-    if (this.formularioFaq.valid) {
-      const faqEditada: Faq = this.formularioFaq.value;
-      faqEditada.id = this.faqDetails[0].id; // Ajusta según tu estructura de datos
-      this.apiService.editFaq(this.faqDetails[0].id, faqEditada).subscribe(
-        (response: ApiResponse) => {
-          this.successMessage = response.message || 'FAQ editada exitosamente';
-          this.cerrarModal();
-          this.obtenerDetallesFaq();
-        },
-        (error: any) => {
-          this.errorMessage = error.error.error || 'Error al editar FAQ';
-        }
-      );
-    } else {
-      this.errorMessage = 'Formulario inválido. Por favor, complete todos los campos requeridos.';
-    }
-  }
-
-  obtenerDetallesFaq() {
-    throw new Error('Method not implemented.');
-  }
-
-  deleteFaq(faqId: number) {
-    this.apiService.deleteFaq(faqId).subscribe(
-      (response: any) => {
-        console.log('FAQ deleted successfully:', response);
-        // Handle success, if needed
-      },
-      (error: any) => {
-        console.error('Error deleting FAQ:', error);
-        // Handle error, if needed
-      }
-    );
-  }
-
-
-mostrarModal() {
-    // this.mostrarModalAgregar = true;
+  mostrarModal() {
+    this.mostrarModalAgregar = true;
   }
 
   cerrarModal() {
-    // this.mostrarModalAgregar = false;
+    this.mostrarModalAgregar = false;
   }
+  cerrarModalEdit() {
+    this.mostrarModalEdit = false;
+ 
+  }
+
+
+  agregarFaq(): void {
+    this.errorMessage2 = "";
+    this.successMessage = "";
+    
+    if (this.faqForm.valid) {
+      try {
+        this.apiRequestService.createFaq(this.faqForm.value).subscribe(
+          (response: any) => {
+            this.successMessage = response.message;
+            this.cerrarModal();
+          },
+          (error: any) => {
+            this.errorMessage2 = error.error.error;
+            // No realizar ninguna acción adicional en caso de error
+          }
+        );
+      } catch (error) {
+        this.errorMessage2 = 'Error al agregar FAQ: ' + error;
+        // No realizar ninguna acción adicional en caso de error
+      }
+    } else {
+      this.errorMessage2 = 'Formulario inválido. Por favor, complete todos los campos requeridos.';
+    }
+  }
+  
+  
+
+confirmDelete(faq: any): void {
+  const confirmacion = confirm(` ${faq.titulo}?`);
+  if (confirmacion) {
+    this.deleteFaq(faq.id);
+  }
+}
+
+deleteFaq(id:number): void {
+  this.apiRequestService.deleteFaq(id).subscribe(
+    (response) => {
+      this.successMessage = response.message;
+    },
+    error => {
+      this.errorMessage = error.error.error;
+    }
+  );
+}
+
+editFaq(): void {
+  if (this.faqForm.valid) {
+    const faqEdit = {
+      titulo: this.faqForm.value.titulo,
+      descripcion: this.faqForm.value.descripcion
+    };
+
+    this.apiRequestService.editFaq(this.FaqID, faqEdit).subscribe(
+      (response: any) => {
+        this.successMessage = response.message;
+        this.cerrarModalEdit();
+        // Realiza cualquier otra acción necesaria después de editar el FAQ
+      },
+      (error: any) => {
+        this.errorMessage = error.error.error;
+        // Maneja el error de alguna manera, como mostrando un mensaje de error al usuario
+      }
+    );
+  } else {
+    // Si el formulario no es válido, puedes mostrar un mensaje de error o realizar alguna otra acción
+    console.error('Formulario inválido');
+  }
+}
+
 
 
   getLoggedUser(): void {

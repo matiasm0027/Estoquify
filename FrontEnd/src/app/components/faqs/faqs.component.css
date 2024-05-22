@@ -1,25 +1,20 @@
 .box-fl{
-    width: calc(100%);
+  width: calc(100%);
   
-  }
-  
+}
+
 .fade-in-out {
-    animation: fadeInOut 2s ease forwards;
+  animation: fadeInOut 2s ease forwards;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 1;
   }
-  
-  @keyframes fadeInOut {
-    0% {
-      opacity: 1;
-    }
-    90% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-    }
+  90% {
+    opacity: 1;
   }
-  
-  .ng-select {
-      width: 100%; /* O un valor específico en píxeles */
+  100% {
+    opacity: 0;
   }
-  
+}
