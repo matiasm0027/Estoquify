@@ -186,8 +186,6 @@ export class MaterialDetailsComponent implements OnInit {
     }
   }
 
-
-
   confirmDelete(material: Material, id:number): void {
     const confirmacion = confirm(`¿Estás seguro de que quieres eliminar el: ${material.name}?`);
     if (confirmacion) {
