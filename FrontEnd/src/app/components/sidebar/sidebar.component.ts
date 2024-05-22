@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 import { Employee } from 'src/app/model/Employee';
-import { SocketService } from 'src/app/services/socket/socket.service';
+import { ApiRequestService } from 'src/app/services/api/api-request.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -13,33 +13,19 @@ export class SidebarComponent implements OnInit {
   loggedInUser: Employee | null = null; // Inicializar con un valor nulo
   userRole!: any;
   showChatModal: boolean = false;
-  public messages: { from: string, message: string }[] = [];
-  public message: string = '';
-  public recipient: string = ''; // Usuario destinatario
-
-  constructor(private authControlService: UsuariosControlService, private socketService: SocketService) {}
+  employees: Employee[] = [];
+  filteredEmployees: Employee[] = [];
+  selectedEmployee: Employee | undefined;
+  placeholder: string = "Seleccionar Administrador";
+   
+  constructor(private authControlService: UsuariosControlService,  private apiRequestService: ApiRequestService) {}
 
   ngOnInit(): void {
     this.userRole = this.authControlService.hasRole();
     this.authControlService.getLoggedUser().subscribe(() => {
       this.loggedInUser = this.authControlService.getStoredLoggedInUser();
-      if (this.loggedInUser && this.loggedInUser.name) {
-        this.socketService.login(this.loggedInUser.name);
-      }
     });
-    this.socketService.getMessages().subscribe((data) => {
-      console.log(data)
-      this.messages.push(data);
-    });
-  }
-
-  sendMessage(): void {
-    if (this.message.trim() !== '' && this.recipient.trim() !== '') {
-      const name = this.loggedInUser?.name ?? 'Me';
-      this.socketService.sendMessage(this.recipient, this.message);
-      this.messages.push({ from: name, message: this.message });
-      this.message = '';
-    }
+    
   }
 
   logout(): void {
@@ -57,4 +43,80 @@ export class SidebarComponent implements OnInit {
   toggleChatModal() {
     this.showChatModal = !this.showChatModal;
   }
+
+  obtenerEmpleados() {
+    this.apiRequestService.getEmployees().subscribe(
+      (data: Employee[]) => {
+        
+
+        // Filtrar empleados por nombre de sucursal
+        this.employees = data.filter(employee => employee.role_id === 1);
+
+        // Filtrar filteredEmployees por nombre de sucursal
+        this.filteredEmployees = this.employees;
+
+        // Transformar fullname
+        this.filteredEmployees.forEach(employee => {
+          employee.fullname = employee.name + ' ' + employee.last_name;
+        });
+
+        console.log(this.employees);
+       
+      },
+      error => {
+        console.error('Error al obtener empleados:', error);
+      }
+    );
+  }
+
+  buscarEmpleado(event: { term: string; items: any[]; }) {
+    this.selectedEmployee = undefined;
+    const searchTerm = event.term.toLowerCase();
+
+    // Si hay un término de búsqueda, filtrar la lista de empleados, de lo contrario, mostrar todos los empleados
+    if (searchTerm.trim() !== '') {
+      this.filteredEmployees = this.employees.filter(employee =>
+        employee.name.toLowerCase().includes(searchTerm) ||
+        employee.last_name.toLowerCase().includes(searchTerm)
+      );
+    } else {
+      this.filteredEmployees = this.employees;
+    }
+}
+
+  seleccionarEmpleado(employee: Employee) {
+    this.selectedEmployee = employee;
+    this.placeholder = '';
+    this.filteredEmployees = this.employees;
+  }
+
+  limpiarSeleccion() {
+    this.selectedEmployee = undefined;
+}
+
+crearConexion() {
+  // Crear la fila en el chat con los datos necesarios
+  const nuevaConexion = {
+    sender: this.loggedInUser?.id,
+    receiver: this.selectedEmployee?.id,
+    message: '' // Mensaje vacío por defecto
+  };
+
+  // Enviar la solicitud para crear la nueva conexión
+  this.apiRequestService.crearConexion(nuevaConexion).subscribe(
+    (response) => {
+      // Manejar la respuesta del servidor si es necesario
+      console.log('Conexión creada exitosamente:', response);
+      
+      // Limpiar la selección de empleado
+      this.selectedEmployee = undefined;
+    },
+    (error) => {
+      console.error('Error al crear la conexión:', error);
+    }
+  );
+
+  // Limpiar la selección de empleado
+  this.selectedEmployee = undefined;
+}
 }

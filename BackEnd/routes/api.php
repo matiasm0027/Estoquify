@@ -71,6 +71,9 @@ Route::group([
     Route::put('editMaterial/{id}', [MaterialController::class, 'editMaterial']);
     Route::get('materialDetails/{id}', [MaterialController::class, 'getMaterialDetails']);
 
+    Route::post('crearconexion', [ChatController::class, 'crearConexion']);
+
+
 
     Route::get('getFaqsDetails', [FaqController::class, 'getFaqsDetails']);
     Route::middleware('auth:api')->get('getFaqsDetails', [FaqController::class, 'getFaqsDetails']);

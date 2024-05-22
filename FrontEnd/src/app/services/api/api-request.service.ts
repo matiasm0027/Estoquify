@@ -173,4 +173,8 @@ export class ApiRequestService {
   editFaq(faqID:number , faqData: any): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/auth/editFaq/${faqID}`, faqData);
   }
+
+  crearConexion(nuevaConexion: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/crearconexion`, nuevaConexion);
+  }
 }
