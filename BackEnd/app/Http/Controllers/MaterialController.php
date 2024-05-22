@@ -99,110 +99,86 @@ class MaterialController extends Controller
         }
     }
 
-    public function getMaterialDetails($id)
-{
-    try {
-        // Verificar si el usuario está autenticado
-        $user = auth()->user();
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no autenticado'], 401);
-        }
-
-        // Verificar si el usuario tiene el rol permitido
-        $this->checkUserRole(['1','2','3']); // Cambia '1' por el ID del rol permitido
-
-        // Buscar el material por su ID
-        $material = Material::with('category', 'attribute')->find($id);
-
-        if (!$material) {
-            return response()->json(['error' => 'Material no encontrado'], 404);
-        }
-
-        // Devolver los detalles del material
-        return response()->json(['material' => $material], 200);
-    } catch (ThrottleRequestsException $e) {
-        return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
-    }
-}
-
-public function editMaterial(Request $request, $materialId)
-{
-    try {
-        // Verificar si el usuario está autenticado
-        $user = $request->user();
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no autenticado'], 401);
-        }
-
-        // Verificar si el usuario tiene el rol permitido
-        $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
-
-        // Validar los datos de entrada del formulario
-        $validator = Validator::make($request->all(), [
-            'material.name' => 'required|string',
-            'material.high_date' => 'required|date',
-            'material.low_date' => '',
-            'material.branch_office_id' => 'required|exists:branch_offices,id',
-            'material.state' => 'required',
-            'material.pivot.*.category_id' => 'required|exists:categories,id',
-            'material.pivot.*.attribute_id' => 'required|exists:attributes,id',
-            'material.pivot.*.value' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 400);
-        }
-
-        // Convertir la fecha al formato adecuado para la base de datos
-        $high_date = date('Y-m-d H:i:s', strtotime($request->input('material.high_date')));
-        $low_date = $request->input('material.low_date') ? date('Y-m-d H:i:s', strtotime($request->input('material.low_date'))) : null;
-        // Obtener el material existente por ID
-        $material = Material::findOrFail($materialId);
-
-        // Actualizar los atributos del material
-        $material->name = $request->input('material.name');
-        $material->high_date = $high_date;
-        $material->low_date = $low_date;
-        $material->branch_office_id = $request->input('material.branch_office_id');
-        $material->state = $request->input('material.state');
-
-        // Guardar los cambios en el material
-        $material->save();
-
-        // Sincronizar los atributos asociados al material
-        foreach ($request->input('material.pivot') as $pivotData) {
-            $attributeId = $pivotData['attribute_id'];
-            $categoryId = $pivotData['category_id'];
-            $value = $pivotData['value'];
-
-            // Buscar el registro existente por attribute_id, category_id y material_id
-            $existingRecord = AttributeCategoryMaterial::where('material_id', $materialId)
-                ->where('attribute_id', $attributeId)
-                ->where('category_id', $categoryId)
-                ->first();
-
-            if ($existingRecord) {
-                // Actualizar el valor del atributo existente
-                $existingRecord->value = $value;
-                $existingRecord->save();
-            } else {
-                // Si no existe un registro, crear uno nuevo
-                $newRecord = new AttributeCategoryMaterial();
-                $newRecord->material_id = $materialId;
-                $newRecord->attribute_id = $attributeId;
-                $newRecord->category_id = $categoryId;
-                $newRecord->value = $value;
-                $newRecord->save();
+    public function editMaterial(Request $request, $materialId)
+    {
+        try {
+            // Verificar si el usuario está autenticado
+            $user = $request->user();
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no autenticado'], 401);
             }
-        }
 
-        // Devolver una respuesta de éxito
-        return response()->json(['message' => 'Material actualizado con éxito'], 200);
-    } catch (\Exception $e) {
-        // Capturar y manejar cualquier excepción que pueda ocurrir
-        return response()->json(['error' => 'Error al editar material: ' . $e->getMessage()], 500);
+            // Verificar si el usuario tiene el rol permitido
+            $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
+
+            // Validar los datos de entrada del formulario
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string',
+                'high_date' => 'required|date',
+                'low_date' => 'nullable|date',
+                'branch_office_id' => 'required|exists:branch_offices,id',
+                'state' => 'required|string',
+                'attributeCategoryMaterials.*.category_id' => 'required|exists:categories,id',
+                'attributeCategoryMaterials.*.attribute_id' => 'required|exists:attributes,id',
+                'attributeCategoryMaterials.*.value' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 400);
+            }
+
+            // Convertir las fechas al formato adecuado para la base de datos
+            $high_date = date('Y-m-d H:i:s', strtotime($request->input('high_date')));
+            $low_date = $request->input('low_date') ? date('Y-m-d H:i:s', strtotime($request->input('low_date'))) : null;
+
+            // Obtener el material existente por ID
+            $material = Material::findOrFail($materialId);
+
+            // Actualizar los atributos del material
+            $material->name = $request->input('name');
+            $material->high_date = $high_date;
+            $material->low_date = $low_date;
+            $material->branch_office_id = $request->input('branch_office_id');
+            $material->state = $request->input('state');
+
+            // Guardar los cambios en el material
+            $material->save();
+
+            // Sincronizar los atributos asociados al material
+            foreach ($request->input('attributeCategoryMaterials') as $attributeCategoryMaterialData) {
+                $attributeId = $attributeCategoryMaterialData['attribute_id'];
+                $categoryId = $attributeCategoryMaterialData['category_id'];
+                $value = $attributeCategoryMaterialData['value'];
+
+                // Buscar el registro existente por attribute_id, category_id y material_id
+                $existingRecord = AttributeCategoryMaterial::where('material_id', $materialId)
+                    ->where('attribute_id', $attributeId)
+                    ->where('category_id', $categoryId)
+                    ->first();
+
+                if ($existingRecord) {
+                    // Actualizar el valor del atributo existente
+                    $existingRecord->value = $value;
+                    $existingRecord->save();
+                } else {
+                    // Si no existe un registro, crear uno nuevo
+                    $newRecord = new AttributeCategoryMaterial();
+                    $newRecord->material_id = $materialId;
+                    $newRecord->attribute_id = $attributeId;
+                    $newRecord->category_id = $categoryId;
+                    $newRecord->value = $value;
+                    $newRecord->save();
+                }
+            }
+
+            // Devolver una respuesta de éxito
+            return response()->json(['message' => 'Material actualizado con éxito'], 200);
+        } catch (\Exception $e) {
+            // Capturar y manejar cualquier excepción que pueda ocurrir
+            return response()->json(['error' => 'Error al editar material: ' . $e->getMessage()], 500);
+        }
     }
-}
+
 
     public function deleteMaterial(Request $request, $id)
     {

@@ -313,7 +313,7 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
   }
 
   obtenerNombreCategoria() {
-    this.apiRequestService.categoryMaterialInfo().subscribe(
+    this.apiRequestService.categoryMaterial().subscribe(
       (response: any[]) => {
         this.categories = response.map(material => ({
           id: material.id,
@@ -481,7 +481,7 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
   }
 
   getCategoriaDetails(idCategoria: number): void {
-    this.apiRequestService.getCategoriaDetails(idCategoria).subscribe(
+    this.apiRequestService.categoryMaterialInfo(idCategoria).subscribe(
       (categoria: any) => {
         // Filtra los materiales disponibles de la categoría
         const materialesDisponibles = categoria.materials.filter((material: any) => material.state === 'available');

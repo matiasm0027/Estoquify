@@ -90,15 +90,12 @@ export class ApiRequestService {
 
 
   //lista de categoria
-  categoryMaterialInfo(): Observable<Category[]>{
-    return this.http.get<Category[]>(`${this.apiUrl}/auth/categoryMaterialInfo`);
-  }
-  getCategoriaDetails(categoryId: number): Observable<Category> {
-    return this.http.get<Category>(`${this.apiUrl}/auth/categoryInfoAssignments/${categoryId}`);
+  categoryMaterial(): Observable<Category[]>{
+    return this.http.get<Category[]>(`${this.apiUrl}/auth/categoryMaterial`);
   }
 
-  getCategoryDetails(employeeId: number): Observable<Category> {
-    return this.http.get<Category>(`${this.apiUrl}/auth/employeeInfoAssignments/${employeeId}`);
+  categoryMaterialInfo(id: number): Observable<Category> {
+    return this.http.get<Category>(`${this.apiUrl}/auth/categoryMaterialInfo/${id}`);
   }
 
   addCategory(category: any): Observable<Category> {
@@ -114,8 +111,8 @@ export class ApiRequestService {
   }
 
   //listado material
-  MaterialDetails(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/auth/employeeInfoAssignments`);
+  getMaterial(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/getMaterial/${id}`);
   }
 
   agregarMaterial(nuevoMaterial: Material): Observable<any> {
@@ -134,19 +131,19 @@ export class ApiRequestService {
     return this.http.get<any>(`${this.apiUrl}/auth/materialDetails/${materialId}`);
   }
 
-  materialAsignado(materialId: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/auth/materialAssignedEmployees/${materialId}`);
+  materialAsignado(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/materialAssignedEmployees/${id}`);
   }
 
-  desasignarMaterial(materialId: any, employee_id: any): Observable<any> {
-    const requestBody = { employee_id: employee_id };
+  desasignarMaterial(id: any, employee_id: any): Observable<any> {
+    const requestBody = { id: employee_id };
     console.log(requestBody)
-    return this.http.post<any>(`${this.apiUrl}/auth/desasignarMaterial/${materialId}`, requestBody);
+    return this.http.post<any>(`${this.apiUrl}/auth/desasignarMaterial/${id}`, requestBody);
   }
 
-  asignarMaterial(materialId: number, employee_id: number): Observable<any> {
-    const requestBody = { employee_id: employee_id };
-    return this.http.post<any>(`${this.apiUrl}/auth/asignarMaterial/${materialId}`, requestBody);
+  asignarMaterial(id: number, employee_id: number): Observable<any> {
+    const requestBody = { id: employee_id };
+    return this.http.post<any>(`${this.apiUrl}/auth/asignarMaterial/${id}`, requestBody);
   }
 
 

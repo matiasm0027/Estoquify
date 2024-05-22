@@ -1,3 +1,4 @@
+import { BranchOffice } from './../../model/BranchOffice';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
@@ -9,6 +10,7 @@ import { Attribute } from 'src/app/model/Attribute';
 import { forkJoin, map } from 'rxjs';
 import { Category } from 'src/app/model/Category';
 import { AttributeCategoryMaterial } from 'src/app/model/AttributeCategoryMaterial';
+import 'jspdf-autotable';
 
 @Component({
   selector: 'app-category-details',
@@ -62,16 +64,8 @@ export class CategoryDetailsComponent implements OnInit {
     this.cargarOpciones();
     this.getCategoriaIdFromRoute();
     this.filtrarMateriales();
-
     this.initForm();
-    console.log(this.category)
-    if (!this.category) {
-      this.getCategoriaDetails();
-    } else {
-      this.extractMaterials();
-      this.aplicarFiltro()
-    }
-    console.log(this.materialFiltrados)
+    this.getCategoriaDetails();
   }
 
   initForm() {
@@ -98,15 +92,12 @@ export class CategoryDetailsComponent implements OnInit {
       }
     );
   }
-  
+
 
   getCategoriaIdFromRoute(): void {
     this.route.params.subscribe(params => {
       this.categoryId = +params['id'];
       this.cargaDatos = false;
-
-    this.category = this.authControlService.getCategory();
-    this.cargaDatos = false;
   });
   }
 
@@ -120,10 +111,10 @@ export class CategoryDetailsComponent implements OnInit {
 
   getCategoriaDetails() {
     try {
-      this.ApiRequestService.getCategoriaDetails(this.categoryId)
+      this.ApiRequestService.categoryMaterialInfo(this.categoryId)
         .subscribe(response => {
           this.category = response;
-          this.extractMaterials();     
+          this.extractMaterials();
           this.aplicarFiltro();
           this.cargaDatos = false;
         });
@@ -132,14 +123,13 @@ export class CategoryDetailsComponent implements OnInit {
     }
   }
 
-
   filtrarMateriales() {
     const searchTermTrimmed = this.searchTerm.trim();
     if (!searchTermTrimmed) {
       this.materialFiltrados = this.materialData;
     } else {
       this.materialFiltrados = this.materialData.filter((material: any) => {
-        material.name.toLowerCase().includes(searchTermTrimmed.toLowerCase())
+        material .toLowerCase().includes(searchTermTrimmed.toLowerCase())
       });
       this.successMessage = "";
       // Verificar si no se encontraron empleados
@@ -148,11 +138,6 @@ export class CategoryDetailsComponent implements OnInit {
         this.successMessage = "No hay ningún material con esos datos.";
       }
     }
-  }
-
-  getNombreSucursal(branch_office_id: number): string {
-    const sucursal = this.sucursales?.find(suc => suc?.id === branch_office_id);
-    return sucursal ? sucursal.name : 'N/A';
   }
 
   agregarAtributo() {
@@ -342,7 +327,7 @@ export class CategoryDetailsComponent implements OnInit {
         this.escapeCsvValue(material.name),
         material.high_date,
         material.low_date ?? 'N/D',
-        this.getNombreSucursal(material.branch_office_id),
+        material.branch_office?.name,
         material.state
       ];
       const csvRow = values.map(value => this.escapeCsvValue(value)).join(',');

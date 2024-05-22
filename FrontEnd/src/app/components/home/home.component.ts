@@ -55,7 +55,7 @@ export class HomeComponent implements OnInit {
   }
 
   obtenerCantidadMaterial() {
-    this.ApiRequestService.categoryMaterialInfo().subscribe(
+    this.ApiRequestService.categoryMaterial().subscribe(
       (response: any[]) => {
         this.materials = response.map(material => ({
           name: material.name, // Cambiar a category_name

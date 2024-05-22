@@ -4,7 +4,6 @@ import { Employee } from 'src/app/model/Employee';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 import { Category } from 'src/app/model/Category';
-import { Material } from 'src/app/model/Material';
 import { AttributeCategoryMaterial } from 'src/app/model/AttributeCategoryMaterial';
 import 'jspdf-autotable';
 import { Router } from '@angular/router';
@@ -50,7 +49,7 @@ export class CategoriesViewComponent implements OnInit{
   }
 
   obtenerCantidadMaterial(){
-    this.ApiRequestService.categoryMaterialInfo().subscribe(category => {
+    this.ApiRequestService.categoryMaterial().subscribe(category => {
       this.categories = category;
       console.log(this.categories[0])
         this.calcularTotales();
@@ -94,8 +93,7 @@ export class CategoriesViewComponent implements OnInit{
     });
   }
 
-  enviarObjeto(id: number, category: Category) {
-    this.authControlService.setCategory(category);
+  enviarObjeto(id: number) {
     this.router.navigate(['/categories_details', id]);
   }
 
@@ -150,7 +148,6 @@ export class CategoriesViewComponent implements OnInit{
         (response: any) => {
           this.successMessage = response.message;
           this.cerrarModalEdit();
-          //this.obtenerCantidadMaterial();
         },
         (error: any) => {
           this.errorMessage = error.error.error;

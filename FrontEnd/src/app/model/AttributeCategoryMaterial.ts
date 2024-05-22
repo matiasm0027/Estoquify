@@ -1,4 +1,4 @@
-import { Attribute } from "@angular/core";
+import { Attribute } from "./Attribute";
 import { Category } from "./Category";
 import { Material } from "./Material";
 
