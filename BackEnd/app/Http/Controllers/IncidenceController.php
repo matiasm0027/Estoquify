@@ -3,17 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Report;
+use App\Models\Incidence;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Category;
-use App\Models\CategoryReport;
+use App\Models\CategoryIncidence;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 
-class ReportController extends Controller{
+class IncidenceController extends Controller{
 
-    public function sendReports(Request $request){
+    public function sendIncidence(Request $request){
         
          // Define las reglas de validación
          $rules = [

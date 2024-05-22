@@ -11,6 +11,7 @@ export class AttributeCategoryMaterial {
   material?: Material; // Relación con la tabla 'material'
   attribute?: Attribute; // Relación con la tabla 'attribute'
   category?: Category; // Relación con la tabla 'category'
+  
   constructor(
     id: number,
     material_id: number,

@@ -111,33 +111,28 @@ export class ApiRequestService {
   }
 
   //listado material
-  getMaterial(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/auth/getMaterial/${id}`);
+  getMaterial(id: number): Observable<Material> {
+    return this.http.get<Material>(`${this.apiUrl}/auth/getMaterial/${id}`);
   }
 
-  agregarMaterial(nuevoMaterial: Material): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/auth/addMaterial`, nuevoMaterial);
+  agregarMaterial(nuevoMaterial: Material): Observable<Material> {
+    return this.http.post<Material>(`${this.apiUrl}/auth/addMaterial`, nuevoMaterial);
   }
 
   deleteMaterial(materialId: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/auth/deleteMaterial/${materialId}`);
   }
 
-  editMaterial(materialId: number, materialData: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/auth/editMaterial/${materialId}`, materialData);
+  editMaterial(materialId: number, materialData: any): Observable<Material> {
+    return this.http.put<Material>(`${this.apiUrl}/auth/editMaterial/${materialId}`, materialData);
   }
 
-  getMaterialDetails(materialId: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/auth/materialDetails/${materialId}`);
-  }
-
-  materialAsignado(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/auth/materialAssignedEmployees/${id}`);
+  getMaterialDetails(materialId: number): Observable<Material> {
+    return this.http.get<Material>(`${this.apiUrl}/auth/materialDetails/${materialId}`);
   }
 
   desasignarMaterial(id: any, employee_id: any): Observable<any> {
     const requestBody = { id: employee_id };
-    console.log(requestBody)
     return this.http.post<any>(`${this.apiUrl}/auth/desasignarMaterial/${id}`, requestBody);
   }
 
@@ -145,8 +140,6 @@ export class ApiRequestService {
     const requestBody = { id: employee_id };
     return this.http.post<any>(`${this.apiUrl}/auth/asignarMaterial/${id}`, requestBody);
   }
-
-
 
   //lista de incidencias
   listReportes(): Observable<any[]>{

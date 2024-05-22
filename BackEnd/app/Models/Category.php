@@ -23,4 +23,9 @@ class Category extends Model
     {
         return $this->hasMany(AttributeCategoryMaterial::class);
     }
+
+    public function categoryIncidences()
+    {
+        return $this->hasMany(CategoryIncidence::class);
+    }
 }

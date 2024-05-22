@@ -124,21 +124,24 @@ export class CategoryDetailsComponent implements OnInit {
   }
 
   filtrarMateriales() {
+    this.successMessage = "";
     const searchTermTrimmed = this.searchTerm.trim();
     if (!searchTermTrimmed) {
       this.materialFiltrados = this.materialData;
     } else {
-      this.materialFiltrados = this.materialData.filter((material: any) => {
-        material .toLowerCase().includes(searchTermTrimmed.toLowerCase())
+      this.materialFiltrados = this.materialData.filter((material) => {
+        console.log(material.name);
+        return material.name.toLowerCase().includes(searchTermTrimmed.toLowerCase());
       });
-      this.successMessage = "";
-      // Verificar si no se encontraron empleados
+      console.log(this.materialFiltrados);
+      // Verificar si no se encontraron materiales
       if (this.materialFiltrados.length === 0) {
         // Mostrar mensaje en pantalla
         this.successMessage = "No hay ningún material con esos datos.";
       }
     }
   }
+  
 
   agregarAtributo() {
     // Agregar un nuevo conjunto de campos para atributo y valor

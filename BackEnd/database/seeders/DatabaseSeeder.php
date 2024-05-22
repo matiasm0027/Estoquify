@@ -4,9 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Employee;
-use App\Models\Report;
+use App\Models\Incidence;
 use App\Models\Material;
-use App\Models\CategoryReport;
+use App\Models\CategoryIncidence;
 
 class DatabaseSeeder extends Seeder
 {
@@ -56,9 +56,9 @@ class DatabaseSeeder extends Seeder
              'branch_office_id' => 1,
         ]);
         Employee::factory(70)->create();
-        Report::factory(10)->create();
+        Incidence::factory(10)->create();
         Material::factory(300)->create();
-        CategoryReport::factory(10)->create();
+        CategoryIncidence::factory(10)->create();
 
         // Llamar a otros seeders después de crear registros
         $this->call([

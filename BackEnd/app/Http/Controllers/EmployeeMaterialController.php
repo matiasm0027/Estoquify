@@ -165,7 +165,6 @@ class EmployeeMaterialController extends Controller
         return $filteredEmployeesFormatted;
     }
 
-
     public function asignarMaterial(Request $request, $id)
     {
         try {
@@ -209,51 +208,51 @@ class EmployeeMaterialController extends Controller
     }
 
 
-public function desasignarMaterial(Request $request, $id)
-{
-    try {
-        // Verificar si el usuario está autenticado
-        $user = auth()->user();
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no autenticado'], 401);
+    public function desasignarMaterial(Request $request, $id)
+    {
+        try {
+            // Verificar si el usuario está autenticado
+            $user = auth()->user();
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no autenticado'], 401);
+            }
+
+            // Verificar si el usuario tiene el rol permitido
+            $this->checkUserRole(['1']);
+
+
+            // Validar el ID del empleado
+            $employeeId = $request->input('id');
+            $employee = Employee::find($employeeId);
+
+            if (!$employee) {
+                return response()->json(['message' => 'Empleado no encontrado'], 404);
+            }
+
+            // Encuentra el material por su ID
+            $material = Material::find($id);
+
+            if (!$material) {
+                return response()->json(['message' => 'Material no encontrado'], 404);
+            }
+
+            // Buscar la asignación entre el empleado y el material
+            $employeeMaterial = EmployeeMaterial::where('employee_id', $employeeId)
+                ->where('material_id', $id)
+                ->first();
+
+            if (!$employeeMaterial) {
+                return response()->json(['message' => 'La asignación no existe'], 404);
+            }
+
+            // Eliminar la asignación
+            $employeeMaterial->delete();
+
+            return response()->json(['message' => 'Material desasignado correctamente'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al desasignar material: ' . $e->getMessage()], 500);
         }
-
-        // Verificar si el usuario tiene el rol permitido
-        $this->checkUserRole(['1']);
-
-
-        // Validar el ID del empleado
-        $employeeId = $request->input('id');
-        $employee = Employee::find($employeeId);
-
-        if (!$employee) {
-            return response()->json(['message' => 'Empleado no encontrado'], 404);
-        }
-
-        // Encuentra el material por su ID
-        $material = Material::find($id);
-
-        if (!$material) {
-            return response()->json(['message' => 'Material no encontrado'], 404);
-        }
-
-        // Buscar la asignación entre el empleado y el material
-        $employeeMaterial = EmployeeMaterial::where('employee_id', $employeeId)
-            ->where('material_id', $id)
-            ->first();
-
-        if (!$employeeMaterial) {
-            return response()->json(['message' => 'La asignación no existe'], 404);
-        }
-
-        // Eliminar la asignación
-        $employeeMaterial->delete();
-
-        return response()->json(['message' => 'Material desasignado correctamente'], 200);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'Error al desasignar material: ' . $e->getMessage()], 500);
     }
-}
 
     protected function checkUserRole($allowedRoles)
     {

@@ -70,6 +70,7 @@ export class EmployeesViewComponent implements OnInit {
   }
 
   filtrarEmpleados() {
+    this.successMessage = "";
     const searchTermTrimmed = this.searchTerm.trim();
     if (!searchTermTrimmed) {
       this.empleadosFiltrados = this.employees;
@@ -79,7 +80,6 @@ export class EmployeesViewComponent implements OnInit {
         empleado.last_name.toLowerCase().includes(searchTermTrimmed.toLowerCase()) ||
         empleado.email.toLowerCase().includes(searchTermTrimmed.toLowerCase())
       );
-      this.successMessage = "";
       // Verificar si no se encontraron empleados
       if (this.empleadosFiltrados.length === 0) {
         // Mostrar mensaje en pantalla

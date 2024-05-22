@@ -2,16 +2,16 @@
 
 namespace Database\Factories;
 use App\Models\Employee;
-use App\Models\Report;
+use App\Models\Incidence;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Report>
  */
-class ReportFactory extends Factory
+class IncidenceFactory extends Factory
 {
-    protected $model = Report::class;
+    protected $model = Incidence::class;
 
     public function definition(): array
     {

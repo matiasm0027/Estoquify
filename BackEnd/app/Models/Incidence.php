@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Report extends Model
+class Incidence extends Model
 {
     use HasFactory;
 
-    protected $table = 'reports';
+    protected $table = 'incidences';
 
     protected $fillable = ['date', 'petition', 'state', 'priority', 'type', 'employee_id'];
 
@@ -18,9 +18,9 @@ class Report extends Model
         return $this->belongsTo(Employee::class);
     }
 
-    public function category()
+    public function categoryIncidences()
     {
-        return $this->belongsToMany(Category::class, 'category_report', 'report_id', 'category_id')
-                    ->withTimestamps(); // Si la tabla pivot tiene campos de marca de tiempo, agrega esto
+        return $this->hasMany(CategoryIncidence::class);
     }
+
 }
