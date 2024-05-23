@@ -33,6 +33,7 @@ class EmployeeFactory extends Factory
              'email' => $email,
              'password' => bcrypt($phone_number),
              'phone_number' => $phone_number,
+             'first_login' => true,
              'department_id' => $this->faker->randomElement($departmentIds),
              'role_id' => $this->faker->randomElement($roleIds),
              'branch_office_id' => $this->faker->randomElement($branchOfficeIds),

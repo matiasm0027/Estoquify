@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Chat;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Crypt;
 
 class ChatController extends Controller
 {

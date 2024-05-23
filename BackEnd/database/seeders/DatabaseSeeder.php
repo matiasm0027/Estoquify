@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\Report;
 use App\Models\Material;
 use App\Models\CategoryReport;
+use App\Models\Faq;
 
 class DatabaseSeeder extends Seeder
 {
