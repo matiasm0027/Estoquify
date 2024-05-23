@@ -121,7 +121,7 @@ confirmDelete(faq: number): void {
 }
 
 deleteFaq(id: number): void {
-  this.apiRequestService.deleteFaq(this.FaqID).subscribe(
+  this.apiRequestService.deleteFaq(id).subscribe(
     (response: any) => {
       this.successMessage = response.message;
       this.loadFaqsDetails();
