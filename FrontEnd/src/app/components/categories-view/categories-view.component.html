@@ -33,7 +33,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr class="border-b border-gray-200 dark:border-gray-700" *ngFor="let material of materials">
+          <tr class="border-b border-gray-200 dark:border-gray-700" *ngFor="let category of categories">
             <th scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
               <span class="flex items-center justify-center">
@@ -41,32 +41,35 @@
                   class="h-4 w-4 mr-1 ">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
-                <a [routerLink]="['/categories_details', material.id]">{{ material.name }}</a>
+                <!-- <a [routerLink]="['/categories_details', category.name]">{{ category.name }}</a> -->
+                <button (click)="enviarObjeto(category.id)">{{
+                  category.name }}</button>
               </span>
             </th>
             <td class="px-6 py-4">
-              {{ material.total_material }}
+              {{ totales[category.name].totalMateriales }}
             </td>
             <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
-              {{ material.activeMaterial}}
+              {{ totales[category.name].active }}
             </td>
             <td class="px-6 py-4">
-              {{ material.availableMaterial}}
+              {{ totales[category.name].available }}
             </td>
             <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
-              {{ material.inactiveMaterial}}
+              {{ totales[category.name].inactive }}
             </td>
             <td class="px-6 py-4" *ngIf="userRole === '1'">
-              <button (click)="mostrarModalEditar(material.id)"
+              <button (click)="mostrarModalEditar(category.id)"
                 class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 px-6 rounded border border-blue-500 lg:mr-2">
                 Editar
               </button>
-              <button (click)="confirmDelete(material)"
+              <button (click)="confirmDelete(category.id, category.name)"
                 class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 px-4 rounded border border-red-500 md:mt-2 sm:mt-1">
                 Eliminar
               </button>
             </td>
           </tr>
+
         </tbody>
       </table>
 
@@ -105,6 +108,7 @@
                   <button (click)="cerrarModal()"
                     class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
                 </div>
+                <div *ngIf="errorMessage2" class="text-red-800 fade-in-out">{{ errorMessage2 }}</div>
               </form>
             </div>
           </div>
@@ -144,12 +148,14 @@
                   <button (click)="cerrarModalEdit()"
                     class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
                 </div>
+                <div *ngIf="errorMessage2" class="text-red-800 fade-in-out">{{ errorMessage2 }}</div>
               </form>
             </div>
           </div>
         </div>
       </div>
-      <div *ngIf="successMessage" class="text-green-800 mensaje_exitoso fade-in-out">{{ successMessage }}</div>
-      <div *ngIf="errorMessage" class="text-red-800 mensaje_error fade-in-out">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="text-green-800 fade-in-out">{{ successMessage }}</div>
+      <div *ngIf="errorMessage" class="text-red-800 fade-in-out">{{ errorMessage }}</div>
     </div>
   </div>
+</div>

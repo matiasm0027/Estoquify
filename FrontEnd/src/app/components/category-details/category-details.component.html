@@ -10,10 +10,10 @@
       </div>
     </div>
     <!-- Contenido de la vista de detalles del material -->
-    <div class="bg-white p-6 rounded shadow" *ngIf="categoryDetails">
+    <div class="bg-white p-6 rounded shadow" *ngIf="materialFiltrados">
       <div class="flex justify-between items-center mb-4">
         <div class="flex items-center"> <!-- Nuevo contenedor flex para el título y el input -->
-          <h1 class="text-2xl font-bold mr-4">{{this.detallesMaterial.category_name}}</h1>
+          <h1 class="text-2xl font-bold mr-4">{{category.name}}</h1>
           <!-- Añade margen a la derecha para separar el título del input -->
           <div class="relative"> <!-- Contenedor relativo para el input y el icono -->
             <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar material..." (input)="filtrarMateriales()"
@@ -25,7 +25,7 @@
         </div>
         <div class="space-x-4 relative">
           <button (click)="mostrarModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 md:ml-4 md:mb-2 rounded"
-                  *ngIf="employeeRole === 'admin'">
+                  *ngIf="userRole === '1'">
             Añadir Material
           </button>
           <button (click)="mostrarModalDeFiltros()"
@@ -35,20 +35,20 @@
           <button (click)="volver()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
             Volver
           </button>
-        
-          <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded relative" type="button"
+
+          <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4  md:mt-2 rounded relative" type="button"
                   (click)="toggleOptions()" aria-controls="dropdownMenu">
             Descargar
             <div *ngIf="showOptions" id="dropdownMenu" class="dropdown-nav-inner-wrapper absolute mt-2"
                  aria-labelledby="dropdownMenuButton">
-              <button class="dropdown-item bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded"
+              <button class="dropdown-item bg-green-300 hover:bg-green-600 text-white font-bold py-2 px-6 rounded"
                       (click)="downloadCsvOrPdf('csv')">CSV</button><br>
-              <button class="dropdown-item bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded"
+              <button class="dropdown-item bg-green-300 hover:bg-green-600 text-white font-bold py-2 px-6 rounded"
                       (click)="downloadCsvOrPdf('pdf')">PDF</button>
             </div>
           </button>
         </div>
-        
+
       </div>
       <div class="table-container overflow-x-auto">
         <table
@@ -73,21 +73,21 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let material of categoryDetails?.materials | paginate: { itemsPerPage: 10, currentPage: page }">
+
+            <tr *ngFor="let material of materialFiltrados | paginate: { itemsPerPage: 10, currentPage: page }">
               <td class="px-6 py-4 text-gray-700">
                 <span class="flex items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                     class="h-4 w-4 mr-1 ">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                   </svg>
-                  <a [routerLink]="['/material_details', material.id]"><strong>{{ material.name
-                      }}</strong></a>
+                  <a [routerLink]="['/material_details', material.id]"><strong>{{ material.name}}</strong></a>
                 </span>
               </td>
               <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{ material.high_date }}</td>
-              <td class="px-6 py-4">{{ material.low_date ?? 'N/D'}}</td>
+              <td class="px-6 py-4">{{ material.low_date ? material.low_date : 'N/D' }}</td>
               <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">{{
-                getNombreSucursal(material.branch_office_id) }}</td>
+                material.branch_office?.name}}</td>
               <td class="px-6 py-4">
                 <span
                   [ngClass]="{'text-green-500 dark:text-green-800': material.state === 'available', 'text-red-500 dark:text-red-800': material.state === 'inactive', 'text-blue-500 dark:text-blue-800': material.state === 'active'}">{{
@@ -103,12 +103,12 @@
           <!-- Contenido del modal -->
           <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full">
             <!-- Encabezado del modal -->
-            <div class="px-4 py-2 bg-gray-200" *ngIf="employeeRole === 'admin'">
+            <div class="px-4 py-2 bg-gray-200" *ngIf="userRole === '1'">
               <h3 class="text-lg font-bold">Añadir Material</h3>
             </div>
             <!-- Cuerpo del modal (aquí va el formulario) -->
             <div class="p-4">
-              <!-- Formulario aquí -->
+              <!-- Formulario aquí-->
               <form [formGroup]="formularioMaterial" (submit)="agregarMaterial()">
                 <div class="mb-4">
                   <label for="nombre" class="block text-gray-700">Nombre</label>
@@ -186,10 +186,11 @@
                       </div>
                     </div>
                     <!-- Campo de Valor -->
-                    <div style="flex: 1;">
+                  <div style="flex: 1;">
                       <label for="valor{{index + 2}}" class="block text-gray-700">Valor {{index + 2}}</label>
-                      <div class="flex items-center"> <!-- Contenedor para alinear los elementos -->
-                        <input type="text" id="valor{{index + 2}}" name="valor{{index + 2}}"
+                      <div class="flex items-center">
+                         <!-- Contenedor para alinear los elementos -->
+                      <input type="text" id="valor{{index + 2}}" name="valor{{index + 2}}"
                           class="form-input mt-1 block w-full mr-2" placeholder="Ingrese el valor"
                           formControlName="valor{{index + 2}}">
 
@@ -210,7 +211,7 @@
                   </div>
                 </div>
 
-                <!-- Botón para agregar más atributos y valores -->
+                   <!--Botón para agregar más atributos y valores -->
                 <div class="flex justify-end mb-4">
                   <button type="button" (click)="agregarAtributo()"
                     class="text-blue-500 hover:text-blue-700 focus:outline-none focus:underline">+
@@ -221,7 +222,7 @@
                   <label for="sucursal" class="block text-gray-700">Sucursal</label>
                   <select formControlName="sucursal" id="sucursal" name="sucursal" class="form-select mt-1 block w-full"
                     required>
-                    <option *ngFor="let suc of sucursales" [value]="suc.id">{{ suc.name }}</option>
+                    <option *ngFor="let suc of sucursales" [value]="suc?.id">{{ suc?.name }}</option>
                   </select>
                   <div
                     *ngIf="formularioMaterial.get('sucursal')?.errors?.['required'] && formularioMaterial.get('sucursal')?.touched"
@@ -230,7 +231,7 @@
                   </div>
                 </div>
                 <div class="flex justify-end">
-                  <button (click)="agregarMaterial()" type="button"
+                   <button (click)="agregarMaterial()" type="button"
                     class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar</button>
                   <button (click)="cerrarModal()" type="button"
                     class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
@@ -275,7 +276,7 @@
                 <label class="block text-gray-700">Sucursal</label>
                 <select class="form-select mt-1 block w-full" [(ngModel)]="filtroSucursal">
                   <option value="">Todas las sucursales</option>
-                  <option *ngFor="let sucursal of sucursales" [value]="sucursal.id">{{ sucursal.name
+                  <option *ngFor="let sucursal of sucursales" [value]="sucursal?.id">{{ sucursal?.name
                     }}</option>
                 </select>
               </div>

@@ -55,7 +55,7 @@ export class EmployeesViewComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30), Validators.pattern('^[a-zA-Z]+$')]],
       last_name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30), Validators.pattern('^[a-zA-Z]+$')]],
       email: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'),]],
-      phone_number: ['', [Validators.required, Validators.pattern('(6|7)[ -]*([0-9][ -]*){8}'),]],
+      phone_number: ['', [Validators.required, Validators.pattern('(6|7)[ -]*([0-9][ -]*){8}')]],
       password: ['', Validators.required],
       department_id: ['', Validators.required],
       branch_office_id: ['', Validators.required],
@@ -70,6 +70,7 @@ export class EmployeesViewComponent implements OnInit {
   }
 
   filtrarEmpleados() {
+    this.successMessage = "";
     const searchTermTrimmed = this.searchTerm.trim();
     if (!searchTermTrimmed) {
       this.empleadosFiltrados = this.employees;
@@ -79,7 +80,6 @@ export class EmployeesViewComponent implements OnInit {
         empleado.last_name.toLowerCase().includes(searchTermTrimmed.toLowerCase()) ||
         empleado.email.toLowerCase().includes(searchTermTrimmed.toLowerCase())
       );
-      this.successMessage = "";
       // Verificar si no se encontraron empleados
       if (this.empleadosFiltrados.length === 0) {
         // Mostrar mensaje en pantalla

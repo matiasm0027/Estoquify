@@ -13,8 +13,8 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { CategoryDetailsComponent } from './components/category-details/category-details.component';
 import { MaterialDetailsComponent } from './components/material-details/material-details.component';
-import { ReportesViewComponent } from './components/reportes-view/reportes-view.component';
-import { ReportesHistoryComponent } from './components/reportes-history/reportes-history.component';
+import { IncidenceHistoryComponent } from './components/incidences-history/incidences-history.component';
+import { IncidenceViewComponent } from './components/incidences-view/incidences-view.component';
 import { FaqsComponent } from './components/faqs/faqs.component';
 import { ChatViewComponent } from './components/chat-view/chat-view.component';
 
@@ -32,8 +32,8 @@ const routes: Routes = [
   { path: 'categories_details/:id', component: CategoryDetailsComponent, canActivate: [MyGuardGuard, ChangePasswordGuard ]},
   { path: 'change_password', component: ChangePasswordComponent, canActivate: [MyGuardGuard, ]},
   { path: 'material_details/:id', component: MaterialDetailsComponent, canActivate: [MyGuardGuard, ]},
-  { path: 'reportes_view', component: ReportesViewComponent, canActivate: [MyGuardGuard, ]},
-  { path: 'reportes_history', component: ReportesHistoryComponent, canActivate: [MyGuardGuard, ]},
+  { path: 'incidences_view', component: IncidenceViewComponent, canActivate: [MyGuardGuard, ]},
+  { path: 'incidences_history', component: IncidenceHistoryComponent, canActivate: [MyGuardGuard, ]},
   { path: 'faqs', component: FaqsComponent, canActivate:[MyGuardGuard]},
   { path: 'chat', component: ChatViewComponent, canActivate:[MyGuardGuard]},
   { path: '', redirectTo: 'login', pathMatch: 'full' },

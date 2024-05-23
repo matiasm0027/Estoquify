@@ -1,95 +1,91 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
-import { Subscription } from 'rxjs';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import { forkJoin } from 'rxjs';
+import { Employee } from 'src/app/model/Employee';
+import { Material } from 'src/app/model/Material';
+import { AttributeCategoryMaterial } from 'src/app/model/AttributeCategoryMaterial';
 
 @Component({
   selector: 'app-material-details',
   templateUrl: './material-details.component.html',
   styleUrls: ['./material-details.component.css']
 })
-export class MaterialDetailsComponent implements OnInit, OnDestroy {
+export class MaterialDetailsComponent implements OnInit {
   materialId!: number;
-  materialDetails: any = {};
-  departamentos: any[] = [];
-  sucursales: any[] = [];
   mostrarModalEditar: boolean = false;
   formularioMaterial!: FormGroup;
-  attributeNames: string[] = [];
   categoria_id!: number;
-  atributos: any[] = [];
   estados: any[] = [
     { value: 'available', label: 'Avaliable' },
     { value: 'active', label: 'Activo' },
     { value: 'inactive', label: 'Inactivo' }
   ];
-  asignado: any;
-  successMessage!: string;
   successMessage2!: string;
-  employeeId!:number;
-  employeeRole!:string;
   cargaDatos: boolean = true;
 
-  private subscriptions: Subscription[] = [];
+  userRole!: any;
+  loggedInUser!: Employee | null;
+  departamentos: { id: number; name: string; }[] = [];
+  sucursales: { id: number; name: string; }[] = [];
+  atributos: { id: number; name: string; }[] = [];
+  material!: Material;
+  errorMessage!: string;
+  successMessage!: string;
+  attriCateMatDetail!: AttributeCategoryMaterial[];
 
   constructor(
     private route: ActivatedRoute,
-    private materialService: ApiRequestService,
     private router: Router,
     private fb: FormBuilder,
-    private controlUsuario: UsuariosControlService
-  ) {
-
-  }
+    private ApiRequestService: ApiRequestService,
+    private authControlService: UsuariosControlService,
+  ) { }
 
   ngOnInit(): void {
+    this.userRole = this.authControlService.hasRole();
+    this.authControlService.getLoggedUser().subscribe(
+      (user) => {
+        this.loggedInUser = user;
+      }
+    );
+    this.cargarOpciones();
     this.getMaterialIdFromRoute();
-    this.obtenerDepartamento();
-    this.obtenerSucursales();
     this.getMaterialDetails();
-    this.getCategoriaID();
-    this.obtenerAtributos();
-    this.getLoggedUser();
-    this.obtenerEmpleadoAsignado(this.materialId);
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-  }
-
-  getCategoriaID(){
-    this.categoria_id = this.controlUsuario.getNumero();
   }
 
   initForm() {
     const formControls: { [key: string]: any } = {
-        nombre: [this.materialDetails.material.name, [Validators.required, Validators.maxLength(30)]],
-        //valor: [this.materialDetails.material.attribute[0].pivot.value, [Validators.required, Validators.maxLength(50)]],
-        sucursal: [this.materialDetails.material.branch_office_id, Validators.required],
-        estado: [this.materialDetails.material.state, Validators.required],
-        lowDate: [' ']
+      name: [this.material.name, [Validators.required, Validators.maxLength(30)]],
+      branch_office_id: [this.material.branch_office?.id, Validators.required],
+      state: [this.material.state, Validators.required],
+      lowDate: [' ']
     };
-
-    this.materialDetails.material.attribute.forEach((attribute: any, index: number) => {
-        formControls['atributo' + index] = [attribute.pivot.value, [Validators.required, Validators.maxLength(50)]];
-    });
-
+    if (this.material.attributeCategoryMaterials) {
+      this.material.attributeCategoryMaterials.forEach((item, index) => {
+        formControls['atributo' + index] = [item.value, [Validators.required, Validators.maxLength(50)]];
+      });
+    }
     this.formularioMaterial = this.fb.group(formControls);
-}
+  }
 
-
-  obtenerAtributos() {
-    this.materialService.listAtributos().subscribe(
-      (response: any[]) => {
-        this.atributos = response;
-
+  cargarOpciones() {
+    forkJoin([
+      this.authControlService.cargarSucursales(),
+      this.authControlService.cargarAtributos(),
+      this.authControlService.cargarDepartamentos(),
+    ]).subscribe(
+      ([sucursales, atributos, departamentos]) => {
+        this.sucursales = sucursales;
+        this.atributos = atributos;
+        this.departamentos = departamentos;
       },
-      error => {
-        console.error('Error al obtener atributos:', error);
+      (error) => {
+        console.error('Error loading options', error);
       }
     );
   }
@@ -100,34 +96,38 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  setFechaActual(checked: boolean) {
-    if (checked) {
-        // Obtiene la fecha actual y la formatea como yyyy-mm-dd
-        const today = new Date().toISOString().slice(0, 10);
-        // Establece la fecha actual como fecha de baja
-        this.formularioMaterial.patchValue({
-            lowDate: today
-        });
-    }
-}
-
   getMaterialDetails(): void {
-    this.materialService.getMaterialDetails(this.materialId)
+    this.ApiRequestService.getMaterial(this.materialId)
       .subscribe(
-        (material: any) => {
-          this.materialDetails = material;
-          this.attributeNames = this.materialDetails.material.attribute.map((attribute: any) => attribute.name);
+        (response) => {
+          this.material = response;
+          this.extractAttributes();
           this.cargaDatos = false;
+          console.log(this.material)
+          console.log(this.attriCateMatDetail)
           this.initForm();
         },
-        (error: any) => {
-          console.error('Error al obtener detalles del material:', error);
+        (error) => {
+          this.errorMessage = error.error.error;
         }
       );
   }
 
-  volver() {
-    this.router.navigate(['/categories_details/' + this.materialDetails.material.category[0].id]);
+  extractAttributes(): void {
+    if (this.material && this.material.attributeCategoryMaterials) {
+      this.attriCateMatDetail = this.material.attributeCategoryMaterials;
+    }
+  }
+
+  setFechaActual(checked: boolean) {
+    if (checked) {
+      // Obtiene la fecha actual y la formatea como yyyy-mm-dd
+      const today = new Date().toISOString().slice(0, 10);
+      // Establece la fecha actual como fecha de baja
+      this.formularioMaterial.patchValue({
+        lowDate: today
+      });
+    }
   }
 
   mostrarModal() {
@@ -142,96 +142,69 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
 
   editarMaterial(): void {
     if (this.formularioMaterial.valid) {
-      let bajaFecha = ' ';
-      if(this.materialDetails.material.low_date!==null){
-         bajaFecha = this.materialDetails.material.low_date
-      }else{
-         bajaFecha = this.formularioMaterial.value.lowDate
+      let bajaFecha = null;
+      if (this.material.low_date !== null) {
+        bajaFecha = this.material.low_date;
+      } else {
+        bajaFecha = this.formularioMaterial.value.lowDate;
       }
-        const materialEditado = {
-          material: {
-            name: this.formularioMaterial.value.nombre,
-            high_date: this.materialDetails.material.high_date,
-            low_date: bajaFecha,
-            branch_office_id: this.formularioMaterial.value.sucursal,
-            state: this.formularioMaterial.value.estado,
-            pivot: {} as { [key: string]: any } // Especificar el tipo de las claves como string
-          }
 
-        };
+      const materialEditado:Material = {
+          id: this.material.id,
+          name: this.formularioMaterial.value.name,
+          high_date: this.material.high_date,
+          low_date: bajaFecha,
+          branch_office_id: this.formularioMaterial.value.branch_office_id,
+          state: this.formularioMaterial.value.state,
+          attributeCategoryMaterials: []
+      };
 
-
-        // Agregar los valores de los atributos al objeto pivot
-        this.materialDetails.material.attribute.forEach((attribute: any, index: number) => {
-
-            materialEditado.material.pivot[index] = {
-                attribute_id: attribute.id,
-                category_id: this.materialDetails.material.category[0].id,
-                value: this.formularioMaterial.value[`atributo${index}`]
-            };
+      // Agregar los valores de los atributos al objeto attributeCategoryMaterials
+      if (this.material.attributeCategoryMaterials) {
+        this.material.attributeCategoryMaterials.forEach((item, index) => {
+          materialEditado.attributeCategoryMaterials?.push({
+            id: item.id,
+            attribute_id: item.attribute?.id ?? 0,
+            category_id: item.category?.id ?? 0,
+            material_id: item.id,
+            value: this.formularioMaterial.value[`atributo${index}`]
         });
+      });
+      }
 
-        this.materialService.editMaterial(this.materialId, materialEditado).subscribe(
-            (response: any) => {
-              this.successMessage2=response.message;
-                this.cerrarModal();
-                this.getMaterialDetails();
-            },
-            (error: any) => {
-                console.error('Error al editar material:', error);
-            }
-        );
+      this.ApiRequestService.editMaterial(this.material.id, materialEditado).subscribe(
+        (response: any) => {
+          this.successMessage2 = response.message;
+          this.cerrarModal();
+        },
+        (error: any) => {
+          this.errorMessage = error.error.error;
+        }
+      );
     } else {
-        console.error('Formulario inválido');
+      this.errorMessage ='Invalid Form';
     }
-}
-
-  obtenerDepartamento() {
-    this.materialService.listDepartments().subscribe(
-      (response: any[]) => {
-        this.departamentos = response;
-        this.cargaDatos = false;
-      },
-      error => {
-        console.error('Error al obtener department:', error);
-      }
-    );
   }
 
-  obtenerSucursales() {
-    this.materialService.listBranchOffices().subscribe(
-      (response: any[]) => {
-        this.sucursales = response;          
-        this.cargaDatos = false;
-      },
-      error => {
-        console.error('Error al obtener sucursales:', error);
-      }
-    );
-  }
-
-  getNombreSucursal(branch_office_id: number): string {
-    const sucursal = this.sucursales.find(suc => suc.id === branch_office_id);
-    this.cargaDatos = false;
-
-    return sucursal ? sucursal.name : 'N/A';
-    
-  }
-
-  confirmDelete(material: any): void {
-    const confirmacion = confirm(`¿Estás seguro de que quieres eliminar el: ${ material.material.name }?`);
+  confirmDelete(material: Material, id:number): void {
+    const confirmacion = confirm(`¿Estás seguro de que quieres eliminar el: ${material.name}?`);
     if (confirmacion) {
-      this.router.navigate(['/categories_details/' + this.materialDetails.material.category[0].id]);
-      this.deleteMaterial(material.material.id);
-      alert(`El material: ${material.material.name} ha sido eliminado.`);
+      if(id === 0){
+        this.router.navigate(['/categories_view']);
+      }else{
+      this.deleteMaterial(material.id);
+
+      }
     }
   }
 
   deleteMaterial(id: number): void {
 
     // Llamar al servicio para eliminar el material
-    this.materialService.deleteMaterial(id).subscribe(
+    this.ApiRequestService.deleteMaterial(id).subscribe(
       (response) => {
+        this.router.navigate(['/categories_details/' + this.attriCateMatDetail[0].category?.id]);
+        alert(response.message);
         // Navegar a la vista de materiales después de eliminar con éxito
       },
       error => {
@@ -243,37 +216,27 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
 
   getColor(state: string | undefined): string {
     if (state === 'available') {
-        return 'green'; // verde para estado 'available'
+      return 'green'; // verde para estado 'available'
     } else if (state === 'inactive') {
-        return 'red'; // rojo para estado 'inactive'
+      return 'red'; // rojo para estado 'inactive'
     } else if (state === 'active') {
-        return 'blue'; // azul para estado 'active'
+      return 'blue'; // azul para estado 'active'
     } else {
-        return 'black'; // color por defecto
+      return 'black'; // color por defecto
     }
   }
 
-  obtenerEmpleadoAsignado(id: number) {
-    this.materialService.materialAsignado(id).subscribe(
-      (response) => {
-        this.asignado = response;
-        this.cargaDatos = false;
-      },
-      error => {
-        console.error('Error al obtener la asignación:', error);
-      }
-    );
-  }
 
   desasignarMaterial(employeeId: number) {
+    this.successMessage = "";
     // Lógica para desasignar el material del empleado actualmente asignado
-    const materialId = this.asignado.material_id;
+    const materialId = this.material.id;
     // Llama al servicio para desasignar el material
-    this.materialService.desasignarMaterial(materialId, employeeId).subscribe(
+    this.ApiRequestService.desasignarMaterial(materialId, employeeId).subscribe(
       (response) => {
         // Actualiza la vista después de desasignar el material
-        this.obtenerEmpleadoAsignado(materialId);
         this.successMessage = response.message;
+        this.getMaterialDetails();
       },
       (error) => {
         console.error('Error al desasignar el material:', error);
@@ -282,26 +245,20 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
   }
 
   asignarMaterial(employeeId: number) {
+    this.successMessage = "";
     // Lógica para asignar el material al empleado con el ID proporcionado
-    const materialId = this.asignado.material_id;
+    const materialId = this.material.id;
     // Llama al servicio para asignar el material al empleado
-    this.materialService.asignarMaterial(materialId, employeeId).subscribe(
+    this.ApiRequestService.asignarMaterial(materialId, employeeId).subscribe(
       (response) => {
         // Actualiza la vista después de asignar el material
-        this.obtenerEmpleadoAsignado(materialId);
         this.successMessage = response.message;
+        this.getMaterialDetails();
       },
       (error) => {
         console.error('Error al asignar el material:', error);
       }
     );
-  }
-
-  clearMessagesAfterDelay(): void {
-    setTimeout(() => {
-      this.successMessage = '';
-      //this.errorMessage = '';
-    }, 2000);
   }
 
   showOptions: boolean = false;
@@ -310,48 +267,26 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
     this.showOptions = !this.showOptions;
   }
 
-
-  getLoggedUser(): void {
-    this.materialService.getLoggedInUser().subscribe(
-      (response: any) => {
-        this.employeeId = response.id;
-        const roleId = response.role_id;
-
-        if (roleId === 1) {
-          this.employeeRole = 'admin';
-        } else if (roleId === 2){
-          this.employeeRole = 'manager';
-        }
-        this.cargaDatos = false;
-
-      },
-      error => {
-        console.error('Error when obtaining data from the logged in user:', error);
-      }
-    );
-  }
-
-  private convertToCsv(data: any): string {
-    if (!data || !data.material || !data.material.attribute || data.material.attribute.length === 0) {
+  private convertToCsv(data: Material): string {
+    if (!data || !data.attributeCategoryMaterials) {
       console.error('Los datos de la tabla no son válidos o están vacíos.');
       return '';
     }
 
     const csvRows = [];
-    const headers = ['ID', 'Nombre', 'Fecha Alta', 'Fecha Baja','Atributos', 'Sucursal', 'Estado' ]; // Ajusta los encabezados
+    const headers = ['ID', 'Nombre', 'Fecha Alta', 'Fecha Baja', 'Atributos', 'Sucursal', 'Estado']; // Ajusta los encabezados
     csvRows.push(headers.join(','));
 
-    const attributes = data.material.attribute.map((attribute: any) => `${attribute.name} - ${attribute.pivot.value}`).join('; ');
-
+    const attributes = data.attributeCategoryMaterials?.map((attribute) => `${attribute.attribute?.name} - ${attribute.value}`).join(';\n ');
 
     const values = [
-      data.material.id,
-      this.escapeCsvValue(data.material.name),
-      data.material.high_date,
-      data.material.low_date ?? 'N/D',
+      data.id,
+      this.escapeCsvValue(data.name),
+      data.high_date,
+      data.low_date ?? 'N/D',
       this.escapeCsvValue(attributes),
-      this.getNombreSucursal(data.material.branch_office_id),
-      data.material.state
+      data.branch_office?.name,
+      data.state
 
     ];
     const csvRow = values.map(value => this.escapeCsvValue(value)).join(',');
@@ -370,34 +305,41 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  
+
 
   downloadPdf(): void {
-    if (!this.materialDetails || !this.materialDetails.material || !this.materialDetails.material.attribute || this.materialDetails.material.attribute.length === 0) {
+    if (!this.material) {
       console.error('Los datos de la tabla no son válidos o están vacíos.');
       return;
     }
-  
-    const material = this.materialDetails.material;
-    const attributes = this.materialDetails.material.attribute.map((attribute: any) => `${attribute.name} - ${attribute.pivot.value}`).join('; ');
-    
+
+    const material = this.material;
+    const attributes = this.material.attributeCategoryMaterials?.map((attribute) => `${attribute.attribute?.name} - ${attribute.value}`).join(';\n');
+
     const doc = new jsPDF();
-  
+
     // Encabezado
-    doc.text('Lista de Materiales', 10, 10);
-  
+    doc.text('Informacion de Material', 10, 10);
+
+
     // Datos del material
     const materialData = [
       ['ID', 'Nombre', 'Fecha Alta', 'Fecha Baja', 'Atributos', 'Sucursal', 'Estado'],
-      [material.id, material.name, material.high_date, material.low_date ?? 'N/D', attributes, this.getNombreSucursal(material.branch_office_id), material.state]
+      [material.id, material.name, material.high_date, material.low_date ?? 'N/D', attributes, material.branch_office?.name, material.state]
     ];
-  
+
+    if(this.material.employee_materials){
+      const employee = material.employee_materials?[0] : null;
+      const employeeData = [
+        ['ID', 'Nombre', 'Apellido', 'Fecha de Asignacion', 'Fecha de Devolucion'],
+      ];
+    }
     // Agregar tabla al PDF
     (doc as any).autoTable({
       head: materialData.slice(0, 1), // Solo la fila de encabezado
       body: materialData.slice(1) // Resto de las filas de datos
     });
-  
+
     // Guardar el PDF
     doc.save(`${material.name}.pdf`);
   }
@@ -405,16 +347,16 @@ export class MaterialDetailsComponent implements OnInit, OnDestroy {
 
 
   downloadCsv() {
-    if (!this.materialDetails) {
+    if (!this.material.attributeCategoryMaterials) {
       console.error('No hay datos de empleado disponibles');
       return;
     }
-    const csvContent = this.convertToCsv(this.materialDetails);
+    const csvContent = this.convertToCsv(this.material);
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const fileName = `${this.materialDetails.material.name}.csv`;
+    const fileName = `${this.material.name}.csv`;
 
 
     a.download = fileName;

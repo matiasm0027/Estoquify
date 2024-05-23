@@ -13,22 +13,23 @@ class MaterialNameSeeder extends Seeder
     public function run()
     {
         // Obtener todos los materiales con sus categorías y atributos relacionados
-        $materials = Material::with(['category'])->get();
+        $materials = Material::with('attributeCategoryMaterials.category')->get();
 
         // Iterar sobre cada material
         foreach ($materials as $material) {
             // Obtener la primera categoría asociada al material
-            $category = $material->category->first();
+            $category = $material->attributeCategoryMaterials->first()->category;
 
+            if ($category) {
+                // Obtener la cantidad de materiales con el mismo prefijo
+                $count = Material::where('name', 'like', substr($category->name, 0, 3) . '_%')->count() + 1;
 
-            // Obtener la cantidad de materiales con el mismo prefijo
-            $count = Material::where('name', 'like', substr($category->name, 0, 3) . '_%')->count() + 1;
+                // Construir el nuevo nombre del material
+                $newName = substr($category->name, 0, 3) . '_' . str_pad($count, 3, '0', STR_PAD_LEFT);
 
-            // Construir el nuevo nombre del material
-            $newName = substr($category->name, 0, 3) . '_' . str_pad($count, 3, '0', STR_PAD_LEFT);
-
-            // Actualizar el nombre del material
-            $material->update(['name' => $newName]);
+                // Actualizar el nombre del material
+                $material->update(['name' => $newName]);
+            }
         }
     }
 }

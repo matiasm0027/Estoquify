@@ -12,4 +12,19 @@ class AttributeCategoryMaterial extends Model
     protected $table = 'attribute_category_material';
 
     protected $fillable = ['attribute_id', 'material_id', 'category_id', 'value'];
+
+    public function material()
+    {
+        return $this->belongsTo(Material::class);
+    }
+
+    public function attribute()
+    {
+        return $this->belongsTo(Attribute::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }

@@ -22,12 +22,10 @@
                     <form [formGroup]="formularioEmpleado" class="flex justify-between items-center space-x-2">
                         <div class="w-full lg:w-auto">
                             <ng-select formControlName="fullname" [items]="filteredEmployees" bindLabel="fullname"
-                                [placeholder]="placeholder" (search)="buscarEmpleado($event)"
-                                (change)="seleccionarEmpleado($event)" (click)="limpiarSeleccion()"
-                                class="ml-auto w-full lg:w-auto">
+                              [placeholder]="placeholder" (search)="buscarEmpleado($event)"
+                              (change)="seleccionarEmpleado($event)"
+                              class="w-full bg-gray-300 rounded shadow">
                             </ng-select>
-                            <input type="text"
-                                [value]="selectedEmployee ? selectedEmployee.name + ' ' + selectedEmployee.last_name : ''">
                         </div>
                         <button (click)="crearConexion()"
                             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">

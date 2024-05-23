@@ -3,28 +3,31 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Report;
+use App\Models\Incidence;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Category;
-use App\Models\CategoryReport;
+use App\Models\CategoryIncidence;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 
-class ReportController extends Controller{
+class IncidenceController extends Controller{
 
-    public function sendReports(Request $request){
-        
-         // Define las reglas de validación
-         $rules = [
+    public function addIncidence(Request $request)
+    {
+        // Define las reglas de validación
+        $rules = [
+            'date' => 'required|date',
             'petition' => 'required|string',
             'priority' => 'required|string',
             'type' => 'required|string',
+            'employee_id' => 'required|exists:employees,id',
         ];
 
         // Si el tipo de reporte es "Solicitud Material", requerir la presencia de categorías
         if ($request->input('type') === 'Solicitud Material') {
-            $rules['category'] = 'required|array';
+            $rules['categories'] = 'required|array';
+            $rules['categories.*.id'] = 'required|exists:categories,id'; // Asegúrate de que cada categoría exista
         }
 
         // Validar la solicitud
@@ -35,8 +38,8 @@ class ReportController extends Controller{
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        //Estos son los datos que recogera de la bbdd para generar el reporte
-        $reportData = [
+        // Datos de la incidencia
+        $incidenceData = [
             'date' => $request->date,
             'petition' => $request->petition,
             'priority' => $request->priority,
@@ -45,55 +48,38 @@ class ReportController extends Controller{
             'employee_id' => $request->employee_id,
         ];
 
-        //Si el reporte es una alta no adjuntara las categorias, si es una solicitud 
+        // Crear y guardar la incidencia
+        $incidence = Incidence::create($incidenceData);
+
+        // Si el tipo de incidencia es "Solicitud Material", asociar las categorías
         if ($request->type === 'Solicitud Material') {
-            $report = new Report($reportData);
-            //Guardamos el reporte en la bbdd
-            $report->save();
-            $reportId = $report->id;
-            $report->category()->attach($request->category, ['report_id' => $reportId]);
-        } else {
-            $report = new Report($reportData);
-            //Guardamos el reporte en la bbdd
-           $report->save();
+            $categories = $request->input('categories');
+            foreach ($categories as $category) {
+                $incidence->categoryIncidences()->create([
+                    'category_id' => $category['id'],
+                    'incidence_id' => $incidence->id
+                ]);
+            }
         }
 
-       
-
-        //Mensaje de que se ha  generado correcatemente la incidencia
+        // Mensaje de que se ha generado correctamente la incidencia
         return response()->json(['message' => 'Reporte generado correctamente'], 201);
     }
+   
 
-
-
-    public function listReports()
+    public function listIncidences()
     {
         try{
-        $reports = Report::all();
-         // Obtener todos los reportes con los datos del empleado asociado
-        $reports = Report::with('employee')
-        ->get()
-        ->map(function ($report) {
-            return [
-                'id' => $report->id,
-                'date' => $report->date,
-                'petition' => $report->petition,
-                'state' => $report->state,
-                'priority' => $report->priority,
-                'type' => $report->type,
-                'updated' => $report->updated_at,
-                'employee_id' => $report->employee->id,
-                'employee_name' => $report->employee->name . ' ' . $report->employee->last_name,
-                'employee_id_sucursal' => $report->employee->branch_office_id ,
-            ];
-        });
-        return response()->json($reports);
+        $incidences = Incidence::with('employee.branchOffice')
+        ->orderBy('id')
+        ->get();
+        return response()->json($incidences);
     } catch (ThrottleRequestsException $e) {
         return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
     }
     }
 
-    public function changeReportStatus(Request $request, $id)
+    public function changeIncidenceStatus(Request $request, $id)
 {
     try {
         // Verifica si el usuario está autenticado
@@ -106,10 +92,10 @@ class ReportController extends Controller{
         $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
 
         // Encuentra el reporte por su ID
-        $report = Report::find($id);
+        $incidence = Incidence::find($id);
 
         // Verifica si se encontró el reporte
-        if (!$report) {
+        if (!$incidence) {
             return response()->json(['message' => 'El reporte no fue encontrado'], 404);
         }
 
@@ -119,8 +105,8 @@ class ReportController extends Controller{
         ]);
 
         // Actualiza el estado del reporte
-        $report->state = $request->estado;
-        $report->save();
+        $incidence->state = $request->estado;
+        $incidence->save();
 
         // Devuelve una respuesta exitosa
         return response()->json(['message' => 'Estado del reporte actualizado correctamente'], 200);

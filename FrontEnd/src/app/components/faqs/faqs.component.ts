@@ -77,10 +77,12 @@ export class FaqsComponent implements OnInit{
 
   cerrarModal() {
     this.mostrarModalAgregar = false;
+    this.loadFaqsDetails();
   }
   cerrarModalEdit() {
     this.mostrarModalEdit = false;
- 
+    this.loadFaqsDetails();
+
   }
 
 
@@ -111,10 +113,10 @@ export class FaqsComponent implements OnInit{
   
   
 
-confirmDelete(faq: any): void {
+confirmDelete(faq: number): void {
   const confirmacion = confirm(`Esta seguro que quieres eliminarla?`);
   if (confirmacion) {
-    this.deleteFaq(faq.id);
+    this.deleteFaq(faq);
   }
 }
 
@@ -122,6 +124,7 @@ deleteFaq(id: number): void {
   this.apiRequestService.deleteFaq(this.FaqID).subscribe(
     (response: any) => {
       this.successMessage = response.message;
+      this.loadFaqsDetails();
     },
     error => {
       this.errorMessage = error.error.error;
@@ -141,6 +144,7 @@ editFaq(): void {
         this.successMessage = response.message;
         this.cerrarModalEdit();
         this.loadFaqsDetails();
+
       },
       (error: any) => {
         this.errorMessage = error.error.error;

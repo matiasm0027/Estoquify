@@ -6,12 +6,13 @@ use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\DepartmentController;
 Use App\Http\Controllers\BranchOfficeController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ReportController;
+use App\Http\Controllers\IncidenceController;
 use App\Http\Controllers\EmployeeMaterialController;
 use App\Http\Controllers\CategoriaMaterialController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\ChatController;
 
@@ -33,44 +34,45 @@ Route::group([
 
 ], function ($router) {
 
-    Route::post('login', [EmployeesController::class, 'login']);
-    Route::post('refresh', [EmployeesController::class, 'refresh']);
-    Route::get('getLoggedInUser', [EmployeesController::class, 'getLoggedInUser']);
+    //Auth
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('refresh', [AuthController::class, 'refresh']);
+    Route::get('getLoggedInUser', [AuthController::class, 'getLoggedInUser']);
+    Route::put('changePassword', [AuthController::class, 'changePassword']);
+    Route::post('resetPasswordRequest', [AuthController::class, 'resetPasswordRequest']);
+    Route::post('resetPassword', [AuthController::class, 'resetPassword']);
+
     Route::get('listEmployees', [EmployeesController::class, 'listEmployees']);
     Route::post('addEmployee', [EmployeesController::class, 'addEmployee']);
     Route::put('editEmployee/{id}', [EmployeesController::class, 'editEmployee']);
-    Route::put('changePassword', [EmployeesController::class, 'changePassword']);
-    Route::delete('deleteEmployee/{id}', [EmployeesController::class, 'deleteEmployee']);
+    Route::delete('deleteEmployees/{id}', [EmployeesController::class, 'deleteEmployees']);
     Route::get('listEmployeeMaterial/{id}', [EmployeesController::class, 'listEmployeeMaterial']);
-    Route::post('resetPasswordRequest', [EmployeesController::class, 'resetPasswordRequest']);
-    Route::post('resetPassword', [EmployeesController::class, 'resetPassword']);
     Route::get('listEmployeesByBranchOffice/{id_branch_office}', [EmployeesController::class, 'listEmployeesByBranchOffice']);
+    Route::get('getEmployeesByBranchOffice', [EmployeesController::class, 'getEmployeesByBranchOffice']);
 
     Route::get('getEmployee/{id}', [EmployeeMaterialController::class, 'getEmployee']);
-    Route::get('materialAssignedEmployees/{id}', [EmployeeMaterialController::class, 'materialAssignedEmployees']);
-    Route::post('asignarMaterial/{materialId}', [EmployeeMaterialController::class, 'asignarMaterial']);
-    Route::post('desasignarMaterial/{materialId}', [EmployeeMaterialController::class, 'desasignarMaterial']);
+    Route::get('getMaterial/{id}', [EmployeeMaterialController::class, 'getMaterial']);
+    Route::post('asignarMaterial/{id}', [EmployeeMaterialController::class, 'asignarMaterial']);
+    Route::post('desasignarMaterial/{id}', [EmployeeMaterialController::class, 'desasignarMaterial']);
 
     Route::get('listDepartments', [DepartmentController::class, 'listDepartments']);
     Route::get('listBranchOffices', [BranchOfficeController::class, 'listBranchOffices']);
     Route::get('listAtributos', [AttributeController::class, 'listAtributos']);
     Route::get('listRoles', [RoleController::class, 'listRoles']);
 
-    Route::get('categoryInfoAssignments/{id}', [CategoriaMaterialController::class, 'categoryInfoAssignments']);
-    Route::get('categoryMaterialInfo', [CategoryController::class, 'categoryMaterialInfo']);
+    Route::get('categoryMaterialInfo/{id}', [CategoryController::class, 'categoryMaterialInfo']);
+    Route::get('categoryMaterial', [CategoryController::class, 'categoryMaterial']);
     Route::post('addCategory', [CategoryController::class, 'addCategory']);
     Route::put('editCategory/{id}', [CategoryController::class, 'editCategory']);
     Route::delete('deleteCategory/{id}', [CategoryController::class, 'deleteCategory']);
 
-
-    Route::get('listReports', [ReportController::class, 'listReports']);
-    Route::post('agregarReporte', [ReportController::class, 'sendReports']);
-    Route::put('changeReportStatus/{id}', [ReportController::class, 'changeReportStatus']);
-
     Route::post('addMaterial', [MaterialController::class, 'addMaterial']);
     Route::delete('deleteMaterial/{id}', [MaterialController::class, 'deleteMaterial']);
     Route::put('editMaterial/{id}', [MaterialController::class, 'editMaterial']);
-    Route::get('materialDetails/{id}', [MaterialController::class, 'getMaterialDetails']);
+
+    Route::get('listIncidences', [IncidenceController::class, 'listIncidences']);
+    Route::post('addIncidence', [IncidenceController::class, 'addIncidence']);
+    Route::put('changeIncidenceStatus/{id}', [IncidenceController::class, 'changeIncidenceStatus']);
 
     Route::post('crearconexion', [ChatController::class, 'crearConexion']);
     Route::delete('eliminarConexion/{id}', [ChatController::class, 'eliminarConexion']);
@@ -81,6 +83,6 @@ Route::group([
     Route::get('getFaqsDetails', [FaqController::class, 'getFaqsDetails']);
     Route::post('createFaq',[FaqController::class,'createFaq']);
     Route::put('editFaq/{id}', [FaqController::class, 'editFaq']);
-    Route::delete('deleteFaq/{id}', [FaqController::class, 'deleteFaq']);
+    Route::delete('deleteFaq/{id}', [FaqController::class, 'deleteFaqById']);
 
 });

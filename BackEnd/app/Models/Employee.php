@@ -13,7 +13,7 @@ class Employee extends Authenticatable implements JWTSubject
 
     protected $table = 'employees';
 
-    protected $fillable = ['name', 'last_name', 'email', 'password', 'phone_number', 'department_id', 'role_id', 'branch_office_id'];
+    protected $fillable = ['name', 'last_name', 'email', 'password', 'phone_number', 'department_id', 'role_id', 'branch_office_id', 'first_login'];
 
     protected $hidden = ['password', 'remember_token',];
 
@@ -22,20 +22,19 @@ class Employee extends Authenticatable implements JWTSubject
         return $this->belongsTo(Role::class);
     }
 
-    public function branchOffice()
-    {
-        return $this->belongsTo(BranchOffice::class);
-    }
-
     public function department()
     {
         return $this->belongsTo(Department::class);
     }
 
-    public function material()
+    public function branchOffice()
     {
-        return $this->belongsToMany(Material::class, 'employee_material', 'employee_id', 'material_id')
-            ->withPivot('assignment_date', 'return_date');
+        return $this->belongsTo(BranchOffice::class);
+    }
+
+    public function employeeMaterials()
+    {
+        return $this->hasMany(EmployeeMaterial::class);
     }
 
     public function report()

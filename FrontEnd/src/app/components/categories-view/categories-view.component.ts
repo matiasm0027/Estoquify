@@ -3,6 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Employee } from 'src/app/model/Employee';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
+import { Category } from 'src/app/model/Category';
+import { AttributeCategoryMaterial } from 'src/app/model/AttributeCategoryMaterial';
+import 'jspdf-autotable';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-categories-view',
@@ -11,20 +15,22 @@ import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-contr
 })
 export class CategoriesViewComponent implements OnInit{
   categoryForm: FormGroup;
-  materials: any[] = [];
+  categories: Category[] = [];
   mostrarModalAgregar: boolean = false;
   mostrarModalEdit: boolean = false;
-  categoryID: string = "" ;
+  categoryID!: number;
   errorMessage!: string;
+  errorMessage2!: string;
   successMessage!: string;
   cargaDatos: boolean = true;
   userRole!: any;
-  loggedInUser: Employee | null = null;
-
+  loggedInUser!: Employee | null;
+  totales:any = [];
   constructor(
     private ApiRequestService: ApiRequestService,
     private authControlService: UsuariosControlService,
     private fb: FormBuilder,
+    private router: Router,
     )
   {
     this.categoryForm = this.fb.group({
@@ -34,31 +40,69 @@ export class CategoriesViewComponent implements OnInit{
 
   ngOnInit(): void {
     this.userRole = this.authControlService.hasRole();
-    this.authControlService.getLoggedUser().subscribe(() => {
-      this.loggedInUser = this.authControlService.getStoredLoggedInUser();
-    });
+    this.authControlService.getLoggedUser().subscribe(
+      (user) => {
+        this.loggedInUser = user;
+      }
+    );
     this.obtenerCantidadMaterial();
   }
 
   obtenerCantidadMaterial(){
-    this.ApiRequestService.categoryMaterialInfo().subscribe(
-      (response: any[]) => {
-        this.materials = response.map(material => ({
-          id: material.id,
-          name: material.name,
-          total_material: material.total_materials,
-          activeMaterial: material.active_materials,
-          availableMaterial: material.available_materials,
-          inactiveMaterial: material.inactive_materials
-        }));
+    this.ApiRequestService.categoryMaterial().subscribe(category => {
+      this.categories = category;
+      console.log(this.categories[0])
+        this.calcularTotales();
         this.cargaDatos = false;
       }
     );
   }
 
+  calcularTotales(): void {
+    this.totales = {};
+    this.categories.forEach(categoria => {
+      if (!this.totales[categoria.name]) {
+        this.totales[categoria.name] = {
+          totalMateriales: 0,
+          available: 0,
+          active: 0,
+          inactive: 0
+        };
+      }
+
+      if (categoria.attributeCategoryMaterials) {
+        Object.values(categoria.attributeCategoryMaterials).forEach((material: AttributeCategoryMaterial) => {
+          switch (material.material?.state) {
+            case "available":
+              this.totales[categoria.name].available++;
+              this.totales[categoria.name].totalMateriales++;
+              break;
+            case "active":
+              this.totales[categoria.name].active++;
+              this.totales[categoria.name].totalMateriales++;
+              break;
+            case "inactive":
+              this.totales[categoria.name].inactive++;
+              this.totales[categoria.name].totalMateriales++;
+              break;
+            default:
+              break;
+          }
+        });
+      }
+    });
+  }
+
+  enviarObjeto(id: number) {
+    this.router.navigate(['/categories_details', id]);
+  }
+
   categoryAdd() {
+    this.successMessage='';
+    this.errorMessage='';
+    this.errorMessage2='';
     if (this.categoryForm.valid) {
-      const newCategory = this.categoryForm.value;
+      const newCategory: Category = this.categoryForm.value;
       this.ApiRequestService.addCategory(newCategory).subscribe(
         (response: any) => {
           this.cerrarModal();
@@ -68,17 +112,21 @@ export class CategoriesViewComponent implements OnInit{
           this.errorMessage = error.error.error;
         }
       );
+    }else{
+      this.errorMessage2 = 'Formulario inválido. Por favor, complete todos los campos requeridos.';
     }
   }
 
-  confirmDelete(category: any): void {
-    const confirmacion = confirm(`¿Al eliminar la categoria se eliminaran TODOS LOS MATERIALES, estás seguro de que quieres eliminar la categoria ${category.name}?`);
+  confirmDelete(id:number, name:string): void {
+    const confirmacion = confirm(`¿Al eliminar la categoria se eliminaran TODOS LOS MATERIALES, estás seguro de que quieres eliminar la categoria ${name}?`);
     if (confirmacion) {
-      this.deleteCategory(category.id);
+      this.deleteCategory(id);
     }
   }
 
   deleteCategory(id: number): void {
+    this.successMessage='';
+    this.errorMessage='';
     this.ApiRequestService.deleteCategory(id).subscribe(
       (response) => {
         this.successMessage = response.message;
@@ -91,24 +139,22 @@ export class CategoriesViewComponent implements OnInit{
   }
 
   editCategory(): void {
+    this.successMessage='';
+    this.errorMessage='';
+    this.errorMessage2='';
     if (this.categoryForm.valid) {
-      const categoryEdit = {
-        name: this.categoryForm.value.name,
-      };
-
+      const categoryEdit = this.categoryForm.value;
       this.ApiRequestService.editCategory(this.categoryID, categoryEdit).subscribe(
         (response: any) => {
           this.successMessage = response.message;
           this.cerrarModalEdit();
-          this.obtenerCantidadMaterial();
         },
         (error: any) => {
           this.errorMessage = error.error.error;
         }
       );
     } else {
-      // Si el formulario no es válido, puedes mostrar un mensaje de error o realizar alguna otra acción
-      console.error('Formulario inválido');
+      this.errorMessage2='Formulario inválido';
     }
   }
 
@@ -124,7 +170,7 @@ export class CategoriesViewComponent implements OnInit{
   cerrarModalEdit() {
     this.mostrarModalEdit = false;
     this.obtenerCantidadMaterial();
-    this.categoryID = "";
+    this.categoryID = 0;
     this.categoryForm.reset();
   }
 

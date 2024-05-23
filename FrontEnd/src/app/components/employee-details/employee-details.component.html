@@ -59,7 +59,7 @@
           </tr>
           <tr>
             <td class="py-2"><strong>Rol:</strong></td>
-            <td class="py-2">{{ employeeDetails[0].role?.name }}</td>
+            <td class="py-2">{{ employeeDetails[0].role?.name}}</td>
           </tr>
           <tr>
             <td class="py-2"><strong>Sucursal:</strong></td>
@@ -69,24 +69,27 @@
       </table>
     </div>
 
-    <div class="bg-white p-6 rounded shadow" *ngIf="employeeMaterial">
+    <div class="bg-white p-6 rounded shadow" *ngIf="employeeDetails">
       <h2 class="text-2xl font-bold my-4">Materiales Asignados</h2>
-      <div *ngIf="employeeMaterial" class="grid grid-cols-3 gap-4">
-        <ng-container *ngFor="let material of employeeMaterial">
+      <div *ngIf="employeeDetails[0].employee_materials && employeeDetails[0].employee_materials?.length !== 0" class="grid grid-cols-3 gap-4">
+        <ng-container *ngFor="let mat of employeeDetails[0].employee_materials">
           <div class="bg-white p-4 rounded shadow col-span-1">
-            <p><strong>Categoria:</strong> {{ material.category[0].name }}</p>
-            <p><strong>Material:</strong> {{ material.name }}</p>
-            <button (click)="desasignarMaterial(employeeDetails[0].id, material.id)"
-              class="bg-white hover:bg-red-200 text-red-500 py-1 px-3 rounded border mt-2" *ngIf="userRole === '1'">
+            <p><strong>Categoria:</strong> {{ mat.material?.attributeCategoryMaterials?.[0]?.category?.name }}</p>
+            <p><strong>Material:</strong> {{ mat.material?.name }}</p>
+            <button
+            (click)="desasignarMaterial(mat.material?.id, employeeDetails[0].id)"
+            class="bg-white hover:bg-red-200 text-red-500 py-1 px-3 rounded border mt-2"
+              *ngIf="userRole === '1'">
               Desasignar
             </button>
           </div>
         </ng-container>
       </div>
-      <div *ngIf="employeeMaterial.length === 0">
+      <div *ngIf="employeeDetails[0].employee_materials && employeeDetails[0].employee_materials.length === 0">
         <p>No hay materiales asignados.</p>
       </div>
     </div>
+
 
     <div *ngIf="mostrarModalEditar" class="fixed z-10 inset-0 overflow-y-auto">
       <div class="flex items-center justify-center min-h-screen px-4">
@@ -182,8 +185,8 @@
                 <select formControlName="department_id" id="departamento" name="departamento"
                   class="form-select mt-1 block w-full" required>
                   <ng-container *ngFor="let dept of departamentos">
-                    <option [value]="dept.id" [selected]="dept.name === employeeDetails[0].department?.name">
-                      {{ dept.name }}</option>
+                    <option [value]="dept?.id" [selected]="dept?.name === employeeDetails[0].department?.name">
+                      {{ dept?.name }}</option>
                   </ng-container>
                 </select>
                 <div
@@ -198,8 +201,8 @@
                 <select formControlName="branch_office_id" id="sucursal" name="sucursal"
                   class="form-select mt-1 block w-full" required>
                   <ng-container *ngFor="let suc of sucursales">
-                    <option [value]="suc.id" [selected]="suc.name === employeeDetails[0].branch_office?.name">
-                      {{ suc.name }}</option>
+                    <option [value]="suc?.id" [selected]="suc?.name === employeeDetails[0].branch_office?.name">
+                      {{ suc?.name }}</option>
                   </ng-container>
                 </select>
                 <div
@@ -211,10 +214,11 @@
 
               <div class="mb-4">
                 <label for="rol" class="block text-gray-700">Rol</label>
-                <select formControlName="role_id" id="rol" name="rol" class="form-select mt-1 block w-full" required>
+                <select formControlName="role_id" id="rol" name="rol" class="form-select mt-1 block w-full" required *ngIf="roles">
                   <ng-container *ngFor="let rol of roles">
-                    <option [value]="rol.id" [selected]="rol.name === employeeDetails[0].role?.name">
-                      {{ rol.name }}</option>
+                    <option [value]="rol?.id" [selected]="rol?.name === employeeDetails[0].role?.name">
+                      {{ rol?.name }}
+                    </option>
                   </ng-container>
                 </select>
                 <div

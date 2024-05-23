@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Employee;
 use App\Models\Material;
 use App\Models\MaterialAssignmentHistory;
+use App\Models\EmployeeMaterial;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 
@@ -19,89 +20,152 @@ class EmployeeMaterialController extends Controller
     public function getEmployee($id)
     {
         try {
-            $employee = Employee::with(['role', 'department', 'branchOffice', 'material' => function ($query) {
-                $query->with('category');
-            }])->find($id);
-            if (!$employee) {
-                return response()->json(['message' => 'Empleado no encontrado'], 404);
-            }
-            return response()->json($employee);
-        } catch (ThrottleRequestsException $e) {
-            return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
+            $employee = Employee::with([
+                'role',
+                'department',
+                'branchOffice',
+                'employeeMaterials.material.attributeCategoryMaterials' => function ($query) {
+                    $query->with('attribute', 'category');
+                }
+            ])->findOrFail($id);
+
+            // Construir la respuesta
+            $response = [
+                'id' => $employee->id,
+                'name' => $employee->name,
+                'last_name' => $employee->last_name,
+                'email' => $employee->email,
+                'phone_number' => $employee->phone_number,
+                'role' => $employee->role,
+                'department' => $employee->department,
+                'branch_office' => $employee->branchOffice,
+                'employee_materials' => $employee->employeeMaterials->map(function ($employeeMaterial) {
+                    return [
+                        'id' => $employeeMaterial->id,
+                        'employee_id' => $employeeMaterial->employee_id,
+                        'material_id' => $employeeMaterial->material_id,
+                        'assignment_date' => $employeeMaterial->assignment_date,
+                        'return_date' => $employeeMaterial->return_date,
+                        'material' => [
+                            'id' => $employeeMaterial->material->id,
+                            'name' => $employeeMaterial->material->name,
+                            'attributeCategoryMaterials' => $employeeMaterial->material->attributeCategoryMaterials->map(function ($attributeCategoryMaterial) {
+                                return [
+                                    'id' => $attributeCategoryMaterial->id,
+                                    'material_id' => $attributeCategoryMaterial->material_id,
+                                    'attribute_id' => $attributeCategoryMaterial->attribute_id,
+                                    'category_id' => $attributeCategoryMaterial->category_id,
+                                    'value' => $attributeCategoryMaterial->value,
+                                    'attribute' => $attributeCategoryMaterial->attribute,
+                                    'category' => $attributeCategoryMaterial->category
+                                ];
+                            })
+                        ]
+                    ];
+                })
+            ];
+
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener el empleado'], 500);
         }
     }
 
-    public function materialAssignedEmployees($materialId)
+    public function getMaterial($materialId)
     {
-        try{
-        // Obtener el material específico con los empleados asignados activos
-        $material = Material::with('employee')->find($materialId);
+        try {
+            $material = Material::with([
+                'branchOffice',
+                'attributeCategoryMaterials',
+                'attributeCategoryMaterials.attribute',
+                'attributeCategoryMaterials.category',
+                'employeeMaterials.employee'
+            ])->findOrFail($materialId);
 
-        if (!$material) {
-            return response()->json(['message' => 'Material no encontrado'], 404);
-        }
-
-        $assignedEmployees = [
-            'material_id' => $material->id,
-            'material_name' => $material->name,
-            'category_name' => $material->category->isNotEmpty() ? $material->category->first()->name : null,
-            $category_id = $material->category->isNotEmpty() ? $material->category->first()->id : null,
-            'assigned_employees' => $material->employee->isEmpty() ?
-                $this->getAllEmployeesInBranch($material->branch_office_id, $category_id) :
-                $material->employee->map(function ($employee) {
+            // Obtener empleados disponibles en la sucursal y categoría
+            $availableEmployees = $this->getAllEmployeesInBranch($material->branchOffice->id, $material->attributeCategoryMaterials->first()->category->id);
+            if ($material->employeeMaterials->isNotEmpty()) {
+                $availableEmployees = [];
+            }
+            // Construir la respuesta
+            $response = [
+                'id' => $material->id,
+                'name' => $material->name,
+                'low_date' => $material->low_date,
+                'high_date' => $material->high_date,
+                'branch_office' => [
+                    'id' => $material->branchOffice->id,
+                    'name' => $material->branchOffice->name,
+                ],
+                'state' => $material->state,
+                'attributeCategoryMaterials' => $material->attributeCategoryMaterials->map(function ($acm) {
                     return [
-                        'employee_id' => $employee->id,
-                        'name' => $employee->name,
-                        'last_name' => $employee->last_name,
-                        'email' => $employee->email,
-                        'assignment_date' => $employee->pivot->assignment_date,
-                        'return_date' => $employee->pivot->return_date,
+                        'id' => $acm->id,
+                        'value' => $acm->value,
+                        'attribute' => [
+                            'id' => $acm->attribute->id,
+                            'name' => $acm->attribute->name
+                        ],
+                        'category' => [
+                            'id' => $acm->category->id,
+                            'name' => $acm->category->name
+                        ],
                     ];
                 }),
-        ];
+                'employee_materials' => $material->employeeMaterials->map(function ($em) {
+                    return [
+                        'id' => $em->id,
+                        'assignment_date' => $em->assignment_date,
+                        'return_date' => $em->return_date,
+                        'employee' => [
+                            'id' => $em->employee->id,
+                            'name' => $em->employee->name,
+                            'last_name' => $em->employee->last_name,
+                        ],
+                    ];
+                }),
+                'available_employees' => $availableEmployees
+            ];
 
-        return response()->json($assignedEmployees, 200);
+            return response()->json($response);
         } catch (ThrottleRequestsException $e) {
             return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Ocurrió un error inesperado.'], 500);
         }
     }
 
-    private function getAllEmployeesInBranch($branchOfficeId, $categoryId)
-{
-    // Obtener los IDs de empleados que tienen al menos un material asignado con la categoría deseada
-    $assignedEmployeeIds = Employee::whereDoesntHave('material', function ($query) use ($categoryId) {
-        $query->whereHas('category', function ($subquery) use ($categoryId) {
-            $subquery->where('category_id', $categoryId);
+    public function getAllEmployeesInBranch($branchOfficeId, $categoryId)
+    {
+        // Obtener los IDs de empleados que NO tienen un material asignado en la categoría especificada
+        $employeeIdsWithoutCategoryMaterial = Employee::whereDoesntHave('employeeMaterials', function ($query) use ($categoryId) {
+            $query->whereHas('material.attributeCategoryMaterials', function ($subquery) use ($categoryId) {
+                $subquery->where('category_id', $categoryId);
+            });
+        })
+        ->where('branch_office_id', $branchOfficeId) // Filtrar por ID de sucursal
+        ->pluck('id')
+        ->toArray();
+
+        // Obtener todos los empleados que cumplen con las condiciones
+        $allEmployees = Employee::whereIn('id', $employeeIdsWithoutCategoryMaterial)
+            ->where('branch_office_id', $branchOfficeId) // Filtrar por ID de sucursal nuevamente para mayor seguridad
+            ->get();
+
+        // Mapear los empleados filtrados a un formato adecuado para la respuesta
+        $filteredEmployeesFormatted = $allEmployees->map(function ($employee) {
+            return [
+                'id' => $employee->id,
+                'name' => $employee->name,
+                'last_name' => $employee->last_name,
+                'email' => $employee->email,
+            ];
         });
-    })
-    ->pluck('id')
-    ->toArray();
 
+        return $filteredEmployeesFormatted;
+    }
 
-    // Obtener todos los empleados en la sucursal especificada
-
-    $allEmployees = Employee::whereIn('id', $assignedEmployeeIds) // Filtrar por IDs de empleados
-    ->where('branch_office_id', $branchOfficeId) // Filtrar por ID de sucursal
-    ->get();
-
-    // Mapear los empleados filtrados a un formato adecuado para respuesta
-    $filteredEmployeesFormatted = $allEmployees->map(function ($employee) {
-        return [
-            'employee_id' => $employee->id,
-            'name' => $employee->name,
-            'last_name' => $employee->last_name,
-            'email' => $employee->email,
-            'assignment_date' => null,
-            'return_date' => null,
-        ];
-    });
-
-    return $filteredEmployeesFormatted;
-}
-
-
-
-    public function asignarMaterial(Request $request, $materialId)
+    public function asignarMaterial(Request $request, $id)
     {
         try {
             // Verificar si el usuario está autenticado
@@ -111,25 +175,31 @@ class EmployeeMaterialController extends Controller
             }
 
             // Verificar si el usuario tiene el rol permitido
-            $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
+            $this->checkUserRole(['1']);
+
             // Validar el ID del empleado
-            $employeeId = $request->input('employee_id');
+            $employeeId = $request->input('id');
             $employee = Employee::find($employeeId);
 
             if (!$employee) {
-                return response()->json(['message' => "Empleado no encontrado: $request"], 404);
+                return response()->json(['message' => "Empleado no encontrado "], 404);
             }
 
-            // Encuentra el material por su ID
-            $material = Material::find($materialId);
+            // Validar el ID del material (que se pasa en el cuerpo de la solicitud)
+            $material = Material::find($id);
 
             if (!$material) {
                 return response()->json(['message' => 'Material no encontrado'], 404);
             }
 
             // Crear una nueva entrada en la tabla pivot
-            $assignmentDate = date('Y-m-d H:i:s'); // Fecha actual como fecha de asignación
-            $material->employee()->attach($employeeId, ['assignment_date' => $assignmentDate]);
+            $assignmentDate = now(); // Fecha actual como fecha de asignación
+            $employee->employeeMaterials()->create([
+                'employee_id' => $employeeId,
+                'material_id' => $id,
+                'assignment_date' => $assignmentDate,
+                'return_date' => null,
+            ]);
 
             return response()->json(['message' => 'Material asignado correctamente'], 200);
         } catch (\Exception $e) {
@@ -137,7 +207,8 @@ class EmployeeMaterialController extends Controller
         }
     }
 
-    public function desasignarMaterial(Request $request, $materialId)
+
+    public function desasignarMaterial(Request $request, $id)
     {
         try {
             // Verificar si el usuario está autenticado
@@ -147,9 +218,11 @@ class EmployeeMaterialController extends Controller
             }
 
             // Verificar si el usuario tiene el rol permitido
-            $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
+            $this->checkUserRole(['1']);
+
+
             // Validar el ID del empleado
-            $employeeId = $request->input('employee_id');
+            $employeeId = $request->input('id');
             $employee = Employee::find($employeeId);
 
             if (!$employee) {
@@ -157,30 +230,23 @@ class EmployeeMaterialController extends Controller
             }
 
             // Encuentra el material por su ID
-            $material = Material::find($materialId);
+            $material = Material::find($id);
 
             if (!$material) {
                 return response()->json(['message' => 'Material no encontrado'], 404);
             }
 
-            // Verificar si hay empleados asignados a este material
-            if ($material->employee->isEmpty()) {
-                return response()->json(['message' => 'No hay empleados asignados a este material'], 200);
+            // Buscar la asignación entre el empleado y el material
+            $employeeMaterial = EmployeeMaterial::where('employee_id', $employeeId)
+                ->where('material_id', $id)
+                ->first();
+
+            if (!$employeeMaterial) {
+                return response()->json(['message' => 'La asignación no existe'], 404);
             }
 
-            // Registrar la desasignación en material_assignments_history
-            $assignmentDate = $material->employee()->where('employee_id', $employeeId)->first()->pivot->assignment_date;
-            $desassignmentDate = date('Y-m-d H:i:s');
-
-            MaterialAssignmentHistory::create([
-                'employee_id' => $employeeId,
-                'material_id' => $materialId,
-                'assignment_date' => $assignmentDate,
-                'return_date' => $desassignmentDate,
-            ]);
-
-            // Desasignar el material (eliminar la relación con el empleado)
-            $material->employee()->detach($employeeId);
+            // Eliminar la asignación
+            $employeeMaterial->delete();
 
             return response()->json(['message' => 'Material desasignado correctamente'], 200);
         } catch (\Exception $e) {

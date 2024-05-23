@@ -89,20 +89,9 @@ class FaqController extends Controller
     {
        
     try {
+        $faq = Faq::find($id);
+        $faq->delete();
 
-        $validator = Validator::make($request->all(), [
-            'titulo' => 'required|string',
-            'descripcion' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 400);
-        }
-
-        $faq = Faq::findOrFail($id);
-        $faq->titulo = $request->input('titulo');
-        $faq->descripcion = $request->input('descripcion');
-        $faq->save();
 
         return response()->json(['message' => 'FAQ eliminada correctamente'], 200);
     } catch (\Exception $e) {

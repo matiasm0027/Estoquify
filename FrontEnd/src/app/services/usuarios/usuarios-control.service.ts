@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, EMPTY, Observable, catchError, tap } from 'rxjs';
+import { EMPTY, Observable, catchError, tap } from 'rxjs';
 import { ApiRequestService } from '../api/api-request.service';
 import { Employee } from 'src/app/model/Employee';
 
@@ -13,23 +13,19 @@ interface DecodedToken {
 })
 
 export class UsuariosControlService {
-  private usuarioSubject: BehaviorSubject<any>;
-  public usuario: Observable<any>;
   usuarioSeleccionado: any;
-  private numero!: number;
   private loggedInUser!: Employee;
-  private employeeData!: Employee;
 
   constructor(private ApiRequestService: ApiRequestService) {
-    //this.checkLocalStorage();
-    this.usuarioSubject = new BehaviorSubject<any>(localStorage.getItem('token')); //comprueba el localStorage de token
-    this.usuario = this.usuarioSubject.asObservable();
-
+    this.getLoggedUser();
   }
 
-  getLoggedUser(): Observable<any> {
+  getLoggedUser(): Observable<Employee> {
     return this.ApiRequestService.getLoggedInUser().pipe(
-      tap(response => this.loggedInUser = response),
+      tap(response => {
+        this.loggedInUser = response;
+
+      }),
       catchError(error => {
         console.error(error);
         return EMPTY;
@@ -37,12 +33,8 @@ export class UsuariosControlService {
     );
   }
 
-  getStoredLoggedInUser(): Employee {
+  getStoredLoggedInUser(): Employee | null {
     return this.loggedInUser;
-  }
-
-  hasRole(): any {
-    return localStorage.getItem('rol');
   }
 
   cargarRoles() {
@@ -57,25 +49,16 @@ export class UsuariosControlService {
     return this.ApiRequestService.listBranchOffices();
   }
 
-  setNumero(valor: number) {
-    this.numero = valor;
+  cargarAtributos() {
+    return this.ApiRequestService.listAtributos();
   }
 
-  getNumero(): number {
-    return this.numero;
+  hasRole(): any {
+    return localStorage.getItem('rol');
   }
 
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('itsLoged');
   }
-
-  setEmployeeData(data: Employee) {
-    this.employeeData = data;
-  }
-
-  getEmployeeData(): Employee | null {
-    return this.employeeData;
-  }
 }
-

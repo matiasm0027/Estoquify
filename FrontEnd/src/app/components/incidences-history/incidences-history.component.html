@@ -6,31 +6,31 @@
               <span class="font-bold mt-2">Cargando..</span>
             </div>
           </div>
-        <div *ngIf="employeeRole === 'admin'" class="bg-gray-100 p-6 rounded shadow ">
+        <div *ngIf="userRole === '1'" class="bg-gray-100 p-6 rounded shadow ">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-bold mb-4 inline-block">Historial de Incidencias</h1>
-                <button class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded mb-3" [routerLink]="['/reportes_view']">Volver</button>
+                <button class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded mb-3" [routerLink]="['/incidences_view']">Volver</button>
             </div>
             <div class="grid grid-cols-4 gap-4">
                 <!-- Iterar sobre los reportes -->
-                <ng-container *ngFor="let reporte of reportes.reverse()">
+                <ng-container *ngFor="let incidence of incidences.reverse()">
                     <div [ngClass]="{
-                        'bg-green-200': reporte.prioridad === 'Low',
-                        'bg-yellow-200': reporte.prioridad === 'Medium',
-                        'bg-red-200': reporte.prioridad === 'High'
+                        'bg-green-200': incidence.priority === 'Low',
+                        'bg-yellow-200': incidence.priority === 'Medium',
+                        'bg-red-200': incidence.priority === 'High'
                     }" class="rounded border border-gray-300 p-2 relative">
-                        <div>ID: {{ reporte.id }}</div>
-                        <div>Tipo: {{ reporte.type }}</div>
-                        <div>Sucursal: {{ obtenerNombreSucursal(reporte.sucursalid) }}</div>
-                        <div>Prioridad: {{ reporte.prioridad }}</div>
-                        <button (click)="mostrarDetalle(reporte)" class="absolute top-0 right-0 mt-2 mr-2">
+                        <div>ID: {{ incidence.id }}</div>
+                        <div>Tipo: {{ incidence.type }}</div>
+                        <div>Sucursal: {{ incidence.employee?.branch_office?.name }}</div>
+                        <div>Prioridad: {{ incidence.priority }}</div>
+                        <button (click)="mostrarDetalle(incidence)" class="absolute top-0 right-0 mt-2 mr-2">
                             <span class="text-blue-900 opacity-75 rounded">Ver detalles</span>
                         </button>
                     </div>
                 </ng-container>
             </div>
             <!-- Modal para mostrar los detalles del reporte seleccionado -->
-            <div *ngIf="reporteSeleccionado" class="fixed z-10 inset-0 overflow-y-auto">
+            <div *ngIf="incidenceSelect" class="fixed z-10 inset-0 overflow-y-auto">
                 <div class="flex items-center justify-center min-h-screen px-4">
                     <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full relative">
                         <!-- Cambiado a relative -->
@@ -40,17 +40,17 @@
                         <div class="p-4">
                             <!-- Ajustado mt-16 a mt-18 -->
                             <p class="flex items-center justify-between"> <!-- Agregado -->
-                                <span>ID: {{ reporteSeleccionado.id }}</span> <!-- Agregado -->
+                                <span>ID: {{ incidenceSelect.id }}</span> <!-- Agregado -->
                                 <span class="ml-auto">
                                     <input type="checkbox" id="aceptar" name="aceptar" class="mr-2"
-                                        (change)="reporteSeleccionado?.id && cambiarEstadoReporte(reporteSeleccionado.id,'pending', $event)">
+                                        (change)="incidenceSelect.id && cambiarEstadoReporte(incidenceSelect.id,'pending', $event)">
                                     <label for="aceptar" class="mr-6 text-blue-700">Pendiente</label>
                                 </span>
                             </p>
-                            <p class="mb-4">Tipo: {{ reporteSeleccionado.type }}</p>
+                            <p class="mb-4">Tipo: {{ incidenceSelect.type }}</p>
                             <p>
                                 <!-- Utilizar ngFor para mostrar dinámicamente los campos de la solicitud -->
-                                <ng-container *ngFor="let linea of reporteSeleccionado.solicitud.split('\n')">
+                                <ng-container *ngFor="let linea of incidenceSelect.petition.split('\n')">
                                     <p>{{ linea }}</p>
                                 </ng-container>
                             </p>
@@ -65,7 +65,7 @@
                 </div>
             </div>
         </div>
-        <div *ngIf="employeeRole === 'user' || employeeRole === 'manager'" class="flex justify-center items-start h-screen">
+        <div *ngIf="userRole === '3' || userRole === '2'" class="flex justify-center items-start h-screen">
             <div class="text-center text-4xl text-red-500 mt-40">
                 <p>No tienes acceso a esta sección.</p>
             </div>

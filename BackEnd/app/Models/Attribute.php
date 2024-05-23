@@ -13,15 +13,8 @@ class Attribute extends Model
 
     protected $fillable = ['name'];
 
-    public function material()
+    public function attributeCategoryMaterials()
     {
-        return $this->belongsToMany(Material::class, AttributeCategoryMaterial::class)
-                    ->withPivot('value', 'material_id');
-    }
-
-    public function category()
-    {
-        return $this->belongsToMany(Category::class, AttributeCategoryMaterial::class)
-                    ->withPivot('value', 'category_id');
+        return $this->hasMany(AttributeCategoryMaterial::class);
     }
 }

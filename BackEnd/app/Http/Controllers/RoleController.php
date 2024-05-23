@@ -10,12 +10,18 @@ class RoleController extends Controller
 {
     public function listRoles()
     {
-        try{
-        $roles = Role::all();
+        try {
+            $roles = Role::all();
+            $result = $roles->map(function ($rol) {
+                return [
+                    'id' => $rol->id,
+                    'name' => $rol->name
+                ];
+            });
 
-        return response()->json($roles);
-    } catch (ThrottleRequestsException $e) {
-        return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
-    }
+            return response()->json($result);
+        } catch (ThrottleRequestsException $e) {
+            return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
+        }
     }
 }
