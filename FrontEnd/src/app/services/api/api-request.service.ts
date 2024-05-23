@@ -170,8 +170,8 @@ export class ApiRequestService {
     return this.http.post<any>(`${this.apiUrl}/auth/deleteFaq`, eliminarFaq);
   }
 
-  editFaq(faqID:number , faqData: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/auth/editFaq/${faqID}`, faqData);
+  editFaq(FaqID:number , faqData: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/auth/editFaq/${FaqID}`, faqData);
   }
 
   crearConexion(nuevaConexion: any): Observable<any> {

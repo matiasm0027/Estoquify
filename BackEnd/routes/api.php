@@ -81,6 +81,6 @@ Route::group([
     Route::get('getFaqsDetails', [FaqController::class, 'getFaqsDetails']);
     Route::post('createFaq',[FaqController::class,'createFaq']);
     Route::put('editFaq/{id}', [FaqController::class, 'editFaq']);
-    Route::delete('deleteFaq/{id}', [FaqController::class, 'delete']);
+    Route::delete('deleteFaq/{id}', [FaqController::class, 'deleteFaq']);
 
 });
