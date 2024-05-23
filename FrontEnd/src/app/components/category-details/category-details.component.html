@@ -135,8 +135,16 @@
                     This field cannot be empty.
                   </div>
                   <div *ngIf="formularioMaterial.get('cantidad')?.errors?.['pattern'] && formularioMaterial.get('cantidad')?.touched"
-                    class="error_form">
+                    class="text-red-800">
                     Only numbers are allowed.
+                  </div>
+                  <div *ngIf="formularioMaterial.get('cantidad')?.errors?.['cantidadMaxima'] && formularioMaterial.get('cantidad')?.touched"
+                    class="text-red-800">
+                    You can only add a batch of 20 materials.
+                  </div>
+                  <div *ngIf="formularioMaterial.get('cantidad')?.errors?.['cantidadMinima'] && formularioMaterial.get('cantidad')?.touched"
+                    class="text-red-800">
+                    You have to add a minimum of one material.
                   </div>
                 </div>
                 <div style="display: flex; align-items: center;" class="mb-5">

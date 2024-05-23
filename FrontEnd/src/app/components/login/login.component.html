@@ -11,10 +11,10 @@
                 
                 <!-- Control de errores -->
                 <div *ngIf="loginForm.get('email')?.errors?.['required'] && loginForm.get('email')?.touched"
-                    class="error_form mensaje_error">
+                    class="text-red-600">
                     This field cannot be empty.
                 </div>
-                <div *ngIf="loginForm.get('email')?.errors?.['pattern'] && loginForm.get('email')?.touched" class="error_form mensaje_error">
+                <div *ngIf="loginForm.get('email')?.errors?.['pattern'] && loginForm.get('email')?.touched" class="text-red-600">
                     Invalid format.
                 </div>
             </div>
@@ -24,7 +24,7 @@
                 
                 <!-- Control de errores -->
                 <div *ngIf="loginForm.get('password')?.errors?.['required'] && loginForm.get('password')?.touched"
-                    class="error_form mensaje_error">
+                    class="text-red-600">
                     This field cannot be empty.
                 </div>
             </div>

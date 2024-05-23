@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 import { jsPDF } from 'jspdf';
 import { Material } from 'src/app/model/Material';
@@ -69,11 +69,22 @@ export class CategoryDetailsComponent implements OnInit {
   initForm() {
     this.formularioMaterial = this.fb.group({
       nombre: ['', Validators.required],
-      cantidad: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+      cantidad: ['', [Validators.required, Validators.pattern('^[0-9]+$'), this.cantidadValidator]],
       value: ['', Validators.required],
       sucursal: ['', Validators.required],
       atributo: ['', Validators.required]
     });
+  }
+
+  cantidadValidator(control: AbstractControl) {
+    const cantidad = parseInt(control.value);
+    if (cantidad < 1) {
+      return { cantidadMinima: true };
+    } else if (cantidad > 20) {
+      return { cantidadMaxima: true };
+    } else {
+      return null;
+    }
   }
 
   cargarOpciones() {

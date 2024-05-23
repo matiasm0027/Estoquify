@@ -14,7 +14,7 @@ export class ChangePasswordGuard implements CanActivate {
   canActivate(): boolean {
     const firstLogin = localStorage.getItem('first_login');
     // Si first_login es 'true', redirige a /change_password
-    if (firstLogin === 'true') {
+    if (firstLogin === '1') {
       this.router.navigate(['/change_password']);
       return false;
     }

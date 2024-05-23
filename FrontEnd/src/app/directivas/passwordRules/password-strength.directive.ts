@@ -13,7 +13,7 @@ export class PasswordStrengthDirective {
   ) {
     this.errorMessageSpan = this.renderer.createElement('span');
     this.renderer.addClass(this.errorMessageSpan, 'error_form');
-    this.renderer.addClass(this.errorMessageSpan, 'text-red-800'); // Añadimos la clase para el color rojo
+    this.renderer.addClass(this.errorMessageSpan, 'text-red-600'); // Añadimos la clase para el color rojo
     this.renderer.setStyle(this.errorMessageSpan, 'display', 'none');
 
     const parentElement = this.el.nativeElement.parentElement;
