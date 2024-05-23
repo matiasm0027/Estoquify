@@ -8,11 +8,11 @@
          </a>
       </div>
       <div class="flex items-center space-x-4">
-         <button (click)="toggleChatModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600 bg-gray-100 dark:bg-gray-700 rounded-full">
+         <a routerLink="/chat" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600 bg-gray-100 dark:bg-gray-700 rounded-full">
             <span class="sr-only">Toggle chat</span>
             <!-- Utiliza el icono de chat de texto de Font Awesome -->
             <i class="fas fa-comment"></i>
-          </button>
+         </a>
          <span *ngIf="loggedInUser" class="text-sm font-medium sm:text-base whitespace-nowrap dark:text-white">
             Bienvenido/a {{ loggedInUser.name }} {{ loggedInUser.last_name }}
          </span>
@@ -30,22 +30,8 @@
    </div>
 </nav>
 
- <!-- Modal del chat -->
- <div *ngIf="showChatModal" class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-   <div class="bg-white p-4 rounded-lg shadow-md w-96">
-     <!-- Historial de mensajes -->
-     <div class="h-52 overflow-y-auto mb-4">
-
-
-     </div>
-     <!-- Área de entrada de texto -->
-     <textarea  class="w-full h-20 border-gray-300 rounded-md mb-4"></textarea>
-     <!-- Botón para enviar mensaje -->
-     <button  class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Enviar</button>
-     <button (click)="toggleChatModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600 bg-gray-100 dark:bg-gray-700 rounded-full px-4 py-2">Cerrar</button>
-   </div>
- </div>
-
+<!-- Sidebar component HTML -->
+ 
 <div id="logo-sidebar"
    class="sidebar fixed top-0 left-0 z-40 w-64 h-screen pt-20 bg-gray-200 border-r border-gray-200 sm:translate-x-0 dark:bg-gray-100 dark:border-gray-700"
    aria-label="Sidebar">
@@ -103,7 +89,18 @@
                <span class="flex-1 ms-3 whitespace-nowrap">Empleado</span>
             </a>
          </li>
-
+         <li>
+            <a routerLink="/faqs"
+               class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group" >
+               <svg
+                  class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                  aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                  <path
+                     d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z" />
+               </svg>
+               <span class="flex-1 ms-3 whitespace-nowrap">Faqs</span>
+            </a>
+         </li>
          <li>
             <button (click)="logout()" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white group">
                <svg

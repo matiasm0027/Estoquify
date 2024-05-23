@@ -13,7 +13,7 @@
             </div>
             <div class="grid grid-cols-4 gap-4">
                 <!-- Iterar sobre los reportes -->
-                <ng-container *ngFor="let incidence of incidences">
+                <ng-container *ngFor="let incidence of incidences.reverse()">
                     <div [ngClass]="{
                         'bg-green-200': incidence.priority === 'Low',
                         'bg-yellow-200': incidence.priority === 'Medium',

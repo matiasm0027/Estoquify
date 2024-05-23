@@ -1,0 +1,8 @@
+.ng-dropdown-panel {
+    box-sizing:border-box;
+    position:relative;
+    opacity:0;
+    width:100%;
+    z-index:1050;
+    -webkit-overflow-scrolling:touch
+   }

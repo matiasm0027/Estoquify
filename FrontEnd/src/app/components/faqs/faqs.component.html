@@ -1,0 +1,189 @@
+<!-- faq.component.html -->
+<div class="flex">
+<app-sidebar></app-sidebar>
+
+<div  class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-24 md:ml-12 md:mr-12 sm:mt-24 sm:ml-12 sm:mr-12 mt-24 ml-12 mr-12 box-fl container">
+  <div class="flex justify-between items-center mb-4">
+    <div class="flex items-center"> <!-- Nuevo contenedor flex para el título y el input -->
+      <h1 class="text-2xl font-bold mr-4">Faqs</h1>
+    </div>
+
+    <div> <!-- Contenedor para los botones -->
+     <button (click)="mostrarModal()"
+      class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 md:ml-3 md:mb-2 rounded mr-2"
+      *ngIf="userRole === '1'">
+      Añadir FAQ
+      </button>
+      
+    </div>
+  </div>  
+
+  <div class="table-container overflow-x-auto">
+
+    <div *ngIf="cargaDatos; else content">
+      <p>Cargando datos...</p>
+    </div>
+    <ng-template #content>
+    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-gray-300 mb-2 lg:text-center md:text-center sm:text-center">
+      <thead class="text-xs text-gray-700 uppercase dark:text-gray-400">
+        <tr>
+          <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
+            Titulo
+          </th>
+          <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800">
+            Descripción
+          </th>
+          <th scope="col" class="px-6 py-3 bg-blue-50 dark:bg-blue-800" *ngIf="userRole === '1'"> 
+            ACCIONES 
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let faq of faqs | paginate: { itemsPerPage: 8, currentPage: page }">
+          
+          <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
+            {{ faq.titulo}}
+          </td>
+          <td class="px-6 py-4">
+            {{ faq.descripcion}}
+          </td>
+          <td class="px-6 py-4" *ngIf="userRole === '1'">
+            <button (click)="mostrarModalEditar(faq.id)"
+                class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 px-6 rounded border border-blue-500 lg:mr-2">
+                Editar
+              </button>
+            <button (click)="confirmDelete(faq.id)"
+                class="bg-white-500 hover:bg-white hover:text-red-500 font-bold py-2 px-4 rounded border border-red-500 md:mt-2 sm:mt-1">
+                Eliminar
+            </button>
+          </td>
+        </tr> 
+      </tbody>
+    </table>
+  </ng-template>
+    <pagination-controls (pageChange)="page = $event"></pagination-controls>
+
+  <div *ngIf="mostrarModalAgregar" class="fixed z-10 inset-0 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+      <!-- Contenido del modal -->
+      <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full">
+        <!-- Encabezado del modal -->
+        <div class="px-4 py-2 bg-gray-200">
+          <h3 class="text-lg font-bold">Añadir FAQ</h3>
+        </div>
+        <!-- Cuerpo del modal (aquí va el formulario) -->
+        <div class="p-4">
+          <!-- Formulario aquí -->
+          <form [formGroup]="faqForm" (submit)="agregarFaq()">
+            <div class="mb-4">
+              <label for="titulo" class="block text-gray-700">Título</label>
+              <input formControlName="titulo" type="text" id="titulo" name="titulo" class="form-input mt-1 block w-full"
+                placeholder="Ingrese el Título" required>
+              <!-- Error handling -->
+              <div *ngIf="faqForm.get('titulo')?.errors?.['required'] && faqForm.get('titulo')?.touched"
+                class="text-red-800">
+                Este campo es obligatorio.
+              </div>
+              <div
+                *ngIf="faqForm.get('titulo')?.errors?.['minlength'] && faqForm.get('titulo')?.touched"
+                class="text-red-800">
+                El título debe tener al menos 3 caracteres.
+              </div>
+              <div
+                *ngIf="faqForm.get('titulo')?.errors?.['maxlength'] && faqForm.get('titulo')?.touched"
+                class="text-red-800">
+                El título no puede tener más de 100 caracteres.
+              </div>
+            </div>
+  
+            <div class="mb-4">
+              <label for="descripcion" class="block text-gray-700">Descripción</label>
+              <textarea formControlName="descripcion" id="descripcion" name="descripcion"
+                class="form-textarea mt-1 block w-full" rows="3" placeholder="Ingrese la Descripción"
+                required></textarea>
+              <!-- Error handling -->
+              <div *ngIf="faqForm.get('descripcion')?.errors?.['required'] && faqForm.get('descripcion')?.touched"
+                class="text-red-800">
+                Este campo es obligatorio.
+              </div>
+              <div
+                *ngIf="faqForm.get('descripcion')?.errors?.['minlength'] && faqForm.get('descripcion')?.touched"
+                class="text-red-800">
+                La descripción debe tener al menos 10 caracteres.
+              </div>
+              <div
+                *ngIf="faqForm.get('descripcion')?.errors?.['maxlength'] && faqForm.get('descripcion')?.touched"
+                class="text-red-800">
+                La descripción no puede tener más de 500 caracteres.
+              </div>
+            </div>
+  
+            <div class="flex justify-end">
+              <button type="submit"
+                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar</button>
+              <button (click)="cerrarModal()"
+                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
+            </div>
+            <div *ngIf="errorMessage2" class="text-red-800 fade-in-out">{{ errorMessage2}}</div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="mostrarModalEdit" class="fixed z-10 inset-0 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+      <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full">
+        <div class="px-4 py-2 bg-gray-200">
+          <h3 class="text-lg font-bold">Editar FAQ</h3>
+        </div>
+        <div class="p-4">
+          <form [formGroup]="faqForm" (submit)="editFaq()">
+            <div class="mb-4">
+              <label for="titulo" class="block text-gray-700">Título</label>
+              <input formControlName="titulo" type="text" id="titulo" name="titulo"
+                class="form-input mt-1 block w-full" placeholder="Ingrese el título" required>
+              <div *ngIf="faqForm.get('titulo')?.errors?.['required'] && faqForm.get('titulo')?.touched"
+                class="text-red-800">
+                Este campo no puede estar vacío.
+              </div>
+              <div *ngIf="faqForm.get('titulo')?.errors?.['minlength'] && faqForm.get('titulo')?.touched"
+                class="text-red-800">
+                El título debe tener al menos 3 caracteres.
+              </div>
+              <div *ngIf="faqForm.get('titulo')?.errors?.['maxlength'] && faqForm.get('titulo')?.touched"
+                class="text-red-800">
+                El título no puede tener más de 30 caracteres.
+              </div>
+            </div>
+            <div class="mb-4">
+              <label for="descripcion" class="block text-gray-700">Descripción</label>
+              <textarea formControlName="descripcion" id="descripcion" name="descripcion"
+                class="form-input mt-1 block w-full" rows="3" placeholder="Ingrese la descripción" required></textarea>
+              <div *ngIf="faqForm.get('descripcion')?.errors?.['required'] && faqForm.get('descripcion')?.touched"
+                class="text-red-800">
+                Este campo no puede estar vacío.
+              </div>
+              <div *ngIf="faqForm.get('descripcion')?.errors?.['minlength'] && faqForm.get('descripcion')?.touched"
+                class="text-red-800">
+                La descripción debe tener al menos 10 caracteres.
+              </div>
+              <div *ngIf="faqForm.get('descripcion')?.errors?.['maxlength'] && faqForm.get('descripcion')?.touched"
+                class="text-red-800">
+                La descripción no puede tener más de 500 caracteres.
+              </div>
+            </div>
+            <div class="flex justify-end">
+              <button type="submit"
+                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar</button>
+              <button (click)="cerrarModalEdit()"
+                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
+            </div>
+          </form>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+  

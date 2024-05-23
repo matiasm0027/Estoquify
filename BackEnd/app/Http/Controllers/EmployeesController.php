@@ -62,9 +62,9 @@ class EmployeesController extends Controller
 
             // Crear un nuevo objeto Employee y asignar los valores
             $employee = new Employee();
-            $employee->name = $validatedData['name'];
-            $employee->last_name = $validatedData['last_name'];
-            $employee->email = $validatedData['email'];
+            $employee->name = ucwords(strtolower($validatedData['name']));
+            $employee->last_name = ucwords(strtolower($validatedData['last_name']));
+            $employee->email = strtolower($validatedData['email']);
             $employee->phone_number = $validatedData['phone_number'];
             $employee->password = bcrypt($validatedData['password']); // Encriptar la contraseña
             $employee->department_id = $validatedData['department_id'];

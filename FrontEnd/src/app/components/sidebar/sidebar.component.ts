@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 import { Employee } from 'src/app/model/Employee';
-import { Observable } from 'rxjs';
-
+import { ApiRequestService } from 'src/app/services/api/api-request.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -13,10 +12,9 @@ export class SidebarComponent implements OnInit {
 
   loggedInUser!: Employee | null;
   userRole!: any;
-  showChatModal: boolean = false;
-
-  constructor(private authControlService: UsuariosControlService) {
-  }
+  
+   
+  constructor(private authControlService: UsuariosControlService,  private apiRequestService: ApiRequestService) {}
 
   ngOnInit(): void {
     this.userRole = this.authControlService.hasRole();
@@ -39,7 +37,6 @@ export class SidebarComponent implements OnInit {
     }
   }
 
-  toggleChatModal() {
-    this.showChatModal = !this.showChatModal;
-  }
+
+
 }

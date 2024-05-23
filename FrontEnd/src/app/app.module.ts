@@ -6,7 +6,6 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { HomeComponent } from './components/home/home.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { EmployeesViewComponent } from './components/employees-view/employees-view.component';
 import { FormsModule } from '@angular/forms';
@@ -25,6 +24,9 @@ import { IncidenceHistoryComponent } from './components/incidences-history/incid
 import { PasswordStrengthDirective } from './directivas/passwordRules/password-strength.directive';
 import { UsuariosControlService } from './services/usuarios/usuarios-control.service';
 import { IncidenceViewComponent } from './components/incidences-view/incidences-view.component';
+import { FaqsComponent } from './components/faqs/faqs.component';
+import { ChatViewComponent } from './components/chat-view/chat-view.component';
+import { SidebarComponent } from './components/sidebar/sidebar.component';
 
 @NgModule({
   declarations: [
@@ -43,6 +45,8 @@ import { IncidenceViewComponent } from './components/incidences-view/incidences-
     IncidenceViewComponent,
     IncidenceHistoryComponent,
     PasswordStrengthDirective,
+    FaqsComponent,
+    ChatViewComponent,
   ],
   imports: [
     BrowserModule,
