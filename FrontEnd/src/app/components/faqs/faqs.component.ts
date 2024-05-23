@@ -121,8 +121,8 @@ confirmDelete(faq: number): void {
 }
 
 deleteFaq(id: number): void {
-  this.apiRequestService.deleteFaq(id).subscribe(
-    (response) => { 
+  this.apiRequestService.deleteFaq(this.FaqID).subscribe(
+    (response: any) => {
       this.successMessage = response.message;
       this.loadFaqsDetails();
     },
@@ -133,9 +133,7 @@ deleteFaq(id: number): void {
 }
 
 editFaq(): void {
-  console.log('Formulario válido:', this.faqForm.valid);
-  console.log('ID de la FAQ:', this.FaqID);
-  if (this.faqForm.valid && typeof this.FaqID !== null) {
+  if (this.faqForm.valid) {
     const faqEditData = {
       titulo: this.faqForm.value.titulo,
       descripcion: this.faqForm.value.descripcion
@@ -143,22 +141,19 @@ editFaq(): void {
 
     this.apiRequestService.editFaq(this.FaqID, faqEditData).subscribe(
       (response: any) => {
-        // Aquí puedes manejar la respuesta si es necesario
         this.successMessage = response.message;
         this.cerrarModalEdit();
-        // Aquí puedes realizar otras acciones después de la edición exitosa
+        this.loadFaqsDetails();
+
       },
       (error: any) => {
-        // Aquí puedes manejar el error si la solicitud falla
         this.errorMessage = error.error.error;
       }
     );
   } else {
-    // Si el formulario no es válido, puedes mostrar un mensaje de error o realizar alguna otra acción
     console.error('Formulario inválido');
   }
 }
-
 
 
 

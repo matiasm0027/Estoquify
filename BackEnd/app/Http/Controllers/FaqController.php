@@ -85,12 +85,13 @@ class FaqController extends Controller
 
  
      // Eliminar una FAQ existente
-     public function deleteFaqById($id)
+     public function deleteFaq(Request $request, $id)
     {
        
     try {
         $faq = Faq::find($id);
         $faq->delete();
+
 
         return response()->json(['message' => 'FAQ eliminada correctamente'], 200);
     } catch (\Exception $e) {
