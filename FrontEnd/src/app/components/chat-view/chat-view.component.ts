@@ -88,7 +88,6 @@ export class ChatViewComponent implements OnInit {
 
     this.apiRequestService.crearConexion(nuevaConexion).subscribe(
       (response) => {
-        console.log('Conexión creada exitosamente:', response);
         this.selectedEmployee = undefined;
         this.loadActiveChats()
       },
@@ -99,17 +98,10 @@ export class ChatViewComponent implements OnInit {
     this.selectedEmployee = undefined;
   }
 
-  eliminarChat() {
-    if (!this.loggedInUser) {
-      console.error('No hay empleado seleccionado para eliminar el chat.');
-      return;
-    }
-
-    const conexionId = this.loggedInUser.id;
-
-    this.apiRequestService.eliminarConexion(conexionId).subscribe(
+  eliminarChat(id: number) {
+    this.apiRequestService.eliminarConexion(id).subscribe(
       (response) => {
-        console.log('Conexión eliminada exitosamente:', response);
+        this.cerrarModal()
         this.selectedEmployee = undefined;
       },
       (error) => {
@@ -162,6 +154,7 @@ export class ChatViewComponent implements OnInit {
   }
   cerrarModal(){
     this.mostrarMensajes = false;
+    this.loadActiveChats()
   }
 
   obtenerUltimaLinea(message: string): string {

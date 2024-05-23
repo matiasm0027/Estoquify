@@ -184,8 +184,8 @@ export class ApiRequestService {
   crearConexion(nuevaConexion: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/crearconexion`, nuevaConexion);
   }
-  eliminarConexion(conexionId: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/auth/eliminarConexion/${conexionId}`);
+  eliminarConexion(Id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/auth/eliminarConexion/${Id}`);
   }
 
   getActiveChats(employeeId: number): Observable<any[]> {

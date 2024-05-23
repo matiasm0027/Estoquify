@@ -25,22 +25,20 @@ class ChatController extends Controller
         return response()->json($chat, 201);
     }
 
-    public function eliminarConexion($senderId)
+    public function eliminarConexion($id)
     {
-       
-        $this->checkUserRole(['1']);
-        // Elimina la conexión
-        $conexiones = Chat::where('sender_id', $senderId)->get();
-
-        if ($conexiones->isEmpty()) {
-            return response()->json(['error' => 'Conexiones no encontradas'], 404);
+        // Busca la conexión por su ID
+        $conexion = Chat::find($id);
+    
+        // Verifica si se encontró la conexión
+        if (!$conexion) {
+            return response()->json(['error' => 'Conexión no encontrada'], 404);
         }
-
-        // Eliminar todas las conexiones encontradas
-        Chat::where('sender_id', $senderId)->delete();
-
-        return response()->json(['message' => 'Conexiones eliminadas exitosamente']);
-
+    
+        // Elimina la conexión
+        $conexion->delete();
+    
+        // Devuelve una respuesta exitosa
         return response()->json(['message' => 'Conexión eliminada exitosamente']);
     }
 
