@@ -19,12 +19,12 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { CategoryDetailsComponent } from './components/category-details/category-details.component';
 import { MaterialDetailsComponent } from './components/material-details/material-details.component';
-import { ReportesViewComponent } from './components/reportes-view/reportes-view.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
-import { ReportesHistoryComponent } from './components/reportes-history/reportes-history.component';
+import { IncidenceHistoryComponent } from './components/incidences-history/incidences-history.component';
 import { PasswordStrengthDirective } from './directivas/passwordRules/password-strength.directive';
 import { UsuariosControlService } from './services/usuarios/usuarios-control.service';
+import { IncidenceViewComponent } from './components/incidences-view/incidences-view.component';
 
 @NgModule({
   declarations: [
@@ -40,8 +40,8 @@ import { UsuariosControlService } from './services/usuarios/usuarios-control.ser
     ForgotPasswordComponent,
     ResetPasswordComponent,
     MaterialDetailsComponent,
-    ReportesViewComponent,
-    ReportesHistoryComponent,
+    IncidenceViewComponent,
+    IncidenceHistoryComponent,
     PasswordStrengthDirective,
   ],
   imports: [

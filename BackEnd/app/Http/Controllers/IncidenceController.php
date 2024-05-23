@@ -14,7 +14,7 @@ use Illuminate\Http\Exceptions\ThrottleRequestsException;
 class IncidenceController extends Controller{
 
     public function sendIncidence(Request $request){
-        
+
          // Define las reglas de validación
          $rules = [
             'petition' => 'required|string',
@@ -45,7 +45,7 @@ class IncidenceController extends Controller{
             'employee_id' => $request->employee_id,
         ];
 
-        //Si el reporte es una alta no adjuntara las categorias, si es una solicitud 
+        //Si el reporte es una alta no adjuntara las categorias, si es una solicitud
         if ($request->type === 'Solicitud Material') {
             $report = new Report($reportData);
             //Guardamos el reporte en la bbdd
@@ -58,7 +58,7 @@ class IncidenceController extends Controller{
            $report->save();
         }
 
-       
+
 
         //Mensaje de que se ha  generado correcatemente la incidencia
         return response()->json(['message' => 'Reporte generado correctamente'], 201);
@@ -66,34 +66,33 @@ class IncidenceController extends Controller{
 
 
 
-    public function listReports()
+    public function listIncidences()
     {
         try{
-        $reports = Report::all();
+        //$reports = Report::all();
          // Obtener todos los reportes con los datos del empleado asociado
-        $reports = Report::with('employee')
-        ->get()
-        ->map(function ($report) {
-            return [
-                'id' => $report->id,
-                'date' => $report->date,
-                'petition' => $report->petition,
-                'state' => $report->state,
-                'priority' => $report->priority,
-                'type' => $report->type,
-                'updated' => $report->updated_at,
-                'employee_id' => $report->employee->id,
-                'employee_name' => $report->employee->name . ' ' . $report->employee->last_name,
-                'employee_id_sucursal' => $report->employee->branch_office_id ,
-            ];
-        });
-        return response()->json($reports);
+        $incidences = Incidence::with('employee.branchOffice')
+        ->orderBy('id')
+        ->get();
+        // ->map(function ($incidence) {
+        //     return [
+        //         'id' => $incidence->id,
+        //         'date' => $incidence->date,
+        //         'petition' => $incidence->petition,
+        //         'state' => $incidence->state,
+        //         'priority' => $incidence->priority,
+        //         'type' => $incidence->type,
+        //         'updated' => $incidence->updated_at,
+        //         'employee' => $incidence->employee,
+        //     ];
+        // });
+        return response()->json($incidences);
     } catch (ThrottleRequestsException $e) {
         return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
     }
     }
 
-    public function changeReportStatus(Request $request, $id)
+    public function changeIncidenceStatus(Request $request, $id)
 {
     try {
         // Verifica si el usuario está autenticado
@@ -106,10 +105,10 @@ class IncidenceController extends Controller{
         $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
 
         // Encuentra el reporte por su ID
-        $report = Report::find($id);
+        $incidence = Incidence::find($id);
 
         // Verifica si se encontró el reporte
-        if (!$report) {
+        if (!$incidence) {
             return response()->json(['message' => 'El reporte no fue encontrado'], 404);
         }
 
@@ -119,8 +118,8 @@ class IncidenceController extends Controller{
         ]);
 
         // Actualiza el estado del reporte
-        $report->state = $request->estado;
-        $report->save();
+        $incidence->state = $request->estado;
+        $incidence->save();
 
         // Devuelve una respuesta exitosa
         return response()->json(['message' => 'Estado del reporte actualizado correctamente'], 200);

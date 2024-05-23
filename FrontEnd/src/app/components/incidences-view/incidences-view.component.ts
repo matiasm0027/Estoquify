@@ -1,15 +1,18 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Incidence } from './../../model/Incidence';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { forkJoin } from 'rxjs';
+import { Category } from 'src/app/model/Category';
 import { Employee } from 'src/app/model/Employee';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
+import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 
 @Component({
-  selector: 'app-reportes-view',
-  templateUrl: './reportes-view.component.html',
-  styleUrls: ['./reportes-view.component.css']
+  selector: 'app-incidences-view',
+  templateUrl: './incidences-view.component.html',
+  styleUrls: ['./incidences-view.component.css']
 })
-export class ReportesViewComponent implements OnInit, OnDestroy {
+export class IncidenceViewComponent implements OnInit {
   categories: any[] = [];
   altaEmpleado: boolean = false;
   solicitudMaterial: boolean = false;
@@ -23,12 +26,9 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
   petition: string = '';
   employeeRole!: string;
   reportes: any[] = [];
-  sucursales: any[] = [];
   envioExitoso: boolean = false;
   mensajeNotificacion: string = '';
-  reporteSeleccionado: any = null;
   formularioEmpleado: FormGroup;
-  departamentos: any[] = [];
   mostrarModalAgregar: boolean = false;
   mostrarModalMaterial: boolean = false;
   detallesMaterial: { [key: number]: any[] } = {};
@@ -38,23 +38,32 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
   placeholder: string = "Seleccionar empleado";
   formularioMaterial: FormGroup;
   successMessage!: string;
+  errorMessage2!:string;
   cargaDatos: boolean = true;
 
-  private subscriptions: Subscription[] = [];
+  userRole!: any;
+  loggedInUser!: Employee | null;
+  departamentos: { id: number; name: string; }[] = [];
+  sucursales: { id: number; name: string; }[] = [];
+  roles: { id: number; name: string; }[] = [];
 
+  incidences!: Incidence[];
+  incidencesPending!: Incidence[];
+  incidenceSelect!:Incidence | null;
   constructor(
-    private apiRequestService: ApiRequestService,
+    private ApiRequestService: ApiRequestService,
+    private authControlService: UsuariosControlService,
     private fb: FormBuilder,
   ) {
     this.formularioEmpleado = this.fb.group({
-      nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30), Validators.pattern('^[a-zA-Z]+$')]],
-      apellido: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30), Validators.pattern('^[a-zA-Z]+$')]],
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30), Validators.pattern('^[a-zA-Z]+$')]],
+      last_name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30), Validators.pattern('^[a-zA-Z]+$')]],
       email: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'),]],
+      phone_number: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
       password: ['', Validators.required],
-      departamento: ['', Validators.required],
-      sucursal: ['', Validators.required],
-      rol: ['', Validators.required],
-      telefonoMovil: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+      department_id: ['', Validators.required],
+      branch_office_id: ['', Validators.required],
+      role_id: ['', Validators.required],
     });
     this.formularioMaterial = this.fb.group({
       fullname: [, Validators.required],
@@ -68,40 +77,35 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.userRole = this.authControlService.hasRole();
+    this.authControlService.getLoggedUser().subscribe(
+      (user) => {
+        this.loggedInUser = user;
+      }
+    );
+    this.cargarOpciones();
     this.obtenerNombreCategoria();
-    this.getLoggedUser();
-    this.obtenerSucursales();
     this.obtenerReportes()
-    this.obtenerDepartamento()
+
   }
 
-  ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-  }
-
-  //--------------------------------------------------------------------------FUNCIONES COMUNES-----------------------------------------------------------------
-
-  getLoggedUser(): void {
-    this.apiRequestService.getLoggedInUser().subscribe(
-      (response: any) => {
-        this.employeeId = response.id;
-        const roleId = response.role_id;
-        this.cargaDatos = false;
-
-
-        if (roleId === 1) {
-          this.employeeRole = 'admin';
-        } else if (roleId === 2) {
-          this.employeeRole = 'manager';
-        }else if (roleId === 3) {
-          this.employeeRole = 'user';
-        }
+  cargarOpciones() {
+    forkJoin([
+      this.authControlService.cargarSucursales(),
+      this.authControlService.cargarDepartamentos(),
+      this.authControlService.cargarRoles(),
+    ]).subscribe(
+      ([sucursales, departamentos, roles]) => {
+        this.sucursales = sucursales;
+        this.departamentos = departamentos;
+        this.roles = roles;
       },
-      error => {
-        console.error('Error when obtaining data from the logged in user:', error);
+      (error) => {
+        console.error('Error loading options', error);
       }
     );
   }
+
 
   //-------------------------------------------------------------FUNCIONES DE ROL MANAGER--------------------------------------------------------------------
 
@@ -184,7 +188,7 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
       }
 
       // Llamar al servicio API para agregar el reporte
-      this.apiRequestService.agregarReporte(reporte).subscribe(
+      this.ApiRequestService.agregarReporte(reporte).subscribe(
         (response: any) => {
           this.resetForm();
           this.mostrarNotificacion('El reporte se ha enviado correctamente', 4000);
@@ -297,10 +301,9 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
         // Lógica para asignar el material al empleado con el ID proporcionado
         const materialId = categoriaValue;
         // Llama al servicio para asignar el material al empleado
-        this.apiRequestService.asignarMaterial(materialId, employeeId).subscribe(
+        this.ApiRequestService.asignarMaterial(materialId, employeeId).subscribe(
           (response) => {
             this.successMessage = response.message;
-            this.clearMessagesAfterDelay();
             this.formularioMaterial.reset();
             this.cerrarModal_Material()
           },
@@ -313,7 +316,7 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
   }
 
   obtenerNombreCategoria() {
-    this.apiRequestService.categoryMaterial().subscribe(
+    this.ApiRequestService.categoryMaterial().subscribe(
       (response: any[]) => {
         this.categories = response.map(material => ({
           id: material.id,
@@ -338,21 +341,12 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
     }, duracion);
   }
 
-
   obtenerReportes() {
-    this.apiRequestService.listReportes().subscribe(
-      (response: any[]) => {
-        this.reportes = response.filter(reporte => reporte.state === 'pending')
-          .map(reporte => ({
-            id: reporte.id,
-            solicitud: reporte.petition,
-            prioridad: reporte.priority,
-            estado: reporte.state,
-            type: reporte.type,
-            nameempleado: reporte.employee_name,
-            sucursalid: reporte.employee_id_sucursal,
-          }));
-
+    this.ApiRequestService.listIncidences().subscribe(
+      (response:Incidence[]) => {
+        this.incidences = response;
+        this.incidencesPending = response.filter((incidence:Incidence) => incidence.state === 'pending');
+        this.cargaDatos = false;
       },
       error => {
         console.error('Error al obtener reportes:', error);
@@ -360,43 +354,12 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
     );
   }
 
-  obtenerNombreSucursal(sucursalId: number): string {
-    const sucursal = this.sucursales.find(sucursal => sucursal.id === sucursalId);
-    return sucursal ? sucursal.name : ''; // Devuelve el nombre de la sucursal si se encuentra, de lo contrario devuelve una cadena vacía
-  }
-
-  obtenerSucursales() {
-    this.apiRequestService.listBranchOffices().subscribe(
-      (response: any) => {
-        this.sucursales = response;
-        this.cargaDatos = false;
-
-      },
-      error => {
-        console.error('Error al obtener sucursales:', error);
-      }
-    );
-  }
-
-  obtenerDepartamento() {
-    this.apiRequestService.listDepartments().subscribe(
-      (response: any) => {
-        this.departamentos = response;
-        this.cargaDatos = false;
-
-      },
-      error => {
-        console.error('Error al obtener department:', error);
-      }
-    );
-  }
-
-  mostrarDetalle(reporte: any) {
-    this.reporteSeleccionado = reporte;
+  mostrarDetalle(incidence:Incidence) {
+    this.incidenceSelect = incidence;
   }
 
   cerrarModal() {
-    this.reporteSeleccionado = null;
+    this.incidenceSelect = null;
     this.obtenerReportes();
     this.cerrarModal_Agregar()
   }
@@ -423,7 +386,7 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
         const nuevoEstado = isChecked ? (estado === 'aceptado' ? 'accepted' : 'rejected') : '';
 
         // Llamar al servicio API para cambiar el estado del reporte
-        this.apiRequestService.cambiarEstadoReporte(idReporte, nuevoEstado).subscribe(
+        this.ApiRequestService.cambiarEstadoIncidencia(idReporte, nuevoEstado).subscribe(
           (response: any) => {
             console.log('Estado del reporte cambiado:', response);
             // Manejar la respuesta del servicio si es necesario
@@ -440,22 +403,30 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
     }
   }
 
-  agregarEmpleado() {
+  agregarEmpleado(): void {
+    this.errorMessage2 = "";
+    this.successMessage = "";
     if (this.formularioEmpleado.valid) {
-      const nuevoEmpleado = this.formularioEmpleado.value;
-      this.apiRequestService.addEmployee(nuevoEmpleado).subscribe(
-        (response: any) => {
-          this.cerrarModal_Agregar();
-
-        },
-        (error: any) => {
-          console.error('Error al agregar empleado:', error);
-        }
-      );
+      const nuevoEmpleado: Employee = this.formularioEmpleado.value;
+      try {
+        this.ApiRequestService.addEmployee(nuevoEmpleado).subscribe(
+          (response: any) => {
+            this.successMessage = response.message;
+            this.cerrarModal_Agregar();
+          },
+          (error: any) => {
+            this.errorMessage2 = error.error.error;
+            // No realizar ninguna acción adicional en caso de error
+          }
+        );
+      } catch (error) {
+        this.errorMessage2 = 'Error al agregar empleado:', error;
+        // No realizar ninguna acción adicional en caso de error
+      }
     } else {
-      console.error('Formulario inválido. Por favor, complete todos los campos requeridos.');
+      this.errorMessage2 = 'Formulario inválido. Por favor, complete todos los campos requeridos.';
     }
-  }
+}
 
   mostrarModal() {
     this.mostrarModalAgregar = true;
@@ -481,16 +452,21 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
   }
 
   getCategoriaDetails(idCategoria: number): void {
-    this.apiRequestService.categoryMaterialInfo(idCategoria).subscribe(
+    this.ApiRequestService.categoryMaterialInfo(idCategoria).subscribe(
       (categoria: any) => {
-        // Filtra los materiales disponibles de la categoría
-        const materialesDisponibles = categoria.materials.filter((material: any) => material.state === 'available');
+        // Verifica que attributeCategoryMaterials existe y es un objeto
+        if (categoria.attributeCategoryMaterials) {
+          // Recoge todos los materiales disponibles
+          const materialesDisponibles = Object.values(categoria.attributeCategoryMaterials)
+            .flatMap((attrCatMat: any) => attrCatMat.material)
+            .filter((material: any) => material.state === 'available' && material.branch_office?.id === this.incidenceSelect?.employee?.branch_office?.id);
 
-        // Verifica si el material ya existe en detallesMaterial antes de agregarlo
-        for (const material of materialesDisponibles) {
-          const existeMaterial = this.detallesMaterial[idCategoria]?.some((m: any) => m.id === material.id);
-          if (!existeMaterial) {
-            this.detallesMaterial[idCategoria] = [...(this.detallesMaterial[idCategoria] || []), material];
+          // Verifica si el material ya existe en detallesMaterial antes de agregarlo
+          for (const material of materialesDisponibles) {
+            const existeMaterial = this.detallesMaterial[idCategoria]?.some((m: any) => m.id === material.id);
+            if (!existeMaterial) {
+              this.detallesMaterial[idCategoria] = [...(this.detallesMaterial[idCategoria] || []), material];
+            }
           }
         }
       },
@@ -504,10 +480,15 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
     this.getCategoriaDetails(idCategoria);
   }
 
+  obtenerNombreSucursal(sucursalId: number): string {
+    const sucursal = this.sucursales.find(sucursal => sucursal.id === sucursalId);
+    return sucursal ? sucursal.name : ''; // Devuelve el nombre de la sucursal si se encuentra, de lo contrario devuelve una cadena vacía
+  }
+
   obtenerEmpleados() {
-    this.apiRequestService.getEmployees().subscribe(
+    this.ApiRequestService.getEmployees().subscribe(
       (data: Employee[]) => {
-        const sucursalNombre = this.obtenerNombreSucursal(this.reporteSeleccionado.sucursalid);
+        const sucursalNombre = this.incidenceSelect?.employee?.branch_office?.name;
 
         // Filtrar empleados por nombre de sucursal
         this.employees = data.filter(employee => employee.branch_office?.name === sucursalNombre);
@@ -521,7 +502,7 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
         });
 
         console.log(this.employees);
-        console.log(sucursalNombre);
+        console.log(this.incidenceSelect?.employee?.branch_office?.name);
       },
       error => {
         console.error('Error al obtener empleados:', error);
@@ -532,7 +513,7 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
   buscarEmpleado(event: { term: string; items: any[]; }) {
     this.selectedEmployee = undefined;
     const searchTerm = event.term.toLowerCase();
-
+    this.placeholder = "Seleccionar empleado";
     // Si hay un término de búsqueda, filtrar la lista de empleados, de lo contrario, mostrar todos los empleados
     if (searchTerm.trim() !== '') {
       this.filteredEmployees = this.employees.filter(employee =>
@@ -551,12 +532,5 @@ export class ReportesViewComponent implements OnInit, OnDestroy {
   }
   limpiarSeleccion() {
     this.selectedEmployee = undefined;
-}
-
-  clearMessagesAfterDelay(): void {
-    setTimeout(() => {
-      this.successMessage = '';
-    }, 2000);
   }
-
 }

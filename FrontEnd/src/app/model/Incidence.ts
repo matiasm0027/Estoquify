@@ -12,7 +12,7 @@ export class Incidence {
   employee_id: number;
   employee?: Employee;
   categories?: Category[]; // Relación con la tabla 'categories'
-
+  updated_at?:Date;
   constructor(id: number, date: string, petition: string, state: string, priority: string, type: string, employee_id: number, categories?: Category[],  employee?: Employee) {
     this.id = id;
     this.date = date;

@@ -6,7 +6,7 @@ use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\DepartmentController;
 Use App\Http\Controllers\BranchOfficeController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ReportController;
+use App\Http\Controllers\IncidenceController;
 use App\Http\Controllers\EmployeeMaterialController;
 use App\Http\Controllers\CategoriaMaterialController;
 use App\Http\Controllers\MaterialController;
@@ -46,6 +46,7 @@ Route::group([
     Route::delete('deleteEmployees/{id}', [EmployeesController::class, 'deleteEmployees']);
     Route::get('listEmployeeMaterial/{id}', [EmployeesController::class, 'listEmployeeMaterial']);
     Route::get('listEmployeesByBranchOffice/{id_branch_office}', [EmployeesController::class, 'listEmployeesByBranchOffice']);
+    Route::get('getEmployeesByBranchOffice', [EmployeesController::class, 'getEmployeesByBranchOffice']);
 
     Route::get('getEmployee/{id}', [EmployeeMaterialController::class, 'getEmployee']);
     Route::get('getMaterial/{id}', [EmployeeMaterialController::class, 'getMaterial']);
@@ -67,9 +68,9 @@ Route::group([
     Route::delete('deleteMaterial/{id}', [MaterialController::class, 'deleteMaterial']);
     Route::put('editMaterial/{id}', [MaterialController::class, 'editMaterial']);
 
-    Route::get('listReports', [ReportController::class, 'listReports']);
+    Route::get('listIncidences', [IncidenceController::class, 'listIncidences']);
     Route::post('agregarReporte', [ReportController::class, 'sendReports']);
-    Route::put('changeReportStatus/{id}', [ReportController::class, 'changeReportStatus']);
+    Route::put('changeIncidenceStatus/{id}', [IncidenceController::class, 'changeIncidenceStatus']);
 });
 
 

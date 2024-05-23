@@ -1,4 +1,3 @@
-import { BranchOffice } from './../../model/BranchOffice';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
@@ -6,8 +5,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 import { jsPDF } from 'jspdf';
 import { Material } from 'src/app/model/Material';
-import { Attribute } from 'src/app/model/Attribute';
-import { forkJoin, map } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { Category } from 'src/app/model/Category';
 import { AttributeCategoryMaterial } from 'src/app/model/AttributeCategoryMaterial';
 import 'jspdf-autotable';
@@ -117,6 +115,7 @@ export class CategoryDetailsComponent implements OnInit {
           this.extractMaterials();
           this.aplicarFiltro();
           this.cargaDatos = false;
+          console.log(this.category)
         });
     } catch (error) {
       console.error('Error al obtener empleados:', error);
@@ -141,7 +140,7 @@ export class CategoryDetailsComponent implements OnInit {
       }
     }
   }
-  
+
 
   agregarAtributo() {
     // Agregar un nuevo conjunto de campos para atributo y valor
@@ -302,7 +301,7 @@ export class CategoryDetailsComponent implements OnInit {
 
           // Filtrar por sucursal
           if (filtroSucursalSeleccionado) { // Verificar si el filtro es un número válido
-              cumpleFiltroSucursal = material.branch_office_id === filtroSucursalSeleccionado;
+              cumpleFiltroSucursal = material.branch_office?.id === filtroSucursalSeleccionado;
           }
 
           // Devolver verdadero si el material cumple todos los filtros

@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use App\Models\Employee;
+use App\Models\BranchOffice;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
@@ -190,6 +191,18 @@ class EmployeesController extends Controller
             return response()->json($employees);
         } catch (ThrottleRequestsException $e) {
             return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
+        }
+    }
+
+    public function getEmployeesByBranchOffice()
+    {
+        try {
+            // Obtener la cantidad de empleados por sucursal
+            $employeesByBranchOffice = BranchOffice::withCount('employee')->get(['id', 'name', 'employees_count']);
+
+            return response()->json($employeesByBranchOffice);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener la cantidad de empleados por sucursal'], 500);
         }
     }
 

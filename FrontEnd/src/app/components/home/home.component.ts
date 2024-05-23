@@ -1,8 +1,11 @@
 import { Component, NgModule, OnInit } from '@angular/core';
+import { AttributeCategoryMaterial } from 'src/app/model/AttributeCategoryMaterial';
+import { Category } from 'src/app/model/Category';
 import { Employee } from 'src/app/model/Employee';
+import { Incidence } from 'src/app/model/Incidence';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
-
+import { KeyValue } from '@angular/common';
 
 @Component({
   selector: 'app-home',
@@ -10,16 +13,17 @@ import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-contr
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-
   loggedInUser!: Employee | null;  // Inicializar con un valor nulo
   employeeRole!: string;
   employee!: any;
-  reportes: any[] = [];
   materials: any[] = [];
-  empleado_id!: number;
-  reportes_id: any[] = [];
   cargaDatos: boolean = true;
   userRole!: any;
+  incidencesPending!: Incidence[];
+  incidencesSend!: Incidence[];
+  totales: { [key: string]: { [key: string]: number } } = {}; // Objeto anidado para almacenar los totales
+  categories: Category[] = [];
+  empleadosPorSucursal: any[] = []; // Inicializa como un array vacío en lugar de un objeto vacío
 
   constructor(private ApiRequestService: ApiRequestService, private authControlService: UsuariosControlService) { }
 
@@ -30,42 +34,66 @@ export class HomeComponent implements OnInit {
     this.obtenerCantidadMaterial();
     this.mostrarMaterialesDisponiblesBajos();
     this.obtenerReportesDelEmpleado();
+    this.obtenerCantidadEmpleadosPorSucursal();
   }
 
-  obtenerReportes() {
-    this.ApiRequestService.listReportes().subscribe(
-      (response: any[]) => {
-        this.reportes = response
-          .filter(reporte => reporte.state === 'pending')
-          .map(reporte => ({
-            id: reporte.id,
-            solicitud: reporte.petition,
-            prioridad: reporte.priority,
-            estado: reporte.state,
-            type: reporte.type,
-            empleado: reporte.employee_id,
-            nameempleado: reporte.employee_name
-          }));
+  obtenerCantidadMaterial(){
+    this.ApiRequestService.categoryMaterial().subscribe(category => {
+      this.categories = category;
+      console.log(this.categories)
+        this.calcularTotales();
+        console.log(this.totales)
         this.cargaDatos = false;
-      },
-      error => {
-        console.error('Error al obtener reportes:', error);
       }
     );
   }
 
-  obtenerCantidadMaterial() {
-    this.ApiRequestService.categoryMaterial().subscribe(
-      (response: any[]) => {
-        this.materials = response.map(material => ({
-          name: material.name, // Cambiar a category_name
-          total_material: material.total_materials, // Cambiar a total_materials
-          activeMaterial: material.active_materials, // Cambiar a active_materials
-          availableMaterial: material.available_materials, // Cambiar a available_materials
-          inactiveMaterial: material.inactive_materials // Cambiar a inactive_materials
-        }));
-        this.mostrarMaterialesDisponiblesBajos();
-        this.cargaDatos = false;
+  calcularTotales(): void {
+    this.totales = {};
+
+    // Iterar sobre cada categoría
+    this.categories.forEach(categoria => {
+      // Verificar si la categoría tiene materiales y si es un objeto
+      if (categoria.attributeCategoryMaterials && typeof categoria.attributeCategoryMaterials === 'object') {
+        // Iterar sobre cada objeto en attributeCategoryMaterials
+        Object.values(categoria.attributeCategoryMaterials).forEach((materialObj: any) => {
+          // Obtener el nombre de la sucursal del material
+          const sucursalName = materialObj.material?.branch_office?.name;
+          if (sucursalName) {
+            // Verificar si la sucursal ya existe en el objeto totales
+            if (!this.totales[sucursalName]) {
+              this.totales[sucursalName] = {};
+            }
+            // Incrementar el contador de la categoría para la sucursal correspondiente
+            if (!this.totales[sucursalName][categoria.name]) {
+              this.totales[sucursalName][categoria.name] = 1;
+            } else {
+              this.totales[sucursalName][categoria.name]++;
+            }
+          }
+        });
+      }
+    });
+  }
+
+  calcularTotalSucursal(materials: { [key: string]: number }): number {
+    let total = 0;
+    for (const key in materials) {
+      if (materials.hasOwnProperty(key)) {
+        total += materials[key];
+      }
+    }
+    return total;
+  }
+
+  obtenerCantidadEmpleadosPorSucursal(): void {
+    this.ApiRequestService.getEmployeesByBranchOffice().subscribe(
+      (response: any[]) => { // Ajusta el tipo de respuesta a 'any[]' si el servicio devuelve un array de objetos
+        this.empleadosPorSucursal = response;
+        console.log(this.empleadosPorSucursal);
+      },
+      error => {
+        console.error('Error al obtener la cantidad de empleados por sucursal:', error);
       }
     );
   }
@@ -106,40 +134,45 @@ export class HomeComponent implements OnInit {
     this.cargaDatos = false;
   }
 
+  obtenerReportes() {
+    this.ApiRequestService.listIncidences().subscribe(
+      (response:Incidence[]) => {
+        this.incidencesPending = response.filter((incidence:Incidence) => incidence.state === 'pending');
+        this.cargaDatos = false;
+        console.log(this.incidencesPending)
+      },
+      error => {
+        console.error('Error al obtener reportes:', error);
+      }
+    );
+  }
+
   obtenerReportesDelEmpleado() {
     const now = Date.now(); // Marca de tiempo actual
     const DaysInMilliseconds = 2 * 24 * 60 * 60 * 1000; // 1 día en milisegundos
 
-
-    this.ApiRequestService.listReportes().subscribe(
-      (response: any[]) => {
-        this.reportes_id = response
-          .filter(reporte => reporte.employee_id === this.empleado_id) // Filtrar por empleado
-          .filter(reporte => {
+    this.ApiRequestService.listIncidences().subscribe(
+      (response:Incidence[]) => {
+        this.incidencesSend = response
+          .filter((incidence:Incidence)=> incidence.employee?.id === this.loggedInUser?.id) // Filtrar por empleado
+          .filter((incidence:Incidence) => {
             // Filtrar los reportes que cumplen las condiciones
-            if (reporte.state === 'pending') {
+            if (incidence.state === 'pending') {
               return true; // Si el estado es 'pending', mostrar en la tabla
-            } else if (reporte.state === 'accepted' || reporte.state === 'rejected') {
+            } else if (incidence.state === 'accepted' || incidence.state === 'rejected') {
               // Si el estado es 'accepted' o 'rejected', verificar si la fecha de actualización es menor o igual a 5 días atrás
-              const updateDate = new Date(reporte.updated).getTime();
-              return now - updateDate <= DaysInMilliseconds;
+              const updateDate = incidence.updated_at ? new Date(incidence.updated_at).getTime() : 0;              return now - updateDate <= DaysInMilliseconds;
             } else {
               // Para otros estados, no mostrar en la tabla
               return false;
             }
           })
-          .map(reporte => ({
-            id: reporte.id,
-            estado: reporte.state,
-            type: reporte.type,
-            date: reporte.date,
-            update: reporte.updated
-          }));
         this.cargaDatos = false;
+        console.log(this.incidencesPending)
       },
       error => {
         console.error('Error al obtener los reportes del empleado:', error);
       }
-    );
+     );
   }
 }

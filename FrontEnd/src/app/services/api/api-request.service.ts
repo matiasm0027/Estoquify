@@ -8,6 +8,7 @@ import { BranchOffice } from '../../model/BranchOffice';
 import { Attribute } from 'src/app/model/Attribute';
 import { Category } from 'src/app/model/Category';
 import { Material } from 'src/app/model/Material';
+import { Incidence } from 'src/app/model/Incidence';
 
 
 @Injectable({
@@ -142,22 +143,25 @@ export class ApiRequestService {
   }
 
   //lista de incidencias
-  listReportes(): Observable<any[]>{
-    return this.http.get<any[]>(`${this.apiUrl}/auth/listReports`);
+  listIncidences(): Observable<Incidence[]>{
+    return this.http.get<Incidence[]>(`${this.apiUrl}/auth/listIncidences`);
   }
 
   agregarReporte(reporte: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/agregarReporte`, reporte);
   }
 
-  cambiarEstadoReporte(idReporte: number, nuevoEstado: string): Observable<any> {
+  cambiarEstadoIncidencia(idReporte: number, nuevoEstado: string): Observable<any> {
     const requestBody = { estado: nuevoEstado };
-    return this.http.put<any>(`${this.apiUrl}/auth/changeReportStatus/${idReporte}`, requestBody);
+    return this.http.put<any>(`${this.apiUrl}/auth/changeIncidenceStatus/${idReporte}`, requestBody);
   }
 
   listEmployeesByBranchOffice(id_branch_office : number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/auth/listEmployeesByBranchOffice/${id_branch_office}`);
   }
 
+  getEmployeesByBranchOffice(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/getEmployeesByBranchOffice`);
+  }
 }
 
