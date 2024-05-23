@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Employee } from '../../model/Employee';
 import { Role } from '../../model/Role';
 import { Department } from '../../model/Department';
@@ -15,8 +15,7 @@ import { Incidence } from 'src/app/model/Incidence';
   providedIn: 'root'
 })
 export class ApiRequestService {
-  private apiUrl = 'http://localhost:8000/api';
-
+  private apiUrl = 'https://estoquify.es/api';
 
   constructor(private http: HttpClient) {}
 

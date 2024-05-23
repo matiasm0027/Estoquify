@@ -11,7 +11,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:4200",  // URL de tu aplicación Angular
+    origin: "https://estoquify.es",  // URL de tu aplicación Angular
     methods: ["GET", "POST"]
   }
 });
