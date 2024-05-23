@@ -19,19 +19,30 @@
               <thead class="bg-blue-100">
                 <tr>
                   <th>Sucursal</th>
-                  <th *ngFor="let categoria of categories" class="hidden lg:table-cell">{{ categoria.name }}</th>
-                  <th>Total</th> <!-- Nueva columna para mostrar el total de materiales -->
+                  <!-- Encabezados de columna para categorías -->
+                  <ng-container *ngFor="let categoria of categories">
+                    <th class="hidden lg:table-cell">{{ categoria.name }}</th>
+                  </ng-container>
+                  <!-- Encabezado de columna para el total -->
+                  <th>Total</th>
                 </tr>
               </thead>
               <tbody>
+                <!-- Iteración sobre las sucursales -->
                 <ng-container *ngFor="let sucursal of totales | keyvalue">
                   <tr class="odd:bg-blue-50 even:bg-blue-200">
                     <td class="px-6 py-4 whitespace-nowrap text-center">{{ sucursal.key }}</td>
-                    <td *ngFor="let categoria of categories" class="px-6 py-4 text-center hidden lg:table-cell">
-                      {{ sucursal.value[categoria.name] || 0 }}
-                    </td>
-                    <td class="px-6 py-4 text-center"> <!-- Celda para mostrar el total -->
-                      {{ calcularTotalSucursal(sucursal.value) }}
+                    <!-- Iteración sobre las categorías -->
+                    <ng-container *ngFor="let categoria of categories">
+                      <td class="px-6 py-4 text-center hidden lg:table-cell">
+                        <!-- Mostrar el total de materiales para la categoría y la sucursal actual -->
+                        {{ sucursal.value[categoria.name].total || 0 }}
+                      </td>
+                    </ng-container>
+                    <!-- Celda para mostrar el total de materiales por sucursal -->
+                    <td class="px-6 py-4 text-center">
+                      <!-- Llamar a la función para calcular el total de materiales para la sucursal actual -->
+                      {{ getTotalSucursal(sucursal.value) }}
                     </td>
                   </tr>
                 </ng-container>
@@ -105,7 +116,7 @@
         </div>
       </div>
       <br>
-    </div> 
+    </div>
     <div *ngIf="userRole === '2'" class="mb-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <!-- Columna 1: Información del empleado -->
@@ -124,13 +135,21 @@
             <p class="text-lg"><strong>Número de teléfono:</strong> {{ loggedInUser?.phone_number }}</p>
             <!-- Aumentado el tamaño del texto -->
           </div>
-          <div class="bg-blue-50 px-6 py-2 ">
-            <h3 class="font-semibold text-lg text-gray-900 dark:text-gray-50 text-center">Información de
-              Stock</h3>
+          <div class="bg-blue-50 px-6 py-2">
+            <h3 class="font-semibold text-lg text-gray-900 dark:text-gray-50 text-center">Información de Stock</h3>
           </div>
-          <div class="message px-6 py-4 ">
 
+          <div *ngIf="categoriasConPocosMateriales && categoriasConPocosMateriales.length > 0; else noStock" class=" text-center text-red-500 mb-3 ml-4 mt-2">
+            <ul>
+              <li *ngFor="let categoria of categoriasConPocosMateriales">
+                Solo quedan {{ categoria.availableMaterials }} {{ categoria.categoryName }}
+              </li>
+            </ul>
           </div>
+
+          <ng-template #noStock>
+            <div class="text-green-500 text-center mt-2 mb-3">Stock de materiales correcto</div>
+          </ng-template>
         </div>
 
         <!-- Columna 2: Tabla de reportes -->
@@ -186,30 +205,40 @@
             <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Totales de Materiales por
               Sucursal</h3>
           </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm text-gray-700 dark:text-gray-400">
-              <thead class="bg-blue-100">
-                <tr>
-                  <th>Sucursal</th>
-                  <th *ngFor="let categoria of categories" class="hidden lg:table-cell">{{ categoria.name }}</th>
-                  <th>Total</th> <!-- Nueva columna para mostrar el total de materiales -->
-                </tr>
-              </thead>
-              <tbody>
-                <ng-container *ngFor="let sucursal of totales | keyvalue">
-                  <tr class="odd:bg-blue-50 even:bg-blue-200">
-                    <td class="px-6 py-4 whitespace-nowrap text-center">{{ sucursal.key }}</td>
-                    <td *ngFor="let categoria of categories" class="px-6 py-4 text-center hidden lg:table-cell">
-                      {{ sucursal.value[categoria.name] || 0 }}
-                    </td>
-                    <td class="px-6 py-4 text-center"> <!-- Celda para mostrar el total -->
-                      {{ calcularTotalSucursal(sucursal.value) }}
-                    </td>
-                  </tr>
+          <table class="w-full text-sm text-gray-700 dark:text-gray-400">
+            <thead class="bg-blue-100">
+              <tr>
+                <th>Sucursal</th>
+                <!-- Encabezados de columna para categorías -->
+                <ng-container *ngFor="let categoria of categories">
+                  <th class="hidden lg:table-cell">{{ categoria.name }}</th>
                 </ng-container>
-              </tbody>
-            </table>
-          </div>
+                <!-- Encabezado de columna para el total -->
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Iteración sobre las sucursales -->
+              <ng-container *ngFor="let sucursal of totales | keyvalue">
+                <tr class="odd:bg-blue-50 even:bg-blue-200">
+                  <td class="px-6 py-4 whitespace-nowrap text-center">{{ sucursal.key }}</td>
+                  <!-- Iteración sobre las categorías -->
+                  <ng-container *ngFor="let categoria of categories">
+                    <td class="px-6 py-4 text-center hidden lg:table-cell">
+                      <!-- Mostrar el total de materiales para la categoría y la sucursal actual -->
+                      {{ sucursal.value[categoria.name].total || 0 }}
+                    </td>
+                  </ng-container>
+                  <!-- Celda para mostrar el total de materiales por sucursal -->
+                  <td class="px-6 py-4 text-center">
+                    <!-- Llamar a la función para calcular el total de materiales para la sucursal actual -->
+                    {{ getTotalSucursal(sucursal.value) }}
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+
         </div>
         <!-- Tabla 2  -->
         <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-1 lg:col-span-1">
@@ -267,19 +296,30 @@
               <thead class="bg-blue-100">
                 <tr>
                   <th>Sucursal</th>
-                  <th *ngFor="let categoria of categories" class="hidden lg:table-cell">{{ categoria.name }}</th>
-                  <th>Total</th> <!-- Nueva columna para mostrar el total de materiales -->
+                  <!-- Encabezados de columna para categorías -->
+                  <ng-container *ngFor="let categoria of categories">
+                    <th class="hidden lg:table-cell">{{ categoria.name }}</th>
+                  </ng-container>
+                  <!-- Encabezado de columna para el total -->
+                  <th>Total</th>
                 </tr>
               </thead>
               <tbody>
+                <!-- Iteración sobre las sucursales -->
                 <ng-container *ngFor="let sucursal of totales | keyvalue">
                   <tr class="odd:bg-blue-50 even:bg-blue-200">
                     <td class="px-6 py-4 whitespace-nowrap text-center">{{ sucursal.key }}</td>
-                    <td *ngFor="let categoria of categories" class="px-6 py-4 text-center hidden lg:table-cell">
-                      {{ sucursal.value[categoria.name] || 0 }}
-                    </td>
-                    <td class="px-6 py-4 text-center"> <!-- Celda para mostrar el total -->
-                      {{ calcularTotalSucursal(sucursal.value) }}
+                    <!-- Iteración sobre las categorías -->
+                    <ng-container *ngFor="let categoria of categories">
+                      <td class="px-6 py-4 text-center hidden lg:table-cell">
+                        <!-- Mostrar el total de materiales para la categoría y la sucursal actual -->
+                        {{ sucursal.value[categoria.name].total || 0 }}
+                      </td>
+                    </ng-container>
+                    <!-- Celda para mostrar el total de materiales por sucursal -->
+                    <td class="px-6 py-4 text-center">
+                      <!-- Llamar a la función para calcular el total de materiales para la sucursal actual -->
+                      {{ getTotalSucursal(sucursal.value) }}
                     </td>
                   </tr>
                 </ng-container>

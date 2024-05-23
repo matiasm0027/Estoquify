@@ -51,7 +51,6 @@ export class CategoriesViewComponent implements OnInit{
   obtenerCantidadMaterial(){
     this.ApiRequestService.categoryMaterial().subscribe(category => {
       this.categories = category;
-      console.log(this.categories[0])
         this.calcularTotales();
         this.cargaDatos = false;
       }

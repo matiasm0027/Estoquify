@@ -149,7 +149,6 @@ export class EmployeeDetailsComponent implements OnInit {
 
   desasignarMaterial(employeeId: any, materialId: any) {
     // Llama al servicio para desasignar el material
-    console.log(materialId)
     this.ApiRequestService.desasignarMaterial(employeeId, materialId).subscribe(
       (response) => {
         // Actualiza la vista después de desasignar el material

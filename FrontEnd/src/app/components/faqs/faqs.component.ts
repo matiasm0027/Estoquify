@@ -26,8 +26,8 @@ export class FaqsComponent implements OnInit{
 
   errorMessage!: string;
   errorMessage2: string | null = null; // Declarar errorMessage2 aquí
-  
-  successMessage: string | null = null; 
+
+  successMessage: string | null = null;
   userRole!: any;
 
   constructor(
@@ -36,7 +36,7 @@ export class FaqsComponent implements OnInit{
     private fb: FormBuilder,
     private authControlService: UsuariosControlService,
     private router: Router
-  
+
   ) {
     this.faqForm = this.fb.group({
       titulo: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
@@ -53,22 +53,17 @@ export class FaqsComponent implements OnInit{
     this.cargaDatos = true;
     this.apiRequestService.getFaqsDetails().subscribe(data => {
       this.faqs = data.faqs;
-      console.log(this.faqs);
       this.cargaDatos = false;
     }, error => {
       console.error('Error al cargar los detalles de las FAQs:', error);
-      
+
       this.cargaDatos = false;
     });
   }
 
   mostrarModalEditar(faq:number): void {
     this.mostrarModalEdit = true;
-    
     this.FaqID = faq;
-    console.log(this.FaqID);
-
-   
   }
 
   mostrarModal() {
@@ -89,7 +84,7 @@ export class FaqsComponent implements OnInit{
   agregarFaq(): void {
     this.errorMessage2 = "";
     this.successMessage = "";
-    
+
     if (this.faqForm.valid) {
       try {
         this.apiRequestService.createFaq(this.faqForm.value).subscribe(
@@ -110,8 +105,8 @@ export class FaqsComponent implements OnInit{
       this.errorMessage2 = 'Formulario inválido. Por favor, complete todos los campos requeridos.';
     }
   }
-  
-  
+
+
 
 confirmDelete(faq: number): void {
   const confirmacion = confirm(`Esta seguro que quieres eliminarla?`);

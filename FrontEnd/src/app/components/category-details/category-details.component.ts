@@ -114,7 +114,6 @@ export class CategoryDetailsComponent implements OnInit {
     if (this.category && this.category.attributeCategoryMaterials) {
       const attributeCategoryMaterialsArray = Object.values(this.category.attributeCategoryMaterials);
       this.materialData = attributeCategoryMaterialsArray.map((acm: AttributeCategoryMaterial) => acm.material).filter(material => material != null) as Material[];
-      console.log('Extracted materials: ', this.materialData);
     }
   }
 
@@ -126,7 +125,6 @@ export class CategoryDetailsComponent implements OnInit {
           this.extractMaterials();
           this.aplicarFiltro();
           this.cargaDatos = false;
-          console.log(this.category)
         });
     } catch (error) {
       console.error('Error al obtener empleados:', error);
@@ -140,10 +138,8 @@ export class CategoryDetailsComponent implements OnInit {
       this.materialFiltrados = this.materialData;
     } else {
       this.materialFiltrados = this.materialData.filter((material) => {
-        console.log(material.name);
         return material.name.toLowerCase().includes(searchTermTrimmed.toLowerCase());
       });
-      console.log(this.materialFiltrados);
       // Verificar si no se encontraron materiales
       if (this.materialFiltrados.length === 0) {
         // Mostrar mensaje en pantalla
@@ -205,7 +201,6 @@ export class CategoryDetailsComponent implements OnInit {
       // Crear múltiples materiales con nombres secuenciales
       for (let i = 1; i <= cantidad; i++) {
         const nuevoMaterial = this.construirObjetoMaterial(nombreBase, sucursal, atributoPrincipal, atributosExtras);
-        console.log(nuevoMaterial)
         // Llamar al servicio para agregar el material
         this.ApiRequestService.agregarMaterial(nuevoMaterial).subscribe(
           (response: any) => {
