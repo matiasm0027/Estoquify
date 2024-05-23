@@ -77,10 +77,8 @@ Route::group([
     Route::get('getActiveChats/{employeeId}', [ChatController::class, 'getActiveChats']);
 
     Route::get('getFaqsDetails', [FaqController::class, 'getFaqsDetails']);
-    Route::middleware('auth:api')->get('getFaqsDetails', [FaqController::class, 'getFaqsDetails']);
     Route::post('createFaq',[FaqController::class,'createFaq']);
-    // Route::post('addFaq', [FaqController::class, 'create']);
-    // Route::put('editFaq/{id}', [FaqController::class, 'edit']);
-    // Route::delete('deleteFaq/{id}', [FaqController::class, 'delete']);
+    Route::put('editFaq/{id}', [FaqController::class, 'editFaq']);
+    Route::delete('deleteFaq/{id}', [FaqController::class, 'delete']);
 
 });

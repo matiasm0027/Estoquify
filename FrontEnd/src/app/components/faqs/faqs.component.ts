@@ -17,7 +17,7 @@ export class FaqsComponent implements OnInit{
   cargaDatos: boolean = false;
   employeeRole: string = '';
   employeeId: any;
-  FaqID: number = 0 ;
+  FaqID!: number  ;
 
   faqForm: FormGroup;
 
@@ -53,16 +53,22 @@ export class FaqsComponent implements OnInit{
     this.cargaDatos = true;
     this.apiRequestService.getFaqsDetails().subscribe(data => {
       this.faqs = data.faqs;
+      console.log(this.faqs);
       this.cargaDatos = false;
     }, error => {
       console.error('Error al cargar los detalles de las FAQs:', error);
+      
       this.cargaDatos = false;
     });
   }
 
-  mostrarModalEditar(id:any) {
+  mostrarModalEditar(faq:number): void {
     this.mostrarModalEdit = true;
-    this.FaqID = id;
+    
+    this.FaqID = faq;
+    console.log(this.FaqID);
+
+   
   }
 
   mostrarModal() {
@@ -124,9 +130,9 @@ deleteFaq(id: number): void {
 }
 
 editFaq(): void {
-  console.log('ID de la FAQ:', this.faqID);
   console.log('Formulario válido:', this.faqForm.valid);
-  if (this.faqForm.valid && typeof this.faqID === 'number') {
+  console.log('ID de la FAQ:', this.FaqID);
+  if (this.faqForm.valid && typeof this.FaqID !== null) {
     const faqEditData = {
       titulo: this.faqForm.value.titulo,
       descripcion: this.faqForm.value.descripcion
@@ -148,9 +154,9 @@ editFaq(): void {
     console.error('Formulario inválido');
   }
 }
-  faqID(arg0: string, faqID: any) {
-    throw new Error('Method not implemented.');
-  }
+
+
+
 
 
 

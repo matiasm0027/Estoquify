@@ -26,6 +26,7 @@ class FaqController extends Controller
     try {
         $faqs = Faq::all()->map(function ($faq) {
             return [
+                'id' => $faq->id,
                 'titulo' => $faq->titulo,
                 'descripcion' => $faq->descripcion
             ];
@@ -60,25 +61,28 @@ class FaqController extends Controller
  
      // Editar una FAQ existente
      public function editFaq(Request $request, $id)
-     {
-         try {
-             $validator = Validator::make($request->all(), [
-                 'titulo' => 'required|string',
-                 'descripcion' => 'required|string',
-             ]);
-     
-             if ($validator->fails()) {
-                 return response()->json(['error' => $validator->errors()], 400);
-             }
-     
-             $faq = Faq::findOrFail($id);
-             $faq->update($request->all());
-     
-             return response()->json(['faq' => $faq], 200);
-         } catch (\Exception $e) {
-             return response()->json(['error' => 'Error al editar la FAQ: ' . $e->getMessage()], 500);
-         }
-     }
+{
+    try {
+        $validator = Validator::make($request->all(), [
+            'titulo' => 'required|string',
+            'descripcion' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+
+        $faq = Faq::findOrFail($id);
+        $faq->titulo = $request->input('titulo');
+        $faq->descripcion = $request->input('descripcion');
+        $faq->save();
+        
+        return response()->json(['faq' => $faq], 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error al editar la FAQ: ' . $e->getMessage()], 500);
+    }
+}
+
  
      // Eliminar una FAQ existente
      public function deleteFaqById($id)

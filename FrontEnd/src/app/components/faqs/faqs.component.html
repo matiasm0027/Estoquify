@@ -48,7 +48,7 @@
             {{ faq.descripcion}}
           </td>
           <td class="px-6 py-4" *ngIf="userRole === '1'">
-            <button (click)="mostrarModalEditar(faq.titulo)"
+            <button (click)="mostrarModalEditar(faq.id)"
                 class="bg-white-500 hover:bg-white hover:text-blue-500 font-bold py-2 px-6 rounded border border-blue-500 lg:mr-2">
                 Editar
               </button>
