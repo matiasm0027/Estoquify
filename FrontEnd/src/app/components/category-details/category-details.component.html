@@ -1,55 +1,67 @@
 <div class="flex">
   <!-- Sidebar -->
   <app-sidebar></app-sidebar>
-  <!-- Contenido de la página -->
+
+
+  <!-- Page Content -->
   <div
     class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-24 md:ml-12 md:mr-12 sm:mt-24 sm:ml-12 sm:mr-12 mt-24 ml-12 mr-12 box-fl container">
+    <!-- Data Loading Container -->
+    <!-- This section represents a container that appears when data is being loaded, showing a message "Loading..." to indicate to the user that the application is fetching data. -->
     <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center" *ngIf="cargaDatos">
       <div role="status" class="flex flex-col items-center">
         <span class="font-bold mt-2">Cargando..</span>
       </div>
     </div>
-    <!-- Contenido de la vista de detalles del material -->
+
+    <!-- Details View Content -->
+    <!-- This section displays the details view content for the material -->
     <div class="bg-white p-6 rounded shadow" *ngIf="materialFiltrados">
       <div class="flex justify-between items-center mb-4">
-        <div class="flex items-center"> <!-- Nuevo contenedor flex para el título y el input -->
+        <div class="flex items-center">
           <h1 class="text-2xl font-bold mr-4">{{category.name}}</h1>
-          <!-- Añade margen a la derecha para separar el título del input -->
-          <div class="relative"> <!-- Contenedor relativo para el input y el icono -->
+          <div class="relative">
             <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar material..." (input)="filtrarMateriales()"
               class="px-4 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500">
-            <!-- Añade espacio a la derecha para el icono -->
             <img src="assets/img/logo_search.png" class="absolute inset-y-0 right-0 flex items-center pr-3 h-6 mt-2"
               alt="Buscar">
           </div>
         </div>
+
+        <!-- Buttons Section -->
         <div class="space-x-4 relative">
-          <button (click)="mostrarModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 md:ml-4 md:mb-2 rounded"
-                  *ngIf="userRole === '1'">
+          <!-- Button to Add Material -->
+          <button (click)="mostrarModal()"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 md:ml-4 md:mb-2 rounded"
+            *ngIf="userRole === '1'">
             Añadir Material
           </button>
+          <!-- Button to Show Filter Modal -->
           <button (click)="mostrarModalDeFiltros()"
-                  class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+            class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold md:ml-4 py-2 px-4 rounded">
             Filtro
           </button>
+          <!-- Button to Go Back -->
           <button (click)="volver()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
             Volver
           </button>
 
-          <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4  md:mt-2 rounded relative" type="button"
-                  (click)="toggleOptions()" aria-controls="dropdownMenu">
+          <!-- Button to Download -->
+          <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4  md:mt-2 rounded relative"
+            type="button" (click)="toggleOptions()" aria-controls="dropdownMenu">
             Descargar
             <div *ngIf="showOptions" id="dropdownMenu" class="dropdown-nav-inner-wrapper absolute mt-2"
-                 aria-labelledby="dropdownMenuButton">
+              aria-labelledby="dropdownMenuButton">
               <button class="dropdown-item bg-green-300 hover:bg-green-600 text-white font-bold py-2 px-6 rounded"
-                      (click)="downloadCsvOrPdf('csv')">CSV</button><br>
+                (click)="downloadCsvOrPdf('csv')">CSV</button><br>
               <button class="dropdown-item bg-green-300 hover:bg-green-600 text-white font-bold py-2 px-6 rounded"
-                      (click)="downloadCsvOrPdf('pdf')">PDF</button>
+                (click)="downloadCsvOrPdf('pdf')">PDF</button>
             </div>
           </button>
         </div>
-
       </div>
+
+      <!-- Table Container -->
       <div class="table-container overflow-x-auto">
         <table
           class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-gray-300 md:mb-2 sm:mb-1">
@@ -74,6 +86,7 @@
           </thead>
           <tbody>
 
+            <!-- Loop through filtered materials -->
             <tr *ngFor="let material of materialFiltrados | paginate: { itemsPerPage: 10, currentPage: page }">
               <td class="px-6 py-4 text-gray-700">
                 <span class="flex items-center">
@@ -96,20 +109,28 @@
             </tr>
           </tbody>
         </table>
+        <!-- Pagination Controls -->
         <pagination-controls (pageChange)="page = $event"></pagination-controls>
       </div>
+
+
+      <!-- Add Material Modal -->
+      <!-- This section represents a modal dialog for adding new materials -->
       <div *ngIf="mostrarModalAgregar" class="fixed z-10 inset-0 overflow-y-auto">
         <div class="flex items-center justify-center min-h-screen px-4">
-          <!-- Contenido del modal -->
+          <!-- Modal Content -->
           <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full">
-            <!-- Encabezado del modal -->
+            <!-- Modal Header -->
             <div class="px-4 py-2 bg-gray-200" *ngIf="userRole === '1'">
               <h3 class="text-lg font-bold">Añadir Material</h3>
             </div>
-            <!-- Cuerpo del modal (aquí va el formulario) -->
+
+            <!-- Modal Body (Form) -->
             <div class="p-4">
               <!-- Formulario aquí-->
               <form [formGroup]="formularioMaterial" (submit)="agregarMaterial()">
+
+                <!-- Material Name Input -->
                 <div class="mb-4">
                   <label for="nombre" class="block text-gray-700">Nombre</label>
                   <input type="text" id="nombre" name="nombre" class="form-input mt-1 block w-full"
@@ -125,6 +146,8 @@
                     The name cannot be more than 30 characters.
                   </div>
                 </div>
+
+                <!-- Quantity Input -->
                 <div class="mb-4 ">
                   <label for="cantidad" class="block text-gray-700 self-end">Cantidad</label>
                   <input type="text" id="cantidad" name="cantidad" class="form-input mt-1 block w-full col-span-1"
@@ -134,19 +157,24 @@
                     class="text-red-800">
                     This field cannot be empty.
                   </div>
-                  <div *ngIf="formularioMaterial.get('cantidad')?.errors?.['pattern'] && formularioMaterial.get('cantidad')?.touched"
+                  <div
+                    *ngIf="formularioMaterial.get('cantidad')?.errors?.['pattern'] && formularioMaterial.get('cantidad')?.touched"
                     class="text-red-800">
                     Only numbers are allowed.
                   </div>
-                  <div *ngIf="formularioMaterial.get('cantidad')?.errors?.['cantidadMaxima'] && formularioMaterial.get('cantidad')?.touched"
+                  <div
+                    *ngIf="formularioMaterial.get('cantidad')?.errors?.['cantidadMaxima'] && formularioMaterial.get('cantidad')?.touched"
                     class="text-red-800">
                     You can only add a batch of 20 materials.
                   </div>
-                  <div *ngIf="formularioMaterial.get('cantidad')?.errors?.['cantidadMinima'] && formularioMaterial.get('cantidad')?.touched"
+                  <div
+                    *ngIf="formularioMaterial.get('cantidad')?.errors?.['cantidadMinima'] && formularioMaterial.get('cantidad')?.touched"
                     class="text-red-800">
                     You have to add a minimum of one material.
                   </div>
                 </div>
+
+                <!-- Attribute and Value Inputs -->
                 <div style="display: flex; align-items: center;" class="mb-5">
                   <div style="flex: 1;margin-right: 14px;">
                     <label for="atributo" class="block text-gray-700">Atributo</label>
@@ -177,10 +205,11 @@
                     </div>
                   </div>
                 </div>
-                <!-- Campos adicionales para atributos y valores -->
+
+                <!-- Additional Attribute and Value Fields -->
                 <div *ngFor="let i of atributosAdicionales; let index = index" class="mb-5">
                   <div style="display: flex; align-items: center;">
-                    <!-- Campo de Atributo -->
+                    <!-- Attribute Field -->
                     <div style="flex: 1;margin-right: 14px;">
                       <label for="atributo{{index + 2}}" class="block text-gray-700">Atributo {{index + 2}}</label>
                       <select formControlName="atributo{{index + 2}}" id="atributo{{index + 2}}"
@@ -193,12 +222,13 @@
                         This field cannot be empty.
                       </div>
                     </div>
-                    <!-- Campo de Valor -->
-                  <div style="flex: 1;">
+                    <!-- Value Field -->
+                    <div style="flex: 1;">
                       <label for="valor{{index + 2}}" class="block text-gray-700">Valor {{index + 2}}</label>
                       <div class="flex items-center">
-                         <!-- Contenedor para alinear los elementos -->
-                      <input type="text" id="valor{{index + 2}}" name="valor{{index + 2}}"
+
+                        <!-- Button to Add More Attributes and Values -->
+                        <input type="text" id="valor{{index + 2}}" name="valor{{index + 2}}"
                           class="form-input mt-1 block w-full mr-2" placeholder="Ingrese el valor"
                           formControlName="valor{{index + 2}}">
 
@@ -219,13 +249,14 @@
                   </div>
                 </div>
 
-                   <!--Botón para agregar más atributos y valores -->
+                <!-- Button to Add More Attributes and Values -->
                 <div class="flex justify-end mb-4">
                   <button type="button" (click)="agregarAtributo()"
                     class="text-blue-500 hover:text-blue-700 focus:outline-none focus:underline">+
                     Agregar Atributo</button>
                 </div>
 
+                <!-- Branch Office Selector -->
                 <div class="mb-4">
                   <label for="sucursal" class="block text-gray-700">Sucursal</label>
                   <select formControlName="sucursal" id="sucursal" name="sucursal" class="form-select mt-1 block w-full"
@@ -238,38 +269,42 @@
                     Please select a branch office.
                   </div>
                 </div>
+
+                <!-- Form Submission Buttons -->
                 <div class="flex justify-end">
-                   <button (click)="agregarMaterial()" type="button"
+                  <button (click)="agregarMaterial()" type="button"
                     class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar</button>
                   <button (click)="cerrarModal()" type="button"
                     class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
                 </div>
+
+                <!-- Error Messages -->
                 <div *ngIf="errorMessage" class="mensaje_error fade-in-out mt-1 mb-3">{{ errorMessage }}</div>
               </form>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Filter Modal -->
       <div *ngIf="mostrarModalFiltros" class="fixed z-10 inset-0 overflow-y-auto">
         <div class="flex items-center justify-center min-h-screen px-4">
-          <!-- Contenido del modal -->
           <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full">
-            <!-- Encabezado del modal -->
             <div class="px-4 py-2 bg-gray-200">
               <h3 class="text-lg font-bold">Filtrar por</h3>
             </div>
-            <!-- Cuerpo del modal -->
+            <!-- Modal Body -->
             <div class="p-4">
-              <!-- Selector de fecha de alta -->
+              <!-- High Date Range Selector -->
               <div class="mb-4">
                 <label class="block text-gray-700">Rango por Fecha de alta</label>
                 <input type="date" class="form-input mt-1 block w-full" [(ngModel)]="fechaInicio">
               </div>
-
               <div class="mb-4">
                 <input type="date" class="form-input mt-1 block w-full" [(ngModel)]="fechaFin">
               </div>
-              <!-- Selector de estado -->
+
+              <!-- Status Selector -->
               <div class="mb-4">
                 <label class="block text-gray-700">Estado</label>
                 <select class="form-select mt-1 block w-full" [(ngModel)]="filtroEstado">
@@ -279,7 +314,8 @@
                   <option value="inactive">Inactive</option>
                 </select>
               </div>
-              <!-- Selector de sucursal -->
+
+              <!-- Branch Office Selector -->
               <div class="mb-4">
                 <label class="block text-gray-700">Sucursal</label>
                 <select class="form-select mt-1 block w-full" [(ngModel)]="filtroSucursal">
@@ -288,7 +324,8 @@
                     }}</option>
                 </select>
               </div>
-              <!-- Botones -->
+
+              <!-- Buttons -->
               <div class="flex justify-end">
                 <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2"
                   (click)="aplicarFiltro()">Aplicar</button>
@@ -299,6 +336,8 @@
           </div>
         </div>
       </div>
+
+      <!-- Success and Error Messages -->
       <div *ngIf="successMessage" class="text-green-800 fade-in-out">{{ successMessage }}</div>
       <div *ngIf="errorMessage" class="text-red-800 fade-in-out">{{ errorMessage }}</div>
     </div>

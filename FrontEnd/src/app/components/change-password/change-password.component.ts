@@ -1,9 +1,9 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import './custom.js';
-import { ApiRequestService } from 'src/app/services/api/api-request.service';
-import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
+import { ApiRequestService } from 'src/app/services/api/api-request.service'; // Importing API request service
+import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service'; // Importing user control service
 
 @Component({
   selector: 'app-change-password',
@@ -23,6 +23,7 @@ export class ChangePasswordComponent implements OnInit {
     private formBuilder: FormBuilder,
     private router: Router
   ) {
+    // Initializing the change password form with form controls and validators
     this.changePasswordForm = this.formBuilder.group({
       newPassword: ['', Validators.required],
       confirmPassword: ['', Validators.required]
@@ -30,11 +31,13 @@ export class ChangePasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Redirecting to home page if it's not the first login (checking local storage)
     if (!localStorage.getItem('first_login')) {
-       this.router.navigate(['/home']);
+      this.router.navigate(['/home']);
     }
   }
- 
+
+  // Function to submit the change password form
   submitChangePassword(): void {
     if (this.changePasswordForm.valid) {
       const newPassword = this.changePasswordForm.value.newPassword;
@@ -44,7 +47,6 @@ export class ChangePasswordComponent implements OnInit {
         this.passwordsMatchError = true;
         return;
       }
-
 
       this.apiService.changePassword(newPassword, confirmPassword).subscribe(
         (response) => {

@@ -8,7 +8,7 @@
       </div>
     </div>
     <div *ngIf="userRole === '1'">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8"> <!-- tabla 1 -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8"> <!-- tabla 1 -->
         <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-2 lg:col-span-2">
           <div class="bg-blue-50 px-6 py-4">
             <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Totales de Materiales por
@@ -51,7 +51,7 @@
           </div>
         </div>
         <!-- Tabla 2  -->
-        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-1 lg:col-span-1">
+        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-2 lg:col-span-1">
           <div class="bg-blue-50 px-6 py-4">
             <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Cantidad de Empleados por
               Sucursal</h3>
@@ -139,7 +139,7 @@
             <h3 class="font-semibold text-lg text-gray-900 dark:text-gray-50 text-center">Información de Stock</h3>
           </div>
 
-          <div *ngIf="categoriasConPocosMateriales && categoriasConPocosMateriales.length > 0; else noStock" class=" text-center text-red-500 mb-3 ml-4 mt-2">
+          <div *ngIf="categoriasConPocosMateriales && categoriasConPocosMateriales.length > 0" class=" text-center text-red-500 mb-3 ml-4 mt-2">
             <ul>
               <li *ngFor="let categoria of categoriasConPocosMateriales">
                 Solo quedan {{ categoria.availableMaterials }} {{ categoria.categoryName }}
@@ -147,9 +147,7 @@
             </ul>
           </div>
 
-          <ng-template #noStock>
-            <div class="text-green-500 text-center mt-2 mb-3">Stock de materiales correcto</div>
-          </ng-template>
+            <div *ngIf="categoriasConPocosMateriales && categoriasConPocosMateriales.length === 0" class="text-green-500 text-center mt-2 mb-3">Stock de materiales correcto</div>
         </div>
 
         <!-- Columna 2: Tabla de reportes -->
@@ -165,7 +163,7 @@
                 <thead>
                   <tr>
                     <th class="px-4 py-2">ID</th>
-                    <th class="px-4 py-2">Fecha</th>
+                    <th class="px-4 py-2 hidden lg:table-cell">Fecha</th>
                     <th class="px-4 py-2">Estado</th>
                     <th class="px-4 py-2">Tipo</th>
                   </tr>
@@ -175,7 +173,7 @@
                   <tr *ngFor="let incidence of incidencesSend">
 
                     <td class="border px-4 py-2 text-center">{{ incidence.id }}</td>
-                    <td class="border px-4 py-2 text-center">{{ incidence.date }}</td>
+                    <td class="border px-4 py-2 text-center hidden lg:table-cell">{{ incidence.date }}</td>
                     <td class="border px-4 py-2 text-center">
                       <span class="text-center" [ngClass]="{
                                                 'text-blue-600': incidence.state === 'pending',
@@ -198,7 +196,7 @@
       </div>
       <br>
       <!-- Tablas para otros roles que no sean admin -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8"> <!-- tabla 1 -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
         <!-- Tabla 1 -->
         <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-2 lg:col-span-2">
           <div class="bg-blue-50 px-6 py-4">
@@ -241,7 +239,7 @@
 
         </div>
         <!-- Tabla 2  -->
-        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-1 lg:col-span-1">
+        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-2 lg:col-span-1">
           <div class="bg-blue-50 px-6 py-4">
             <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Cantidad de Empleados por
               Sucursal</h3>
@@ -285,7 +283,7 @@
       </div>
       <br>
       <!-- Tablas para otros roles que no sean admin -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8"> <!-- tabla 1 -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8"> <!-- tabla 1 -->
         <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-2 lg:col-span-2">
           <div class="bg-blue-50 px-6 py-4">
             <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Totales de Materiales por
@@ -328,7 +326,7 @@
           </div>
         </div>
         <!-- Tabla 2  -->
-        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-1 lg:col-span-1">
+        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-2 lg:col-span-1">
           <div class="bg-blue-50 px-6 py-4">
             <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Cantidad de Empleados por
               Sucursal</h3>

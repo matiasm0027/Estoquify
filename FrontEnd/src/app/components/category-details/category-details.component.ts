@@ -3,12 +3,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
-import { jsPDF } from 'jspdf';
-import { Material } from 'src/app/model/Material';
-import { forkJoin } from 'rxjs';
-import { Category } from 'src/app/model/Category';
-import { AttributeCategoryMaterial } from 'src/app/model/AttributeCategoryMaterial';
-import 'jspdf-autotable';
+import { jsPDF } from 'jspdf'; // Importing jsPDF library for PDF generation
+import { Material } from 'src/app/model/Material'; // Importing Material model
+import { forkJoin } from 'rxjs'; // Importing forkJoin operator from RxJS
+import { Category } from 'src/app/model/Category'; // Importing Category model
+import { AttributeCategoryMaterial } from 'src/app/model/AttributeCategoryMaterial'; // Importing AttributeCategoryMaterial model
+import 'jspdf-autotable'; // Importing jspdf-autotable plugin for PDF table creation
 
 @Component({
   selector: 'app-category-details',
@@ -48,6 +48,8 @@ export class CategoryDetailsComponent implements OnInit {
   cargaDatos: boolean = true;
 
   categoryName!: string;
+
+  // Constructor with dependency injection
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -56,9 +58,10 @@ export class CategoryDetailsComponent implements OnInit {
     private authControlService: UsuariosControlService
   ) { }
 
+  // Angular lifecycle hook, called after Angular initializes the component
   ngOnInit(): void {
+    // Initialization logic
     this.userRole = this.authControlService.hasRole();
-
     this.cargarOpciones();
     this.getCategoriaIdFromRoute();
     this.filtrarMateriales();
@@ -66,6 +69,7 @@ export class CategoryDetailsComponent implements OnInit {
     this.getCategoriaDetails();
   }
 
+  // Function to initialize the form
   initForm() {
     this.formularioMaterial = this.fb.group({
       nombre: ['', Validators.required],
@@ -76,6 +80,7 @@ export class CategoryDetailsComponent implements OnInit {
     });
   }
 
+  // Validator function for 'cantidad' control in the form
   cantidadValidator(control: AbstractControl) {
     const cantidad = parseInt(control.value);
     if (cantidad < 1) {
@@ -87,6 +92,7 @@ export class CategoryDetailsComponent implements OnInit {
     }
   }
 
+  // Function to load options like sucursales and atributos
   cargarOpciones() {
     forkJoin([
       this.authControlService.cargarSucursales(),
@@ -102,14 +108,15 @@ export class CategoryDetailsComponent implements OnInit {
     );
   }
 
-
+  // Function to get category id from route parameters
   getCategoriaIdFromRoute(): void {
     this.route.params.subscribe(params => {
       this.categoryId = +params['id'];
       this.cargaDatos = false;
-  });
+    });
   }
 
+  // Function to extract materials from category data
   extractMaterials(): void {
     if (this.category && this.category.attributeCategoryMaterials) {
       const attributeCategoryMaterialsArray = Object.values(this.category.attributeCategoryMaterials);
@@ -117,6 +124,7 @@ export class CategoryDetailsComponent implements OnInit {
     }
   }
 
+  // Function to get category details
   getCategoriaDetails() {
     try {
       this.ApiRequestService.categoryMaterialInfo(this.categoryId)
@@ -131,6 +139,7 @@ export class CategoryDetailsComponent implements OnInit {
     }
   }
 
+  // Function to filter materials based on search term
   filtrarMateriales() {
     this.successMessage = "";
     const searchTermTrimmed = this.searchTerm.trim();
@@ -140,15 +149,13 @@ export class CategoryDetailsComponent implements OnInit {
       this.materialFiltrados = this.materialData.filter((material) => {
         return material.name.toLowerCase().includes(searchTermTrimmed.toLowerCase());
       });
-      // Verificar si no se encontraron materiales
       if (this.materialFiltrados.length === 0) {
-        // Mostrar mensaje en pantalla
         this.successMessage = "No hay ningún material con esos datos.";
       }
     }
   }
 
-
+  // Function to add additional attribute fields dynamically
   agregarAtributo() {
     // Agregar un nuevo conjunto de campos para atributo y valor
     this.atributosAdicionales.push({});
@@ -158,6 +165,7 @@ export class CategoryDetailsComponent implements OnInit {
     this.formularioMaterial.addControl(controlNameValor, this.fb.control('', Validators.required));
   }
 
+  // Function to delete an additional attribute field
   eliminarAtributo(index: number) {
     this.atributosAdicionales.splice(index, 1);
     const controlNameAtributo = `atributo${index + 2}`;
@@ -166,45 +174,49 @@ export class CategoryDetailsComponent implements OnInit {
     this.formularioMaterial.removeControl(controlNameValor);
   }
 
+
+  // Function to navigate back to previous page
   volver() {
     this.router.navigate(['/categories_view']);
   }
 
+  // Function to show the modal for adding materials
   mostrarModal() {
     this.mostrarModalAgregar = true;
   }
 
+  // Function to show the filter modal
   mostrarModalDeFiltros(): void {
     this.mostrarModalFiltros = true;
   }
 
+  // Function to close the filter modal
   cerrarModalFiltros() {
     this.mostrarModalFiltros = false;
   }
 
+  // Function to close the material addition modal
   cerrarModal() {
     this.mostrarModalAgregar = false;
     this.getCategoriaDetails();
     this.formularioMaterial.reset();
   }
 
+  // Function to add a new material
   agregarMaterial() {
     if (this.formularioMaterial.valid) {
       const nombreBase = this.formularioMaterial.value.nombre;
       const cantidad = parseInt(this.formularioMaterial.value.cantidad, 10);
       const sucursal = this.formularioMaterial.value.sucursal;
-      const atributoId = this.formularioMaterial.value.atributo; // Obtener el ID del atributo seleccionado
+      const atributoId = this.formularioMaterial.value.atributo;
       const nombreAtributo = this.atributos?.find(atributo => atributo.id === atributoId)?.name ?? 'Valor predeterminado';
       const atributoPrincipal = this.construirAtributoPrincipal(atributoId, nombreAtributo);
       const atributosExtras = this.construirAtributosExtras();
 
-      // Crear múltiples materiales con nombres secuenciales
       for (let i = 1; i <= cantidad; i++) {
         const nuevoMaterial = this.construirObjetoMaterial(nombreBase, sucursal, atributoPrincipal, atributosExtras);
-        // Llamar al servicio para agregar el material
         this.ApiRequestService.agregarMaterial(nuevoMaterial).subscribe(
           (response: any) => {
-            // Cerrar el modal y limpiar el formulario después de agregar cada material
             this.successMessage = response.message;
             if (i === cantidad) {
               this.cerrarModal();
@@ -217,24 +229,23 @@ export class CategoryDetailsComponent implements OnInit {
         );
       }
     } else {
-      // Marcar los campos inválidos
       this.formularioMaterial.markAllAsTouched();
       this.errorMessage = "Formulario inválido";
     }
   }
 
-  // Función para construir el atributo principal
+  // Function to build the main attribute object
   construirAtributoPrincipal(atributoId: number, nombreAtributo: string): AttributeCategoryMaterial {
     return new AttributeCategoryMaterial(
-      0, // id será asignado por el servidor
-      0, // material_id será asignado cuando se cree el material
+      0,
+      0,
       atributoId,
       this.categoryId,
       this.formularioMaterial.value.value
     );
   }
 
-  // Función para construir los atributos extras
+  // Function to build additional attribute objects
   construirAtributosExtras(): AttributeCategoryMaterial[] {
     const atributosExtras: AttributeCategoryMaterial[] = [];
 
@@ -242,8 +253,8 @@ export class CategoryDetailsComponent implements OnInit {
       const atributoExtraId = this.formularioMaterial.value[`atributo${i + 2}`];
       const valorExtra = this.formularioMaterial.value[`valor${i + 2}`];
       const atributoExtra = new AttributeCategoryMaterial(
-        0, // id será asignado por el servidor
-        0, // material_id será asignado cuando se cree el material
+        0,
+        0,
         atributoExtraId,
         this.categoryId,
         valorExtra
@@ -254,71 +265,67 @@ export class CategoryDetailsComponent implements OnInit {
     return atributosExtras;
   }
 
-  // Función para construir el objeto del material
+  // Function to build the material object
   construirObjetoMaterial(nombre: string, sucursal: number, atributoPrincipal: AttributeCategoryMaterial, atributosExtras: AttributeCategoryMaterial[]): Material {
     return new Material(
-      0, // id será asignado por el servidor
+      0,
       nombre,
-      null, // low_date inicial es null
-      new Date(), // high_date es la fecha actual
+      null,
+      new Date(),
       "available",
       sucursal,
-      undefined, // branch_office se puede definir si es necesario
+      undefined,
       [
         atributoPrincipal,
         ...atributosExtras
       ],
-      undefined // employee_materials se puede definir si es necesario
+      undefined
     );
   }
 
+  // Function to apply filters to materials
   aplicarFiltro(): void {
-      // Obtener los filtros seleccionados
-      const filtroFechaInicio = this.fechaInicio;
-      const filtroFechaFin = this.fechaFin;
-      const filtroEstadoSeleccionado = this.filtroEstado;
-      const filtroSucursalSeleccionado = parseInt(this.filtroSucursal, 10); // Convertir a entero
-       // Eliminar duplicados de materiales basados en material.id
+    const filtroFechaInicio = this.fechaInicio;
+    const filtroFechaFin = this.fechaFin;
+    const filtroEstadoSeleccionado = this.filtroEstado;
+    const filtroSucursalSeleccionado = parseInt(this.filtroSucursal, 10);
 
+    this.materialFiltrados = this.materialData.filter((material: any) => {
+      let cumpleFiltroFecha = true;
+      let cumpleFiltroEstado = true;
+      let cumpleFiltroSucursal = true;
 
-      // Aplicar los filtros
-      this.materialFiltrados= this.materialData.filter((material: any) => {
-          let cumpleFiltroFecha = true;
-          let cumpleFiltroEstado = true;
-          let cumpleFiltroSucursal = true;
+      if (filtroFechaInicio && filtroFechaFin) {
+        const fechaMaterial = new Date(material.high_date).getTime();
+        const fechaInicio = new Date(filtroFechaInicio).getTime();
+        const fechaFin = new Date(filtroFechaFin).getTime();
 
-          // Filtrar por fecha de alta
-          if (filtroFechaInicio && filtroFechaFin) {
-              const fechaMaterial = new Date(material.high_date).getTime();
-              const fechaInicio = new Date(filtroFechaInicio).getTime();
-              const fechaFin = new Date(filtroFechaFin).getTime();
+        if (isNaN(fechaMaterial) || isNaN(fechaInicio) || isNaN(fechaFin)) {
+          throw new Error('Error al convertir las fechas');
+        }
 
-              if (isNaN(fechaMaterial) || isNaN(fechaInicio) || isNaN(fechaFin)) {
-                  throw new Error('Error al convertir las fechas');
-              }
+        cumpleFiltroFecha = fechaMaterial >= fechaInicio && fechaMaterial <= fechaFin;
+      }
 
-              cumpleFiltroFecha = fechaMaterial >= fechaInicio && fechaMaterial <= fechaFin;
-          }
+      if (filtroEstadoSeleccionado) {
+        cumpleFiltroEstado = material.state === filtroEstadoSeleccionado;
+      }
 
-          // Filtrar por estado
-          if (filtroEstadoSeleccionado) {
-              cumpleFiltroEstado = material.state === filtroEstadoSeleccionado;
-          }
+      if (filtroSucursalSeleccionado) {
+        cumpleFiltroSucursal = material.branch_office?.id === filtroSucursalSeleccionado;
+      }
 
-          // Filtrar por sucursal
-          if (filtroSucursalSeleccionado) { // Verificar si el filtro es un número válido
-              cumpleFiltroSucursal = material.branch_office?.id === filtroSucursalSeleccionado;
-          }
-
-          // Devolver verdadero si el material cumple todos los filtros
-          return cumpleFiltroFecha && cumpleFiltroEstado && cumpleFiltroSucursal;
-      });
+      return cumpleFiltroFecha && cumpleFiltroEstado && cumpleFiltroSucursal;
+    });
   }
 
   showOptions: boolean = false;
+  // Function to toggle options display
   toggleOptions() {
     this.showOptions = !this.showOptions;
   }
+
+  // Helper function to convert data to CSV format
   private convertToCsv(data: any): string {
     if (!data || !data.materials || !Array.isArray(data.materials) || data.materials.length === 0) {
       console.error('Los datos de la tabla no son válidos o están vacíos.');
@@ -345,7 +352,7 @@ export class CategoryDetailsComponent implements OnInit {
     return csvRows.join('\n');
   }
 
-
+  // Function to download CSV or PDF format
   downloadCsvOrPdf(format: string): void {
     if (format === 'csv') {
       this.downloadCsv();
@@ -356,40 +363,40 @@ export class CategoryDetailsComponent implements OnInit {
     }
   }
 
-
+  // Function to download PDF format
   downloadPdf(): void {
-      if (!this.category) {
-        console.error('No hay datos disponibles para descargar');
-        return;
-      }
+    if (!this.category) {
+      console.error('No hay datos disponibles para descargar');
+      return;
+    }
 
-      const filteredMaterials = this.materialData.filter((material: any) => {
-        let cumpleFiltroFecha = true;
-        let cumpleFiltroEstado = true;
-        let cumpleFiltroSucursal = true;
+    const filteredMaterials = this.materialData.filter((material: any) => {
+      let cumpleFiltroFecha = true;
+      let cumpleFiltroEstado = true;
+      let cumpleFiltroSucursal = true;
 
-        return cumpleFiltroFecha && cumpleFiltroEstado && cumpleFiltroSucursal;
-      });
+      return cumpleFiltroFecha && cumpleFiltroEstado && cumpleFiltroSucursal;
+    });
 
-      const pdf = new jsPDF();
-      pdf.text('Lista de Materiales', 10, 10);
-     (pdf as any).autoTable({
-        head: [['ID', 'Nombre', 'Fecha Alta', 'Fecha Baja', 'Sucursal', 'Estado']],
-        body: filteredMaterials.map((material) => [
-          material.id,
-          material.name,
-          material.high_date,
-          material.low_date ? material.low_date : 'N/D',
-          material.branch_office?.name,
-          material.state
-        ]),
+    const pdf = new jsPDF();
+    pdf.text('Lista de Materiales', 10, 10);
+    (pdf as any).autoTable({
+      head: [['ID', 'Nombre', 'Fecha Alta', 'Fecha Baja', 'Sucursal', 'Estado']],
+      body: filteredMaterials.map((material) => [
+        material.id,
+        material.name,
+        material.high_date,
+        material.low_date ? material.low_date : 'N/D',
+        material.branch_office?.name,
+        material.state
+      ]),
 
-      });
+    });
 
-      pdf.save(`${this.category.name}.pdf`);
+    pdf.save(`${this.category.name}.pdf`);
   }
 
-
+  // Function to download CSV format
   downloadCsv(): void {
     //if there is no data in both it shows the error message
     if (!this.category) {
@@ -403,19 +410,16 @@ export class CategoryDetailsComponent implements OnInit {
       let cumpleFiltroEstado = true;
       let cumpleFiltroSucursal = true;
 
-     return cumpleFiltroFecha && cumpleFiltroEstado && cumpleFiltroSucursal;
+      return cumpleFiltroFecha && cumpleFiltroEstado && cumpleFiltroSucursal;
     });
 
-    // Convertir los materiales filtrados a formato CSV
     const csvContenido = this.convertToCsv({ materials: filteredMaterials });
 
-    // Crear el archivo CSV y descargarlo
     const blob = new Blob([csvContenido], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     const fileName = `${this.category.name}.csv`;
-
 
     a.download = fileName;
     document.body.appendChild(a);
@@ -424,6 +428,7 @@ export class CategoryDetailsComponent implements OnInit {
     document.body.removeChild(a);
   }
 
+  // Function to escape CSV value
   private escapeCsvValue(value: any): string {
     if (typeof value === 'string') {
       return `"${value.replace(/"/g, '""')}"`;
