@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Chat;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Crypt;
 
 class ChatController extends Controller
 {
@@ -69,6 +71,34 @@ class ChatController extends Controller
                 // El usuario no tiene uno de los roles permitidos
                 abort(403, 'Access denied');
             }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
+        }
+    }
+    public function actualizarMensaje($id, Request $request)
+    {
+        // Validar los datos de la solicitud
+        $validator = Validator::make($request->all(), [
+            'message' => 'required|string',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+    
+        try {
+            // Buscar el chat por ID
+            $chat = Chat::find($id);
+    
+            if (!$chat) {
+                return response()->json(['error' => 'Chat no encontrado'], 404);
+            }
+    
+            // Actualizar el mensaje
+            $chat->message = $request->input('message');
+            $chat->save();
+    
+            return response()->json(['message' => 'Mensaje actualizado exitosamente']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error interno del servidor'], 500);
         }

@@ -184,4 +184,8 @@ export class ApiRequestService {
   getActiveChats(employeeId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/auth/getActiveChats/${employeeId}`)
   }
+
+  actualizarMensaje(chatId: number, nuevoMensaje: string): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/auth/actualizarMensaje/${chatId}`, { message: nuevoMensaje });
+  }
 }

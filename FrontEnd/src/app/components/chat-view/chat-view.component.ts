@@ -7,10 +7,10 @@ import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-contr
 @Component({
   selector: 'app-chat-view',
   templateUrl: './chat-view.component.html',
-  styleUrl: './chat-view.component.css'
+  styleUrls: ['./chat-view.component.css']
 })
 export class ChatViewComponent implements OnInit {
-  loggedInUser: Employee | null = null; // Inicializar con un valor nulo
+  loggedInUser: Employee | null = null;
   userRole: any;
   showChatModal: boolean = false;
   employees: Employee[] = [];
@@ -22,7 +22,7 @@ export class ChatViewComponent implements OnInit {
   ngSelectSeleccionado: boolean = false;
   chatActivo: any;
   mostrarMensajes: boolean = false;
-
+  nuevoMensaje: string = '';
 
   constructor(private authControlService: UsuariosControlService, private apiRequestService: ApiRequestService, private fb: FormBuilder,) {
     this.formularioEmpleado = this.fb.group({
@@ -38,17 +38,13 @@ export class ChatViewComponent implements OnInit {
       this.loadActiveChats()
     });
     this.obtenerEmpleados()
-
   }
-
 
   obtenerEmpleados() {
     this.apiRequestService.getEmployees().subscribe(
       (data: Employee[]) => {
-        // Filtrar empleados por nombre de sucursal
         this.employees = data;
         this.filteredEmployees = data;
-
         this.filteredEmployees.forEach(employee => {
           employee.fullname = employee.name + ' ' + employee.last_name;
         });
@@ -63,8 +59,6 @@ export class ChatViewComponent implements OnInit {
   buscarEmpleado(event: { term: string; items: any[]; }) {
     this.selectedEmployee = undefined;
     const searchTerm = event.term.toLowerCase();
-
-    // Si hay un término de búsqueda, filtrar la lista de empleados, de lo contrario, mostrar todos los empleados
     if (searchTerm.trim() !== '') {
       this.filteredEmployees = this.employees.filter(employee =>
         employee.name.toLowerCase().includes(searchTerm) ||
@@ -80,28 +74,21 @@ export class ChatViewComponent implements OnInit {
     this.placeholder = '';
     this.filteredEmployees = this.employees;
   }
+
   limpiarSeleccion() {
     this.selectedEmployee = undefined;
-
   }
 
-
-
   crearConexion() {
-
-    // Crear la fila en el chat con los datos necesarios
     const nuevaConexion = {
       sender_id: this.loggedInUser?.id,
       receiver_id: this.formularioEmpleado.value.fullname.id,
-      message: '' // Mensaje vacío por defecto
+      message: ''
     };
 
-    // Enviar la solicitud para crear la nueva conexión
     this.apiRequestService.crearConexion(nuevaConexion).subscribe(
       (response) => {
-        // Manejar la respuesta del servidor si es necesario
         console.log('Conexión creada exitosamente:', response);
-        // Limpiar la selección de empleado
         this.selectedEmployee = undefined;
         this.loadActiveChats()
       },
@@ -109,11 +96,8 @@ export class ChatViewComponent implements OnInit {
         console.error('Error al crear la conexión:', error);
       }
     );
-
-    // Limpiar la selección de empleado
     this.selectedEmployee = undefined;
   }
-
 
   eliminarChat() {
     if (!this.loggedInUser) {
@@ -121,13 +105,12 @@ export class ChatViewComponent implements OnInit {
       return;
     }
 
-    // Suponiendo que `selectedEmployee.id` sea el ID de la conexión de chat a eliminar
     const conexionId = this.loggedInUser.id;
 
     this.apiRequestService.eliminarConexion(conexionId).subscribe(
       (response) => {
         console.log('Conexión eliminada exitosamente:', response);
-        this.selectedEmployee = undefined; // Limpiar la selección de empleado
+        this.selectedEmployee = undefined;
       },
       (error) => {
         console.error('Error al eliminar la conexión:', error);
@@ -142,16 +125,47 @@ export class ChatViewComponent implements OnInit {
 
     this.apiRequestService.getActiveChats(this.loggedInUser.id).subscribe(
       (chats: any[]) => {
-        this.activeChats = chats
+        this.activeChats = chats;
       },
       (error) => {
         console.error('Error al cargar los chats activos:', error);
       }
     );
   }
+
   seleccionarChatActivo(chat: any) {
-    console.log('hola')
     this.mostrarMensajes = true;
     this.chatActivo = chat;
-}
+    console.log(this.chatActivo)
+  }
+
+  enviarMensaje() {
+    if (this.nuevoMensaje.trim() !== '') {
+      const prefijo = this.loggedInUser?.id === this.chatActivo.sender_id ? 'S: ' : 'R: ';
+      const mensajeFormateado = `${prefijo}${this.nuevoMensaje.trim()}`;
+      this.chatActivo.message = this.chatActivo.message ? this.chatActivo.message + '\n' + mensajeFormateado : mensajeFormateado;
+
+      // Actualizar el chat en la base de datos
+      this.apiRequestService.actualizarMensaje(this.chatActivo.id, this.chatActivo.message).subscribe(
+        response => {
+          console.log('Mensaje actualizado exitosamente:', response);
+          this.nuevoMensaje = '';
+        },
+        error => {
+          console.error('Error al actualizar el mensaje:', error);
+        }
+      );
+    }
+  }
+  cerrarModal(){
+    this.mostrarMensajes = false;
+  }
+
+  obtenerUltimaLinea(message: string): string {
+    if (!message) return ''; // Si no hay mensaje, retorna una cadena vacía
+  
+    // Dividir el mensaje por saltos de línea y obtener la última línea
+    const lineas = message.split('\n');
+    return lineas[lineas.length - 1]; // Obtener la última línea del mensaje
+  }
 }
