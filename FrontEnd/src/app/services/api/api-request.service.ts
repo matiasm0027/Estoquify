@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError } from 'rxjs';
+import { Observable, catchError, throwError } from 'rxjs';
 import { Employee } from '../../model/Employee';
 import { Role } from '../../model/Role';
 import { Department } from '../../model/Department';
@@ -163,5 +163,36 @@ export class ApiRequestService {
   getEmployeesByBranchOffice(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/auth/getEmployeesByBranchOffice`);
   }
-}
 
+
+  getFaqsDetails(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/getFaqsDetails`);
+  }
+
+  createFaq(nuevaFaq: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/createFaq`, nuevaFaq);
+  }
+
+  deleteFaq(eliminarFaq: number) : Observable<any>{
+    return this.http.delete<any>(`${this.apiUrl}/auth/deleteFaq/${eliminarFaq}`);
+  }
+
+  editFaq(faqID:number , faqData: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/auth/editFaq/${faqID}`, faqData);
+  }
+
+  crearConexion(nuevaConexion: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/crearconexion`, nuevaConexion);
+  }
+  eliminarConexion(conexionId: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/auth/eliminarConexion/${conexionId}`);
+  }
+
+  getActiveChats(employeeId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/auth/getActiveChats/${employeeId}`)
+  }
+
+  actualizarMensaje(chatId: number, nuevoMensaje: string): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/auth/actualizarMensaje/${chatId}`, { message: nuevoMensaje });
+  }
+}

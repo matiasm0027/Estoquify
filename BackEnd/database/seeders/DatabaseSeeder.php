@@ -7,6 +7,8 @@ use App\Models\Employee;
 use App\Models\Incidence;
 use App\Models\Material;
 use App\Models\CategoryIncidence;
+use App\Models\CategoryReport;
+use App\Models\Faq;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,6 +21,7 @@ class DatabaseSeeder extends Seeder
             BranchOfficeSeeder::class,
             CategorySeeder::class,
             AttributeSeeder::class,
+            FaqSeeder::class,
         ]);
 
         // Crear registros utilizando factories
@@ -59,6 +62,8 @@ class DatabaseSeeder extends Seeder
         Incidence::factory(10)->create();
         Material::factory(300)->create();
         CategoryIncidence::factory(10)->create();
+        CategoryReport::factory(10)->create();
+        Faq::factory(5)->create();
 
         // Llamar a otros seeders después de crear registros
         $this->call([

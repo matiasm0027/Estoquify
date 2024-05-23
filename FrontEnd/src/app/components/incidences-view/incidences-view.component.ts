@@ -59,9 +59,10 @@ export class IncidenceViewComponent implements OnInit {
       email: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'),]],
       phone_number: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
       password: ['', Validators.required],
-      department_id: ['', Validators.required],
-      branch_office_id: ['', Validators.required],
-      role_id: ['', Validators.required],
+      departamento: ['', Validators.required],
+      sucursal: ['', Validators.required],
+      rol: ['', Validators.required],
+      telefonoMovil: ['', [Validators.required, Validators.pattern('(6|7)[ -]*([0-9][ -]*){8}')]],
     });
     this.formularioMaterial = this.fb.group({
       fullname: [, Validators.required],

@@ -1,0 +1,377 @@
+<div class="flex">
+    <app-sidebar></app-sidebar>
+    <div
+        class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-24 md:ml-12 md:mr-12 sm:mt-24 sm:ml-12 sm:mr-12 mt-24 ml-12 mr-12 box-fl container">
+        <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center" *ngIf="cargaDatos">
+            <div role="status" class="flex flex-col items-center">
+              <span class="font-bold mt-2">Cargando..</span>
+            </div>
+          </div>
+        <ng-container *ngIf="employeeRole === 'manager'">
+            <div class="bg-white p-6 rounded shadow">
+                <h1 class="text-2xl font-bold mb-4">Formulario de Incidencias</h1>
+
+                <!-- Tipo de Reporte: Alta Empleado / Solicitud Material -->
+                <div class="mb-4">
+                    <label class="block mb-2 font-bold">Tipo de Incidencia:</label>
+                    <div class="flex items-center">
+                        <input type="checkbox" class="mr-2 ml-4" id="altaEmpleado" [(ngModel)]="altaEmpleado"
+                            (change)="toggleCheckbox('altaEmpleado')">
+                        <label for="altaEmpleado" class="mr-4">Alta Empleado</label>
+                        <input type="checkbox" class="mr-2" id="bajaEmpleado" [(ngModel)]="bajaEmpleado"
+                            (change)="toggleCheckbox('bajaEmpleado')">
+                        <label for="bajaEmpleado" class="mr-4">Baja Empleado</label>
+                        <input type="checkbox" class="mr-2" id="solicitudMaterial" [(ngModel)]="solicitudMaterial"
+                            (change)="toggleCheckbox('solicitudMaterial')">
+                        <label for="solicitudMaterial">Solicitud Material</label>
+                        <input type="checkbox" class="ml-2" id="bajaMaterial" [(ngModel)]="bajaMaterial"
+                            (change)="toggleCheckbox('bajaMaterial')">
+                        <label for="bajaMaterial" class="ml-2">Baja Material</label>
+                    </div>
+                </div>
+
+                <div *ngIf="solicitudMaterial" class="mb-4">
+                    <label class="block mb-2 font-bold">Categorías:</label>
+                    <div class="flex flex-wrap">
+                        <div *ngFor="let categoria of categories" class="mr-4 mb-2">
+                            <input type="checkbox" class="ml-4" [id]="categoria.id" [value]="categoria.id"
+                                [(ngModel)]="categoriasSeleccionadas[categoria.id]"
+                                (ngModelChange)="onCategoriaChange()">
+                            <label [for]="categoria.id" class="ml-2">{{ categoria.name }}</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prioridad del Reporte -->
+                <div class="mb-4">
+                    <label class="block mb-2 font-bold">Prioridad de la Incidencia</label>
+                    <div class="flex items-center">
+                        <input type="checkbox" class="mr-2 ml-4" id="prioridadLow" [(ngModel)]="prioridadLow"
+                            (change)="togglePriority('prioridadLow')">
+                        <label for="prioridadLow" class="mr-4" [class.text-green-500]="prioridadLow">Low</label>
+                        <input type="checkbox" class="mr-2" id="prioridadMedium" [(ngModel)]="prioridadMedium"
+                            (change)="togglePriority('prioridadMedium')">
+                        <label for="prioridadMedium" class="mr-4"
+                            [class.text-yellow-500]="prioridadMedium">Medium</label>
+                        <input type="checkbox" class="mr-2" id="prioridadHigh" [(ngModel)]="prioridadHigh"
+                            (change)="togglePriority('prioridadHigh')">
+                        <label for="prioridadHigh" [class.text-red-500]="prioridadHigh">High</label>
+                    </div>
+                </div>
+
+                <!-- Campo de Texto -->
+                <div class="mb-4">
+                    <label class="block mb-2 font-bold">{{ (altaEmpleado || bajaEmpleado) ? 'Datos del Empleado' :
+                        'Datos del Material' }}:</label>
+                    <textarea class="w-full h-48 px-3 py-2 border rounded w-1/2 ml-4"
+                        placeholder="Ingrese los detalles aquí"
+                        [(ngModel)]="petition">{{ formatSelectedCategories() }}</textarea>
+                </div>
+
+                <!-- Botón Enviar -->
+                <div>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                        (click)="agregarReporte()">Enviar</button>
+                </div>
+                <div *ngIf="envioExitoso" class="text-green-800 mt-2 rounded">
+                    {{ mensajeNotificacion }}
+                </div>
+            </div>
+        </ng-container>
+        <div *ngIf="employeeRole === 'admin'" class="bg-gray-100 p-6 rounded shadow">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold mb-4">Incidencias recibidas</h1>
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-3"
+                    [routerLink]="['/reportes_history']">Historial de Incidencias</button>
+            </div>
+            <div class="grid grid-cols-4 gap-4">
+                <!-- Iterar sobre los reportes -->
+                <ng-container *ngIf="reportes.length > 0; else noIncidencias">
+                    <ng-container *ngFor="let reporte of reportes">
+                        <div [ngClass]="{
+                            'bg-green-200': reporte.prioridad === 'Low',
+                            'bg-yellow-200': reporte.prioridad === 'Medium',
+                            'bg-red-200': reporte.prioridad === 'High'
+                        }" class="rounded border border-gray-300 p-2 relative">
+                            <div>ID: {{ reporte.id }}</div>
+                            <div>Tipo: {{ reporte.type }}</div>
+                            <div>Sucursal: {{ obtenerNombreSucursal(reporte.sucursalid) }}</div>
+                            <div>Prioridad: {{ reporte.prioridad }}</div>
+                            <button (click)="mostrarDetalle(reporte)" class="absolute top-0 right-0 mt-2 mr-2">
+                                <span class="text-blue-900 opacity-75 rounded">Ver detalles</span>
+                            </button>
+                        </div>
+                    </ng-container>
+                </ng-container>
+                <ng-template #noIncidencias>
+                    <div class="text-center text-gray-600">No hay incidencias pendientes.</div>
+                </ng-template>
+            </div>
+            <!-- Modal para mostrar los detalles del reporte seleccionado -->
+            <div *ngIf="reporteSeleccionado" class="fixed z-10 inset-0 overflow-y-auto">
+                <div class="flex items-center justify-center min-h-screen px-4">
+                    <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full relative">
+                        <!-- Cambiado a relative -->
+
+                        <div class="px-4 py-2 bg-gray-200">
+                            <h3 class="text-lg font-bold">Detalles de la incidencia</h3>
+                        </div>
+                        <div class="p-4">
+
+                            <!-- Ajustado mt-16 a mt-18 -->
+                            <p class="flex items-center justify-between"> <!-- Agregado -->
+                                <span>ID: {{ reporteSeleccionado.id }}</span> <!-- Agregado -->
+                                <span class="ml-auto">
+                                    <input type="checkbox" id="aceptar" name="aceptar" class="mr-2"
+                                        (change)="reporteSeleccionado?.id && cambiarEstadoReporte(reporteSeleccionado.id,'aceptado', $event)">
+                                    <label for="aceptar" class="mr-6 text-green-700">Aceptar</label>
+                                    <input type="checkbox" id="rechazar" name="rechazar" class="mr-2"
+                                        (change)="reporteSeleccionado?.id && cambiarEstadoReporte(reporteSeleccionado.id,'rechazado', $event)">
+                                    <label for="rechazar" class="mr-6 text-red-700">Rechazar</label>
+                                </span>
+                            </p>
+                            <p class="mb-4">Tipo: {{ reporteSeleccionado.type }}</p>
+                            <p>
+                                <!-- Utilizar ngFor para mostrar dinámicamente los campos de la solicitud -->
+                                <ng-container *ngFor="let linea of reporteSeleccionado.solicitud.split('\n')">
+                                    <p>{{ linea }}</p>
+                                </ng-container>
+                            </p>
+                            <div class="flex justify-end">
+                                <!-- Botón de cerrar -->
+                                <button (click)="cerrarModal()"
+                                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mr-2 mt-2">Cerrar</button>
+                                <button *ngIf="reporteSeleccionado.type === 'Alta Empleado'"
+                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2"
+                                    (click)="mostrarModal()">Agregar Empleado</button>
+                                <button *ngIf="reporteSeleccionado.type === 'Solicitud Material'"
+                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2"
+                                    (click)="mostrarModal_Material()">Asignar Material</button>
+                            </div>
+                            <div *ngIf="successMessage" class="mensaje_exitoso fade-in-out mt-1 mb-3">{{ successMessage
+                                }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="mostrarModalAgregar" class="fixed z-10 inset-0 overflow-y-auto ">
+                <div class="flex items-center justify-end min-h-screen px-4 mr-8">
+                    <!-- Contenido del modal -->
+                    <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full ">
+                        <!-- Encabezado del modal -->
+                        <div class="px-4 py-2 bg-gray-200">
+                            <h3 class="text-lg font-bold">Agregar Empleado</h3>
+                        </div>
+                        <!-- Cuerpo del modal (aquí va el formulario) -->
+                        <div class="p-4">
+                            <!-- Formulario aquí -->
+                            <form [formGroup]="formularioEmpleado" (submit)="agregarEmpleado()">
+                              <div class="mb-4">
+                                  <label for="nombre" class="block text-gray-700">Nombre</label>
+                                  <input formControlName="nombre" type="text" id="nombre" name="nombre"
+                                      class="form-input mt-1 block w-full" placeholder="Ingrese el Nombre" required>
+                                  <!-- Error handling -->
+                                  <div *ngIf="formularioEmpleado.get('nombre')?.errors?.['required'] && formularioEmpleado.get('nombre')?.touched"
+                                      class="text-red-800">
+                                      This field cannot be empty.
+                                  </div>
+                                  <div *ngIf="formularioEmpleado.get('nombre')?.errors?.['minlength'] && formularioEmpleado.get('nombre')?.touched"
+                                      class="text-red-800">
+                                      The name must be at least 3 characters.
+                                  </div>
+                                  <div *ngIf="formularioEmpleado.get('nombre')?.errors?.['maxlength'] && formularioEmpleado.get('nombre')?.touched"
+                                      class="text-red-800">
+                                      The name cannot be more than 30 characters.
+                                  </div>
+                                  <div *ngIf="formularioEmpleado.get('nombre')?.errors?.['pattern'] && formularioEmpleado.get('nombre')?.touched"
+                                      class="text-red-800">
+                                      The name can only contain letters.
+                                  </div>
+                              </div>
+
+                              <div class="mb-4">
+                                  <label for="apellido" class="block text-gray-700">Apellido</label>
+                                  <input formControlName="apellido" type="text" id="apellido" name="apellido"
+                                      class="form-input mt-1 block w-full" placeholder="Ingrese el Apellido" required>
+                                  <!-- Error handling -->
+                                  <div *ngIf="formularioEmpleado.get('apellido')?.errors?.['required'] && formularioEmpleado.get('apellido')?.touched"
+                                      class="text-red-800">
+                                      This field cannot be empty.
+                                  </div>
+                                  <div *ngIf="formularioEmpleado.get('apellido')?.errors?.['minlength'] && formularioEmpleado.get('nombre')?.touched"
+                                      class="text-red-800">
+                                      The last name must be at least 3 characters.
+                                  </div>
+                                  <div *ngIf="formularioEmpleado.get('apellido')?.errors?.['maxlength'] && formularioEmpleado.get('nombre')?.touched"
+                                      class="text-red-800">
+                                      The last name cannot be more than 30 characters.
+                                  </div>
+                                  <div *ngIf="formularioEmpleado.get('apellido')?.errors?.['pattern'] && formularioEmpleado.get('nombre')?.touched"
+                                      class="text-red-800">
+                                      The last name can only contain letters.
+                                  </div>
+                              </div>
+
+                              <div class="mb-4">
+                                  <label for="email" class="block text-gray-700">Email</label>
+                                  <input formControlName="email" type="email" id="email" name="email"
+                                      class="form-input mt-1 block w-full" placeholder="Ingrese el Email" required>
+                                  <!-- Error handling -->
+                                  <div *ngIf="formularioEmpleado.get('email')?.errors?.['required'] && formularioEmpleado.get('email')?.touched"
+                                      class="text-red-800">
+                                      This field cannot be empty.
+                                  </div>
+                                  <div *ngIf="formularioEmpleado.get('email')?.errors?.['pattern'] && formularioEmpleado.get('email')?.touched"
+                                      class="text-red-800">
+                                      Invalid email format.
+                                  </div>
+                              </div>
+
+                              <div class="mb-4">
+                                  <label for="password" class="block text-gray-700">Contraseña</label>
+                                  <input formControlName="password" type="password" id="password" name="password"
+                                      class="form-input mt-1 block w-full" placeholder="Ingrese la Contraseña" required>
+                                  <!-- Error handling -->
+                                  <div *ngIf="formularioEmpleado.get('password')?.errors?.['required'] && formularioEmpleado.get('password')?.touched"
+                                      class="text-red-800">
+                                      This field cannot be empty.
+                                  </div>
+                              </div>
+
+                              <div class="mb-4">
+                                  <label for="telefonoMovil" class="block text-gray-700">Telefono</label>
+                                  <input formControlName="telefonoMovil" type="tel" id="telefonoMovil" name="telefonoMovil"
+                                      class="form-input mt-1 block w-full" placeholder="Ingrese el Numero de Telefono" required>
+                                  <!-- Error handling -->
+                                  <div *ngIf="formularioEmpleado.get('telefonoMovil')?.errors?.['required'] && formularioEmpleado.get('telefonoMovil')?.touched"
+                                      class="text-red-800">
+                                      This field cannot be empty.
+                                  </div>
+                                  <div *ngIf="formularioEmpleado.get('telefonoMovil')?.errors?.['pattern'] && formularioEmpleado.get('telefonoMovil')?.touched"
+                                      class="text-red-800">
+                                      The phone number must be valid.
+                                  </div>
+                              </div>
+
+                              <div class="mb-4">
+                                  <label for="departamento" class="block text-gray-700">Departamento</label>
+                                  <select formControlName="departamento" id="departamento" name="departamento"
+                                      class="form-select mt-1 block w-full" required>
+                                      <option *ngFor="let dept of departamentos" [value]="dept.id">{{ dept.name }}</option>
+                                  </select>
+                                  <!-- Error handling -->
+                                  <div *ngIf="formularioEmpleado.get('departamento')?.errors?.['required'] && formularioEmpleado.get('departamento')?.touched"
+                                      class="text-red-800">
+                                      Please select a department.
+                                  </div>
+                              </div>
+
+                              <div class="mb-4">
+                                  <label for="sucursal" class="block text-gray-700">Sucursal</label>
+                                  <select formControlName="sucursal" id="sucursal" name="sucursal"
+                                      class="form-select mt-1 block w-full" required>
+                                      <option *ngFor="let suc of sucursales" [value]="suc.id">{{ suc.name }}</option>
+                                  </select>
+                                  <!-- Error handling -->
+                                  <div *ngIf="formularioEmpleado.get('sucursal')?.errors?.['required'] && formularioEmpleado.get('sucursal')?.touched"
+                                      class="text-red-800">
+                                      Please select a branch office.
+                                  </div>
+                              </div>
+
+                              <div class="mb-4">
+                                  <label for="rol" class="block text-gray-700">Rol</label>
+                                  <select formControlName="rol" id="rol" name="rol" class="form-select mt-1 block w-full"
+                                      required>
+                                      <option value="1">Administrator</option>
+                                      <option value="2">Manager</option>
+                                      <option value="3">Employee</option>
+                                  </select>
+                                  <!-- Error handling -->
+                                  <div *ngIf="formularioEmpleado.get('rol')?.errors?.['required'] && formularioEmpleado.get('rol')?.touched"
+                                      class="text-red-800">
+                                      Please select a role.
+                                  </div>
+                              </div>
+                                <div class="flex justify-end">
+                                    <button type="submit"
+                                        class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar</button>
+                                    <button (click)="cerrarModal_Agregar()"
+                                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="mostrarModalMaterial" class="fixed z-10 inset-0 overflow-y-auto ">
+                <div class="flex items-center justify-end min-h-screen px-4 mr-8">
+                    <!-- Contenido del modal -->
+                    <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full">
+                        <!-- Encabezado del modal -->
+                        <div class="px-4 py-2 bg-gray-200">
+                            <h3 class="text-lg font-bold">Asignar Material a Empleados</h3>
+                        </div>
+                        <!-- Cuerpo del modal -->
+                        <div class="p-4">
+                            <form [formGroup]="formularioMaterial" (submit)="asignarMaterial()">
+                                <div class="flex flex-col lg:flex-row">
+                                    <!-- Select de materiales por categoría -->
+                                    <div class="ml-2">
+                                        <label class="block text-gray-700">Categoría de Material</label>
+                                        <div class="overflow-x-auto">
+                                            <table class="table-auto">
+                                                <tbody>
+                                                    <div class="mt-2">
+                                                        <tr *ngFor="let categoria of categories" class="mb-2">
+                                                            <td class="pr-2">{{ categoria.name }}:</td>
+                                                            <td>
+                                                                <select formControlName="categoria{{categoria.id}}"
+                                                                    class="ml-2 pr-2 mb-2"
+                                                                    (change)="onChangeCategoria(categoria.id)">
+                                                                    <option value="">Seleccionar material</option>
+                                                                    <option
+                                                                        *ngFor="let material of detallesMaterial[categoria.id]"
+                                                                        [value]="material.id">
+                                                                        {{ material.name }}
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                    </div>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="ml-2">
+                                        <ng-select formControlName="fullname" [items]="filteredEmployees"
+                                            bindLabel="fullname" [placeholder]="placeholder"
+                                            (search)="buscarEmpleado($event)" (change)="seleccionarEmpleado($event)"
+                                            (click)="limpiarSeleccion()"
+                                            class="ml-auto w-full lg:w-auto">
+                                        </ng-select>
+                                        <input type="text"
+                                        [value]="selectedEmployee ? selectedEmployee.name + ' ' + selectedEmployee.last_name : ''">
+                                    </div>
+                                </div>
+                                <br>
+                                <!-- Botones -->
+                                <div class="relative justify-end mt-4">
+                                    <button type="submit"
+                                        class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Guardar</button>
+                                    <button (click)="cerrarModal_Material()"
+                                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="employeeRole === 'user'"  class="flex justify-center items-start h-screen">
+            <div class="text-center text-4xl text-red-500 mt-40">
+                <p>No tienes acceso a esta sección.</p>
+            </div>
+        </div>
+    </div>

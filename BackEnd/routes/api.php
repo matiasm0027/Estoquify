@@ -13,6 +13,8 @@ use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FaqController;
+use App\Http\Controllers\ChatController;
 
 /*
 |--------------------------------------------------------------------------
@@ -71,7 +73,16 @@ Route::group([
     Route::get('listIncidences', [IncidenceController::class, 'listIncidences']);
     Route::post('addIncidence', [IncidenceController::class, 'addIncidence']);
     Route::put('changeIncidenceStatus/{id}', [IncidenceController::class, 'changeIncidenceStatus']);
+
+    Route::post('crearconexion', [ChatController::class, 'crearConexion']);
+    Route::delete('eliminarConexion/{id}', [ChatController::class, 'eliminarConexion']);
+    Route::get('getActiveChats/{employeeId}', [ChatController::class, 'getActiveChats']);
+    Route::put('actualizarMensaje/{id}', [ChatController::class, 'actualizarMensaje']);
+
+
+    Route::get('getFaqsDetails', [FaqController::class, 'getFaqsDetails']);
+    Route::post('createFaq',[FaqController::class,'createFaq']);
+    Route::put('editFaq/{id}', [FaqController::class, 'editFaq']);
+    Route::delete('deleteFaq/{id}', [FaqController::class, 'delete']);
+
 });
-
-
-

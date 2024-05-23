@@ -15,6 +15,9 @@ import { CategoryDetailsComponent } from './components/category-details/category
 import { MaterialDetailsComponent } from './components/material-details/material-details.component';
 import { IncidenceHistoryComponent } from './components/incidences-history/incidences-history.component';
 import { IncidenceViewComponent } from './components/incidences-view/incidences-view.component';
+import { FaqsComponent } from './components/faqs/faqs.component';
+import { ChatViewComponent } from './components/chat-view/chat-view.component';
+
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -31,6 +34,8 @@ const routes: Routes = [
   { path: 'material_details/:id', component: MaterialDetailsComponent, canActivate: [MyGuardGuard, ]},
   { path: 'incidences_view', component: IncidenceViewComponent, canActivate: [MyGuardGuard, ]},
   { path: 'incidences_history', component: IncidenceHistoryComponent, canActivate: [MyGuardGuard, ]},
+  { path: 'faqs', component: FaqsComponent, canActivate:[MyGuardGuard]},
+  { path: 'chat', component: ChatViewComponent, canActivate:[MyGuardGuard]},
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', component: NotFoundComponent }
 
