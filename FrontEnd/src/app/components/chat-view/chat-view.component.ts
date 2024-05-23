@@ -135,7 +135,10 @@ export class ChatViewComponent implements OnInit {
 
   seleccionarChatActivo(chat: any) {
     this.mostrarMensajes = true;
-    this.chatActivo = chat;
+   
+      this.chatActivo = chat;
+    
+   
     console.log(this.chatActivo)
   }
 
@@ -166,6 +169,6 @@ export class ChatViewComponent implements OnInit {
   
     // Dividir el mensaje por saltos de línea y obtener la última línea
     const lineas = message.split('\n');
-    return lineas[lineas.length - 1]; // Obtener la última línea del mensaje
+    return lineas[lineas.length - 1].slice(2); // Obtener la última línea del mensaje
   }
 }
