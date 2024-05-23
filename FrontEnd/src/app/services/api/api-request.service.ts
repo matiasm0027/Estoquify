@@ -180,4 +180,8 @@ export class ApiRequestService {
   eliminarConexion(conexionId: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/auth/eliminarConexion/${conexionId}`);
   }
+
+  getActiveChats(employeeId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/auth/getActiveChats/${employeeId}`)
+  }
 }

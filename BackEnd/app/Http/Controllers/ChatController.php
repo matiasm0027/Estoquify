@@ -42,6 +42,17 @@ class ChatController extends Controller
 
         return response()->json(['message' => 'Conexión eliminada exitosamente']);
     }
+
+    public function getActiveChats($employeeId)
+    {
+        // Asume que tienes una relación en el modelo Chat que relaciona los chats con los empleados
+        $chats = Chat::where('sender_id', $employeeId)
+                     ->orWhere('receiver_id', $employeeId)
+                     ->with(['sender', 'receiver']) // Cargar relaciones si es necesario
+                     ->get();
+
+        return response()->json($chats);
+    }
     
 
     protected function checkUserRole($allowedRoles)

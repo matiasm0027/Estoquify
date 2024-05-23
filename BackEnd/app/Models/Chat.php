@@ -13,5 +13,14 @@ class Chat extends Model
 
     protected $fillable = ['sender_id', 'receiver_id', 'message'];
 
-    protected $hidden = ['message'];
+    // Definir las relaciones con el modelo Employee
+    public function sender()
+    {
+        return $this->belongsTo(Employee::class, 'sender_id');
+    }
+
+    public function receiver()
+    {
+        return $this->belongsTo(Employee::class, 'receiver_id');
+    }
 }

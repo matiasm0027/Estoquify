@@ -1,13 +1,14 @@
 <div class="flex">
-    <app-sidebar></app-sidebar> <!-- Agrega ngIf para mostrar u ocultar el sidebar -->
+    <app-sidebar></app-sidebar>
     <div
         class="justify-center lg:mt-24 lg:ml-80 lg:mr-12 md:mt-24 md:ml-12 md:mr-12 sm:mt-24 sm:ml-12 sm:mr-12 mt-24 ml-12 mr-12 box-fl container">
         <div class="flex justify-between items-center mb-4">
-            <div class="bg-white p-4 rounded-lg shadow-md w-96">
-                <div>
+            <div class="bg-white p-4 rounded-lg shadow-md w-full flex flex-col lg:flex-row items-start">
+                <!-- Columna izquierda con el buscador y el botón de nueva conexión -->
+                <div class="w-full lg:w-1/4 pr-4 mb-4 lg:mb-0">
                     <h3 class="text-lg font-bold mb-2">Chat</h3>
-                    <form [formGroup]="formularioEmpleado">
-                        <div class="ml-2">
+                    <form [formGroup]="formularioEmpleado" class="flex justify-between items-center space-x-2">
+                        <div class="w-full lg:w-auto">
                             <ng-select formControlName="fullname" [items]="filteredEmployees" bindLabel="fullname"
                                 [placeholder]="placeholder" (search)="buscarEmpleado($event)"
                                 (change)="seleccionarEmpleado($event)" (click)="limpiarSeleccion()"
@@ -16,17 +17,47 @@
                             <input type="text"
                                 [value]="selectedEmployee ? selectedEmployee.name + ' ' + selectedEmployee.last_name : ''">
                         </div>
+                        <button (click)="crearConexion()"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            Crear Conexión
+                        </button>
                     </form>
                 </div>
-                <div *ngIf="!selectedEmployee" class="text-red-500">Por favor, selecciona un empleado.</div>
-                <button (click)="crearConexion()"
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
-                    Crear Conexión
-                </button>
-                <button *ngIf="userRole === '1'" (click)="eliminarChat()"
-                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4">
-                    Eliminar Chat
-                </button>
+                <!-- Columna derecha con la lista de chats activos -->
+                <div class="w-full lg:w-3/4 flex flex-wrap">
+                    <h4 class="text-md font-semibold mb-2 mt-2 w-full">Chats Activos</h4>
+                    <div *ngFor="let chat of activeChats" class="bg-gray-100 p-2 rounded mb-2 lg:ml-2"
+                        (click)="seleccionarChatActivo(chat)">
+                        <p><strong>De:</strong> {{ chat.sender.name }} {{ chat.sender.last_name }}</p>
+                        <p><strong>Para:</strong> {{ chat.receiver.name }} {{ chat.receiver.last_name }}</p>
+                        <p><strong>Último mensaje:</strong> {{ chat.message || 'Sin mensajes' }}</p>
+                    </div>
+                    <ng-container *ngIf="activeChats.length === 0">
+                        <p>No hay chats activos.</p>
+                    </ng-container>
+                </div>
+            </div>
+
+
+            <div *ngIf="mostrarMensajes" class="fixed z-10 inset-0 overflow-y-auto">
+                <div class="flex items-center justify-center min-h-screen px-4">
+                    <div class="bg-white rounded-lg overflow-hidden shadow-xl sm:max-w-lg sm:w-full relative">
+                        <div class="bg-white p-4 rounded-lg shadow-md w-full">
+                            <h3 class="text-lg font-bold mb-2">Mensajes</h3>
+                            <!-- Área para mostrar los mensajes -->
+                            <div>
+                                <!-- Mostrar mensajes del chat activo -->
+                                <div *ngIf="chatActivo">
+                                    <textarea class="textarea-mensajes  w-full" readonly>
+                                        {{ chatActivo.messages.join('\n') }}
+                                    </textarea>
+                                </div>
+                            </div>
+                            <!-- Campo de entrada para editar el mensaje -->
+                            <input type="text" placeholder="Escribe tu mensaje aquí" class="w-full mt-2 p-2 border rounded">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
