@@ -69,7 +69,7 @@ Route::group([
     Route::put('editMaterial/{id}', [MaterialController::class, 'editMaterial']);
 
     Route::get('listIncidences', [IncidenceController::class, 'listIncidences']);
-    Route::post('agregarReporte', [ReportController::class, 'sendReports']);
+    Route::post('addIncidence', [IncidenceController::class, 'addIncidence']);
     Route::put('changeIncidenceStatus/{id}', [IncidenceController::class, 'changeIncidenceStatus']);
 });
 

@@ -33,31 +33,32 @@ export class LoginComponent implements OnInit {
 
   enviarLogin(): void {
     if (this.loginForm.valid) {
-      const credentials = {
-        email: this.loginForm.value.email,
-        password: this.loginForm.value.password
-      };
+        const credentials = {
+            email: this.loginForm.value.email,
+            password: this.loginForm.value.password
+        };
 
-      this.apiService.login(credentials).subscribe(
-        (response) => {
-          if (response && response.access_token) {
-            localStorage.setItem('itsLoged', 'true');
-            localStorage.setItem('token', response.access_token);
-            localStorage.setItem('rol', response.rol);
-            if (response.first_login) {
-              localStorage.setItem('first_login', 'true');
-              this.router.navigate(['/change_password']);
-           
-            } else {
-              this.router.navigate(['/home']);
+        this.apiService.login(credentials).subscribe(
+            (response) => {
+                if (response && response.access_token) {
+                    localStorage.setItem('itsLoged', 'true');
+                    localStorage.setItem('token', response.access_token);
+                    localStorage.setItem('rol', response.rol);
+                    localStorage.setItem('first_login', response.first_login.toString());
+
+                    if (response.first_login) {
+                        this.router.navigate(['/change_password']);
+                    } else {
+                        this.router.navigate(['/home']);
+                    }
+                }
+            },
+            (error) => {
+                this.errorMessage = error.error.error;
             }
-          }
-        },
-        (error) => {
-          this.errorMessage = error.error.error;
-        }
-      );
+        );
     }
-  }
+}
+
 }
 

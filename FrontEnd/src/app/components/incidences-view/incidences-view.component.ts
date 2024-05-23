@@ -24,8 +24,6 @@ export class IncidenceViewComponent implements OnInit {
   prioridadHigh: boolean = false;
   employeeId!: number;
   petition: string = '';
-  employeeRole!: string;
-  reportes: any[] = [];
   envioExitoso: boolean = false;
   mensajeNotificacion: string = '';
   formularioEmpleado: FormGroup;
@@ -147,10 +145,10 @@ export class IncidenceViewComponent implements OnInit {
     }
   }
 
-  agregarReporte() {
+  addIncidence(): void {
     const date = new Date().toISOString().slice(0, 10);
     let type: string = '';
-
+  
     // Determinar el tipo según la selección del usuario
     if (this.altaEmpleado) {
       type = 'Alta Empleado';
@@ -161,34 +159,44 @@ export class IncidenceViewComponent implements OnInit {
     } else if (this.bajaMaterial) {
       type = 'Baja Material';
     }
-
+  
+    // Validar que se haya seleccionado un tipo válido
+    if (!type) {
+      console.error('Error: No se ha seleccionado un tipo válido de incidencia');
+      return;
+    }
+  
+    // Validar que petition esté definida y tenga un valor
+    if (!this.petition || this.petition.trim() === '') {
+      console.error('Error: La petición no puede estar vacía');
+      return;
+    }
+  
+    // Validar que employeeId esté definido
+    if (!this.loggedInUser?.id) {
+      console.error('Error: No se puedo leer datos del empleado');
+      return;
+    }
+  
     try {
-      let reporte;
-
-      // Construir el objeto de reporte
+      // Construir el objeto de incidencia
+      let newIncidence = new Incidence(
+        0, // id, se espera que sea asignado por la base de datos
+        date,
+        this.petition,
+        'pending',
+        this.getPriority(),
+        type,
+        this.loggedInUser?.id
+      );
+  
+      // Agregar categorías seleccionadas solo si el tipo es 'Solicitud Material'
       if (type === 'Solicitud Material') {
-        reporte = {
-          date: date,
-          type: type,
-          petition: this.petition,
-          state: 'pending',
-          priority: this.getPriority(),
-          employee_id: this.employeeId,
-          category: this.getCategoriasSeleccionadasIds()
-        };
-      } else {
-        reporte = {
-          date: date,
-          type: type,
-          petition: this.petition,
-          state: 'pending',
-          priority: this.getPriority(),
-          employee_id: this.employeeId
-        };
+        newIncidence.categories = this.getCategoriasSeleccionadas().map(id => new Category(id.id,id.name));
       }
-
+  
       // Llamar al servicio API para agregar el reporte
-      this.ApiRequestService.agregarReporte(reporte).subscribe(
+      this.ApiRequestService.addIncidence(newIncidence).subscribe(
         (response: any) => {
           this.resetForm();
           this.mostrarNotificacion('El reporte se ha enviado correctamente', 4000);
@@ -203,6 +211,7 @@ export class IncidenceViewComponent implements OnInit {
       // Manejar el error de acuerdo a tus necesidades, por ejemplo, mostrar un mensaje al usuario
     }
   }
+  
 
   getPriority(): string {
     if (this.prioridadLow) {

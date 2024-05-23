@@ -13,18 +13,21 @@ use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 class IncidenceController extends Controller{
 
-    public function sendIncidence(Request $request){
-
-         // Define las reglas de validación
-         $rules = [
+    public function addIncidence(Request $request)
+    {
+        // Define las reglas de validación
+        $rules = [
+            'date' => 'required|date',
             'petition' => 'required|string',
             'priority' => 'required|string',
             'type' => 'required|string',
+            'employee_id' => 'required|exists:employees,id',
         ];
 
         // Si el tipo de reporte es "Solicitud Material", requerir la presencia de categorías
         if ($request->input('type') === 'Solicitud Material') {
-            $rules['category'] = 'required|array';
+            $rules['categories'] = 'required|array';
+            $rules['categories.*.id'] = 'required|exists:categories,id'; // Asegúrate de que cada categoría exista
         }
 
         // Validar la solicitud
@@ -35,8 +38,8 @@ class IncidenceController extends Controller{
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        //Estos son los datos que recogera de la bbdd para generar el reporte
-        $reportData = [
+        // Datos de la incidencia
+        $incidenceData = [
             'date' => $request->date,
             'petition' => $request->petition,
             'priority' => $request->priority,
@@ -45,47 +48,31 @@ class IncidenceController extends Controller{
             'employee_id' => $request->employee_id,
         ];
 
-        //Si el reporte es una alta no adjuntara las categorias, si es una solicitud
+        // Crear y guardar la incidencia
+        $incidence = Incidence::create($incidenceData);
+
+        // Si el tipo de incidencia es "Solicitud Material", asociar las categorías
         if ($request->type === 'Solicitud Material') {
-            $report = new Report($reportData);
-            //Guardamos el reporte en la bbdd
-            $report->save();
-            $reportId = $report->id;
-            $report->category()->attach($request->category, ['report_id' => $reportId]);
-        } else {
-            $report = new Report($reportData);
-            //Guardamos el reporte en la bbdd
-           $report->save();
+            $categories = $request->input('categories');
+            foreach ($categories as $category) {
+                $incidence->categoryIncidences()->create([
+                    'category_id' => $category['id'],
+                    'incidence_id' => $incidence->id
+                ]);
+            }
         }
 
-
-
-        //Mensaje de que se ha  generado correcatemente la incidencia
+        // Mensaje de que se ha generado correctamente la incidencia
         return response()->json(['message' => 'Reporte generado correctamente'], 201);
     }
-
-
+   
 
     public function listIncidences()
     {
         try{
-        //$reports = Report::all();
-         // Obtener todos los reportes con los datos del empleado asociado
         $incidences = Incidence::with('employee.branchOffice')
         ->orderBy('id')
         ->get();
-        // ->map(function ($incidence) {
-        //     return [
-        //         'id' => $incidence->id,
-        //         'date' => $incidence->date,
-        //         'petition' => $incidence->petition,
-        //         'state' => $incidence->state,
-        //         'priority' => $incidence->priority,
-        //         'type' => $incidence->type,
-        //         'updated' => $incidence->updated_at,
-        //         'employee' => $incidence->employee,
-        //     ];
-        // });
         return response()->json($incidences);
     } catch (ThrottleRequestsException $e) {
         return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);

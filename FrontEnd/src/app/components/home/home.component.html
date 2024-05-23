@@ -8,9 +8,11 @@
       </div>
     </div>
     <div *ngIf="userRole === '1'">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">        <!-- tabla 1 -->
-        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-2 lg:col-span-2">          <div class="bg-blue-50 px-6 py-4">
-            <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Totales de Materiales por Sucursal</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8"> <!-- tabla 1 -->
+        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-2 lg:col-span-2">
+          <div class="bg-blue-50 px-6 py-4">
+            <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Totales de Materiales por
+              Sucursal</h3>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm text-gray-700 dark:text-gray-400">
@@ -38,8 +40,10 @@
           </div>
         </div>
         <!-- Tabla 2  -->
-        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-1 lg:col-span-1">          <div class="bg-blue-50 px-6 py-4">
-            <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Cantidad de Empleados por Sucursal</h3>
+        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-1 lg:col-span-1">
+          <div class="bg-blue-50 px-6 py-4">
+            <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Cantidad de Empleados por
+              Sucursal</h3>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm text-gray-700 dark:text-gray-400">
@@ -102,7 +106,7 @@
       </div>
       <br>
     </div>
-    <div *ngIf="userRole === '2'">
+    <div *ngIf="userRole === '2'" class="mb-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <!-- Columna 1: Información del empleado -->
         <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm">
@@ -175,53 +179,59 @@
       </div>
       <br>
       <!-- Tablas para otros roles que no sean admin -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8"> <!-- tabla 1 -->
         <!-- Tabla 1 -->
-        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm">
+        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-2 lg:col-span-2">
           <div class="bg-blue-50 px-6 py-4">
-            <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Categoría de
-              Materiales</h3>
+            <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Totales de Materiales por
+              Sucursal</h3>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm text-gray-700 dark:text-gray-400">
               <thead class="bg-blue-100">
                 <tr>
-                  <th class="px-6 py-3 text-center">Nombre</th>
-                  <th class="px-6 py-3 text-center">Total</th>
-                  <th class="px-6 py-3 text-center">Asignados</th>
+                  <th>Sucursal</th>
+                  <th *ngFor="let categoria of categories" class="hidden lg:table-cell">{{ categoria.name }}</th>
+                  <th>Total</th> <!-- Nueva columna para mostrar el total de materiales -->
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let material of materials" class="odd:bg-blue-50 even:bg-blue-200">
-                  <td class="px-6 py-4 whitespace-nowrap text-center">{{ material.name }}</td>
-                  <td class="px-6 py-4 text-center">{{ material.total_material }}</td>
-                  <td class="px-6 py-4 text-center">{{ material.activeMaterial }}</td>
-                </tr>
+                <ng-container *ngFor="let sucursal of totales | keyvalue">
+                  <tr class="odd:bg-blue-50 even:bg-blue-200">
+                    <td class="px-6 py-4 whitespace-nowrap text-center">{{ sucursal.key }}</td>
+                    <td *ngFor="let categoria of categories" class="px-6 py-4 text-center hidden lg:table-cell">
+                      {{ sucursal.value[categoria.name] || 0 }}
+                    </td>
+                    <td class="px-6 py-4 text-center"> <!-- Celda para mostrar el total -->
+                      {{ calcularTotalSucursal(sucursal.value) }}
+                    </td>
+                  </tr>
+                </ng-container>
               </tbody>
             </table>
           </div>
         </div>
-        <!-- Tabla 2 -->
-        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm">
+        <!-- Tabla 2  -->
+        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-1 lg:col-span-1">
           <div class="bg-blue-50 px-6 py-4">
-            <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Control de Stock
-            </h3>
+            <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Cantidad de Empleados por
+              Sucursal</h3>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm text-gray-700 dark:text-gray-400">
-              <thead class="bg-blue-100">
+              <thead class="bg-blue-100 hidden md:table-header-group">
                 <tr>
-                  <th class="px-6 py-3 text-center">Nombre</th>
-                  <th class="px-6 py-3 text-center">Cantidad Disponible</th>
-                  <th class="px-6 py-3 text-center">Cantidad de Bajas</th>
+                  <th>Sucursal</th>
+                  <th>Total de Empleados</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let material of materials" class="odd:bg-blue-50 even:bg-blue-200">
-                  <td class="px-6 py-4 whitespace-nowrap text-center">{{ material.name }}</td>
-                  <td class="px-6 py-4 text-center">{{ material.availableMaterial }}</td>
-                  <td class="px-6 py-4 text-center">{{ material.inactiveMaterial }}</td>
-                </tr>
+                <ng-container *ngFor="let data of empleadosPorSucursal">
+                  <tr class="odd:bg-blue-50 even:bg-blue-200">
+                    <td class="px-6 py-4 whitespace-nowrap text-center">{{ data.name }}</td>
+                    <td class="px-6 py-4 text-center">{{ data.employee_count }}</td>
+                  </tr>
+                </ng-container>
               </tbody>
             </table>
           </div>
@@ -229,7 +239,7 @@
 
       </div>
     </div>
-    <div *ngIf="userRole === '3'">
+    <div *ngIf="userRole === '3'" class="mb-4">
       <div class="flex justify-center mt-8" *ngIf="loggedInUser">
         <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm w-full md:w-1/2">
           <div class="bg-blue-50 px-6 py-4">
@@ -246,53 +256,58 @@
       </div>
       <br>
       <!-- Tablas para otros roles que no sean admin -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Tabla 1 -->
-        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8"> <!-- tabla 1 -->
+        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-2 lg:col-span-2">
           <div class="bg-blue-50 px-6 py-4">
-            <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Categoría de
-              Materiales</h3>
+            <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Totales de Materiales por
+              Sucursal</h3>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm text-gray-700 dark:text-gray-400">
               <thead class="bg-blue-100">
                 <tr>
-                  <th class="px-6 py-3 text-left">Nombre</th>
-                  <th class="px-6 py-3 text-left">Total</th>
-                  <th class="px-6 py-3 text-left">Asignados</th>
+                  <th>Sucursal</th>
+                  <th *ngFor="let categoria of categories" class="hidden lg:table-cell">{{ categoria.name }}</th>
+                  <th>Total</th> <!-- Nueva columna para mostrar el total de materiales -->
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let material of materials" class="odd:bg-blue-50 even:bg-blue-200">
-                  <td class="px-6 py-4 whitespace-nowrap">{{ material.name }}</td>
-                  <td class="px-6 py-4">{{ material.total_material }}</td>
-                  <td class="px-6 py-4">{{ material.activeMaterial }}</td>
-                </tr>
+                <ng-container *ngFor="let sucursal of totales | keyvalue">
+                  <tr class="odd:bg-blue-50 even:bg-blue-200">
+                    <td class="px-6 py-4 whitespace-nowrap text-center">{{ sucursal.key }}</td>
+                    <td *ngFor="let categoria of categories" class="px-6 py-4 text-center hidden lg:table-cell">
+                      {{ sucursal.value[categoria.name] || 0 }}
+                    </td>
+                    <td class="px-6 py-4 text-center"> <!-- Celda para mostrar el total -->
+                      {{ calcularTotalSucursal(sucursal.value) }}
+                    </td>
+                  </tr>
+                </ng-container>
               </tbody>
             </table>
           </div>
         </div>
-        <!-- Tabla 2 -->
-        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm">
+        <!-- Tabla 2  -->
+        <div class="overflow-hidden rounded-lg border border-gray-300 shadow-sm md:col-span-1 lg:col-span-1">
           <div class="bg-blue-50 px-6 py-4">
-            <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Control de Stock
-            </h3>
+            <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50 text-center">Cantidad de Empleados por
+              Sucursal</h3>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm text-gray-700 dark:text-gray-400">
-              <thead class="bg-blue-100">
+              <thead class="bg-blue-100 hidden md:table-header-group">
                 <tr>
-                  <th class="px-6 py-3 text-center">Nombre</th>
-                  <th class="px-6 py-3 text-center">Cantidad Disponible</th>
-                  <th class="px-6 py-3 text-center">Cantidad de Bajas</th>
+                  <th>Sucursal</th>
+                  <th>Total de Empleados</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let material of materials" class="odd:bg-blue-50 even:bg-blue-200">
-                  <td class="px-6 py-4 whitespace-nowrap text-center">{{ material.name }}</td>
-                  <td class="px-6 py-4 text-center">{{ material.availableMaterial }}</td>
-                  <td class="px-6 py-4 text-center">{{ material.inactiveMaterial }}</td>
-                </tr>
+                <ng-container *ngFor="let data of empleadosPorSucursal">
+                  <tr class="odd:bg-blue-50 even:bg-blue-200">
+                    <td class="px-6 py-4 whitespace-nowrap text-center">{{ data.name }}</td>
+                    <td class="px-6 py-4 text-center">{{ data.employee_count }}</td>
+                  </tr>
+                </ng-container>
               </tbody>
             </table>
           </div>

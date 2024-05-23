@@ -74,26 +74,18 @@ class AuthController extends Controller
     {
         try {
             $user = auth()->user();
-            if ($user->first_login === 1) {
-                return response()->json([
-                    'first_login' => true,
-                    'access_token' => $token,
-                    'rol' => $user->role_id(),
-                    'token_type' => 'bearer',
-                    'expires_in' => auth()->factory()->getTTL() * 60
-                ]);
-            } else {
-                return response()->json([
-                    'access_token' => $token,
-                    'token_type' => 'bearer',
-                    'rol' => $user->role_id,
-                    'expires_in' => auth()->factory()->getTTL() * 60
-                ]);
-            }
+            return response()->json([
+                'access_token' => $token,
+                'token_type' => 'bearer',
+                'rol' => $user->role_id,
+                'expires_in' => auth()->factory()->getTTL() * 60,
+                'first_login' => $user->first_login
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error interno del servidor'], 500);
         }
     }
+
 
     public function changePassword(Request $request)
     {

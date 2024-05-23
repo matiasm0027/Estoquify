@@ -28,14 +28,15 @@ class EmployeeFactory extends Factory
         $phone_number = $this->faker->numerify('#########');
 
         return [
-             'name' => $name,
-             'last_name' => $this->faker->lastName,
-             'email' => $email,
-             'password' => bcrypt($phone_number),
-             'phone_number' => $phone_number,
-             'department_id' => $this->faker->randomElement($departmentIds),
-             'role_id' => $this->faker->randomElement($roleIds),
-             'branch_office_id' => $this->faker->randomElement($branchOfficeIds),
-         ];
+            'name' => $name,
+            'last_name' => $this->faker->lastName,
+            'email' => $email,
+            'password' => bcrypt($phone_number),
+            'phone_number' => $phone_number,
+            'first_login' => true, 
+            'department_id' => $this->faker->randomElement($departmentIds),
+            'role_id' => $this->faker->randomElement($roleIds),
+            'branch_office_id' => $this->faker->randomElement($branchOfficeIds),
+        ];
     }
 }

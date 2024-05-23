@@ -29,7 +29,11 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.userRole = this.authControlService.hasRole();
-    this.loggedInUser = this.authControlService.getStoredLoggedInUser();
+    this.authControlService.getLoggedUser().subscribe(
+      (user) => {
+        this.loggedInUser = user;
+      }
+    );
     this.obtenerReportes();
     this.obtenerCantidadMaterial();
     this.mostrarMaterialesDisponiblesBajos();

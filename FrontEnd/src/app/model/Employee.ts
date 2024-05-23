@@ -16,6 +16,7 @@ export class Employee {
   department?: Department; // Relación con la tabla 'department'
   branch_office?: BranchOffice; // Relación con la tabla 'branch_office'
   role?: Role; // Relación con la tabla 'role'
+  first_login: boolean;
   fullname?: string;
   employee_materials?: EmployeeMaterial[]; // Relación con la tabla 'employee_material'
 
@@ -31,6 +32,7 @@ export class Employee {
     department: Department,
     branch_office: BranchOffice,
     role: Role,
+    first_login: boolean,
     employee_materials?: EmployeeMaterial[]
   ) {
     this.id = id;
@@ -44,6 +46,7 @@ export class Employee {
     this.department = department;
     this.branch_office = branch_office;
     this.role = role;
+    this.first_login = first_login;
     this.employee_materials = employee_materials;
   }
 }

@@ -147,8 +147,8 @@ export class ApiRequestService {
     return this.http.get<Incidence[]>(`${this.apiUrl}/auth/listIncidences`);
   }
 
-  agregarReporte(reporte: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/auth/agregarReporte`, reporte);
+  addIncidence(incidence: Incidence): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/addIncidence`, incidence);
   }
 
   cambiarEstadoIncidencia(idReporte: number, nuevoEstado: string): Observable<any> {
