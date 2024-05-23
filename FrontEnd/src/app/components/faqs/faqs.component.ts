@@ -4,9 +4,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
 import { Router } from '@angular/router';
 
-
-
-
 @Component({
   selector: 'app-faqs',
   templateUrl: './faqs.component.html',
@@ -49,6 +46,7 @@ export class FaqsComponent implements OnInit{
 
   ngOnInit(): void {
     this.userRole = this.authControlService.hasRole();
+    this.loadFaqsDetails();
   }
 
   loadFaqsDetails(): void {
@@ -108,15 +106,15 @@ export class FaqsComponent implements OnInit{
   
 
 confirmDelete(faq: any): void {
-  const confirmacion = confirm(` ${faq.titulo}?`);
+  const confirmacion = confirm(`Esta seguro que quieres eliminarla?`);
   if (confirmacion) {
-    this.deleteFaq(faq.id);
+    this.deleteFaq(faq.titulo);
   }
 }
 
-deleteFaq(id:number): void {
+deleteFaq(id: number): void {
   this.apiRequestService.deleteFaq(id).subscribe(
-    (response) => {
+    (response) => { 
       this.successMessage = response.message;
     },
     error => {
@@ -126,21 +124,23 @@ deleteFaq(id:number): void {
 }
 
 editFaq(): void {
-  if (this.faqForm.valid) {
-    const faqEdit = {
+  console.log('ID de la FAQ:', this.faqID);
+  console.log('Formulario válido:', this.faqForm.valid);
+  if (this.faqForm.valid && typeof this.faqID === 'number') {
+    const faqEditData = {
       titulo: this.faqForm.value.titulo,
       descripcion: this.faqForm.value.descripcion
     };
 
-    this.apiRequestService.editFaq(this.FaqID, faqEdit).subscribe(
+    this.apiRequestService.editFaq(this.FaqID, faqEditData).subscribe(
       (response: any) => {
+        // Aquí puedes manejar la respuesta si es necesario
         this.successMessage = response.message;
-        this.cerrarModalEdit();
-        // Realiza cualquier otra acción necesaria después de editar el FAQ
+        // Aquí puedes realizar otras acciones después de la edición exitosa
       },
       (error: any) => {
+        // Aquí puedes manejar el error si la solicitud falla
         this.errorMessage = error.error.error;
-        // Maneja el error de alguna manera, como mostrando un mensaje de error al usuario
       }
     );
   } else {
@@ -148,6 +148,10 @@ editFaq(): void {
     console.error('Formulario inválido');
   }
 }
+  faqID(arg0: string, faqID: any) {
+    throw new Error('Method not implemented.');
+  }
+
 
 
 
