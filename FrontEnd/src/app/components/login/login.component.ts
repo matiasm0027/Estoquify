@@ -46,7 +46,6 @@ export class LoginComponent implements OnInit {
                 localStorage.setItem('rol', response.rol);
                 localStorage.setItem('first_login', response.first_login);
                 if (localStorage.getItem('first_login') === '1') {
-                  console.log(localStorage.getItem('first_login') )
                   this.router.navigate(['/change_password']);
                 } else {
                   this.router.navigate(['/home']);

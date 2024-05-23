@@ -71,8 +71,7 @@ export class IncidenceHistoryComponent implements OnInit {
         // Llamar al servicio API para cambiar el estado del reporte
         this.ApiRequestService.cambiarEstadoIncidencia(idReporte, nuevoEstado).subscribe(
           (response: any) => {
-            console.log('Estado del reporte cambiado:', response);
-            // Manejar la respuesta del servicio si es necesario
+            
           },
           (error: any) => {
             console.error('Error al cambiar el estado del reporte:', error);

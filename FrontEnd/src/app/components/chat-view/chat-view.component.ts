@@ -32,7 +32,6 @@ export class ChatViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.userRole = this.authControlService.hasRole();
-    console.log(this.userRole)
     this.authControlService.getLoggedUser().subscribe(() => {
       this.loggedInUser = this.authControlService.getStoredLoggedInUser();
       this.loadActiveChats()
@@ -131,7 +130,7 @@ export class ChatViewComponent implements OnInit {
       this.chatActivo = chat;
     
    
-    console.log(this.chatActivo)
+  
   }
 
   enviarMensaje() {
@@ -143,7 +142,7 @@ export class ChatViewComponent implements OnInit {
       // Actualizar el chat en la base de datos
       this.apiRequestService.actualizarMensaje(this.chatActivo.id, this.chatActivo.message).subscribe(
         response => {
-          console.log('Mensaje actualizado exitosamente:', response);
+         
           this.nuevoMensaje = '';
         },
         error => {

@@ -103,8 +103,6 @@ export class MaterialDetailsComponent implements OnInit {
           this.material = response;
           this.extractAttributes();
           this.cargaDatos = false;
-          console.log(this.material)
-          console.log(this.attriCateMatDetail)
           this.initForm();
         },
         (error) => {
