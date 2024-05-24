@@ -181,7 +181,7 @@ export class ChatViewComponent implements OnInit {
 iniciarPolling(id: number) {
   this.pollingInterval = setInterval(() => {
     this.obtenerMensajesChatActivo(id);
-  }, 10000); // Poll every 2 seconds
+  }, 2000); // Poll every 2 seconds
 }
 
  // Function to obtain the messages of the active chat
@@ -206,12 +206,12 @@ iniciarPolling(id: number) {
 
     const lineas = message.split('\n');
     let ultimaLinea = lineas[lineas.length - 1].slice(2);
-    let textoLimitado = this.limitarTexto(ultimaLinea, 50); 
+    let textoLimitado = this.limitarTexto(ultimaLinea, 30); 
     return textoLimitado;
   }
  limitarTexto(texto: String, limite: number) {
     if (texto.length > limite) {
-        return texto.slice(0, limite) + " ...";
+        return texto.slice(0, limite) + "...";
     } else {
         return texto;
     }
