@@ -61,7 +61,7 @@
               <div class="flex-grow overflow-y-auto mb-4 mx-4 h-96">
                 <!-- Mostrar mensajes del chat activo -->
                 <div *ngIf="chatActivo">
-                  <div *ngFor="let message of chatActivo.message.split('\n')" class="flex mb-1">
+                  <div *ngFor="let message of chatActivo.message?.split('\n')" class="flex mb-1">
                     <div [ngClass]="{
                             'mr-auto bg-blue-100 ': (message.startsWith('R:') && chatActivo.sender_id === loggedInUser?.id) || (message.startsWith('S:') && chatActivo.receiver_id === loggedInUser?.id), 
                             'ml-auto mr-4 bg-green-100 ': (message.startsWith('S:') && chatActivo.sender_id === loggedInUser?.id) || (message.startsWith('R:') && chatActivo.receiver_id === loggedInUser?.id)

@@ -100,4 +100,23 @@ class ChatController extends Controller
             return response()->json(['error' => 'Error interno del servidor'], 500);
         }
     }
+//DESPUES DE LA SUBIDA DEL SERVIDOR
+    public function obtenerMensajes($chatId)
+    {
+        try {
+            // Buscar el chat por su ID
+            $chat = Chat::find($chatId);
+
+            if (!$chat) {
+                return response()->json(['error' => 'Chat no encontrado'], 404);
+            }
+
+            // Obtener los mensajes asociados con el chat
+            $mensajes = $chat->message;
+
+            return response()->json($mensajes);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error interno del servidor'], 500);
+        }
+    }
 }

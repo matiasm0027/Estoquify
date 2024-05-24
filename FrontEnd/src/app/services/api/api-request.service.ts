@@ -15,7 +15,7 @@ import { Incidence } from 'src/app/model/Incidence';
   providedIn: 'root'
 })
 export class ApiRequestService {
-  private apiUrl = 'https://estoquify.es/api';
+  private apiUrl = 'http://localhost:8000/api';
 
   constructor(private http: HttpClient) {}
 
@@ -193,5 +193,9 @@ export class ApiRequestService {
 
   actualizarMensaje(chatId: number, nuevoMensaje: string): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/auth/actualizarMensaje/${chatId}`, { message: nuevoMensaje });
+  }
+//DESPUES DE LA SUBIDA DEL SERVIDOR
+  obtenerMensajes(chatId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/obtenerMensajes/${chatId}`);
   }
 }

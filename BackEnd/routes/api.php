@@ -78,6 +78,7 @@ Route::group([
     Route::delete('eliminarConexion/{id}', [ChatController::class, 'eliminarConexion']);
     Route::get('getActiveChats/{employeeId}', [ChatController::class, 'getActiveChats']);
     Route::put('actualizarMensaje/{id}', [ChatController::class, 'actualizarMensaje']);
+    Route::get('obtenerMensajes/{chatId}', [ChatController::class, 'obtenerMensajes']);
 
 
     Route::get('getFaqsDetails', [FaqController::class, 'getFaqsDetails']);

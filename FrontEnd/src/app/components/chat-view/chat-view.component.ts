@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+//DESPUES DE LA SUBIDA DEL SERVIDOR
+import { Subscription } from 'rxjs';
 import { Employee } from 'src/app/model/Employee';
 import { ApiRequestService } from 'src/app/services/api/api-request.service';
 import { UsuariosControlService } from 'src/app/services/usuarios/usuarios-control.service';
@@ -21,8 +23,12 @@ export class ChatViewComponent implements OnInit {
   activeChats: any[] = [];
   ngSelectSeleccionado: boolean = false;
   chatActivo: any;
+  chatElegido: any;
   mostrarMensajes: boolean = false;
   nuevoMensaje: string = '';
+  //DESPUES DE LA SUBIDA DEL SERVIDOR
+  pollingInterval: any;
+  private subscriptions: Subscription = new Subscription();
 
   constructor(private authControlService: UsuariosControlService, private apiRequestService: ApiRequestService, private fb: FormBuilder,) {
     // Initializing the employee form with form controls and validators
@@ -136,7 +142,10 @@ export class ChatViewComponent implements OnInit {
   // Function to select an active chat
   seleccionarChatActivo(chat: any) {
     this.mostrarMensajes = true;
-    this.chatActivo = chat;
+    this.chatElegido = chat;
+    this.chatActivo = chat; // Asignar también a this.chatActivo
+    //DESPUES DE LA SUBIDA DEL SERVIDOR
+    this.iniciarPolling(this.chatElegido.id)
   }
 
   // Function to send a message in the active chat
@@ -148,7 +157,6 @@ export class ChatViewComponent implements OnInit {
 
       this.apiRequestService.actualizarMensaje(this.chatActivo.id, this.chatActivo.message).subscribe(
         response => {
-
           this.nuevoMensaje = '';
         },
         error => {
@@ -158,17 +166,54 @@ export class ChatViewComponent implements OnInit {
     }
   }
 
-  // Function to close the modal and reload active chats
-  cerrarModal() {
-    this.mostrarMensajes = false;
-    this.loadActiveChats()
+ // Function to close the modal and reload active chats
+ cerrarModal() {
+  this.mostrarMensajes = false;
+  this.loadActiveChats();
+  //DESPUES DE LA SUBIDA DEL SERVIDOR
+  if (this.pollingInterval) {
+    clearInterval(this.pollingInterval);
   }
+}
+
+// Function to start polling for active chat messages
+//DESPUES DE LA SUBIDA DEL SERVIDOR
+iniciarPolling(id: number) {
+  this.pollingInterval = setInterval(() => {
+    this.obtenerMensajesChatActivo(id);
+  }, 10000); // Poll every 2 seconds
+}
+
+ // Function to obtain the messages of the active chat
+ //DESPUES DE LA SUBIDA DEL SERVIDOR
+ obtenerMensajesChatActivo(id: number) {
+    this.subscriptions.add(
+      this.apiRequestService.obtenerMensajes(id).subscribe(
+        response => {
+          this.chatActivo.message = response;  
+        },
+        error => {
+          console.error('Error al obtener los mensajes:', error);
+        }
+      )
+    );
+  
+}
 
   // Function to obtain the last line of a message
-  obtenerUltimaLinea(message: string): string {
+  obtenerUltimaLinea(message: String): String {
     if (!message) return '';
 
     const lineas = message.split('\n');
-    return lineas[lineas.length - 1].slice(2);
+    let ultimaLinea = lineas[lineas.length - 1].slice(2);
+    let textoLimitado = this.limitarTexto(ultimaLinea, 50); 
+    return textoLimitado;
   }
+ limitarTexto(texto: String, limite: number) {
+    if (texto.length > limite) {
+        return texto.slice(0, limite) + " ...";
+    } else {
+        return texto;
+    }
+}
 }
