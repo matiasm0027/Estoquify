@@ -24,26 +24,33 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Check if the user is already logged in based on the presence of an item in local storage
     if (localStorage.getItem('itsLoged')) {
-      this.router.navigate(['/home']);
+        // If the user is logged in, redirect them to the home page
+        this.router.navigate(['/home']);
     }
-  }
+}
 
-  submitResetPassword(): void {
-    if (this.changePasswordForm.valid) {
-      const emailValue = this.changePasswordForm.value.email; // Obtener el valor del campo email
-  
-      // Después de verificar el email, si es válido, enviar la solicitud de cambio de contraseña
+
+submitResetPassword(): void {
+  // Check if the change password form is valid
+  if (this.changePasswordForm.valid) {
+      // Get the value of the email field
+      const emailValue = this.changePasswordForm.value.email;
+
+      // After verifying the email, if it's valid, send the password reset request
       this.apiService.resetPasswordRequest(emailValue).subscribe(
-        (response) => {
-          this.successMessage = response.message;
-          this.errorMessage = "";
-        },
-        (error) => {
-          this.errorMessage = error.error.error;
-
-        }
+          (response) => {
+              // If the request is successful, set the success message and clear the error message
+              this.successMessage = response.message;
+              this.errorMessage = "";
+          },
+          (error) => {
+              // If there's an error, set the error message
+              this.errorMessage = error.error.error;
+          }
       );
-    }
   }
+}
+
 }

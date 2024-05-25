@@ -23,67 +23,87 @@ export class IncidenceHistoryComponent implements OnInit {
   constructor(private ApiRequestService: ApiRequestService,
     private authControlService: UsuariosControlService,) { }
 
-  ngOnInit(): void {
-    this.userRole = this.authControlService.hasRole();
-    this.authControlService.getLoggedUser().subscribe(
-      (user) => {
-        this.loggedInUser = user;
-      }
-    );
-    this.cargarOpciones();
-    this.obtenerReportes();
-  }
-  cargarOpciones() {
-    this.authControlService.cargarSucursales().subscribe(
-      (sucursales) => {
-        this.sucursales = sucursales;
-      },
-      (error) => {
-        console.error('Error loading options', error);
-      }
-    );
-  }
-
-  obtenerReportes() {
-    this.ApiRequestService.listIncidences().subscribe(
-      (response: Incidence[]) => {
-        this.incidences = response.filter((incidence: Incidence) => incidence.state === 'accepted' || incidence.state === 'rejected').sort((a, b) => a.id - b.id);;
-        this.cargaDatos = false;
-      },
-      error => {
-        console.error('Error al obtener reportes:', error);
-      }
-    );
-  }
-
-  mostrarDetalle(incidence: Incidence) {
-    this.incidenceSelect = incidence;
-  }
-
-  cambiarEstadoReporte(idReporte: number, estado: string, event: any) {
-    if (event) {
-      const target = event.target as HTMLInputElement;
-      if (target) {
-        const isChecked = target.checked;
-
-        const nuevoEstado = isChecked ? 'pending' : '';
-
-        // Llamar al servicio API para cambiar el estado del reporte
-        this.ApiRequestService.cambiarEstadoIncidencia(idReporte, nuevoEstado).subscribe(
-          (response: any) => {
-            
-          },
-          (error: any) => {
-            console.error('Error al cambiar el estado del reporte:', error);
-            // Manejar el error del servicio si es necesario
+    ngOnInit(): void {
+      // Get the role of the user from the authentication control service
+      this.userRole = this.authControlService.hasRole();
+  
+      // Get the logged-in user from the authentication control service
+      this.authControlService.getLoggedUser().subscribe(
+          (user) => {
+              // Store the logged-in user
+              this.loggedInUser = user;
           }
-        );
-      }
-    }
+      );
+  
+      // Load options and fetch reports when the component initializes
+      this.cargarOpciones();
+      this.obtenerReportes();
   }
 
-  cerrarModal() {
+
+ cargarOpciones() {
+    // Load options for branch offices from the authentication control service
+    this.authControlService.cargarSucursales().subscribe(
+        (sucursales) => {
+            // Store the loaded branch offices in the sucursales array
+            this.sucursales = sucursales;
+        },
+        (error) => {
+            // Log any errors that occur while loading options
+            console.error('Error loading options', error);
+        }
+    );
+}
+
+obtenerReportes() {
+    // Get the list of incidences from the API
+    this.ApiRequestService.listIncidences().subscribe(
+        (response: Incidence[]) => {
+            // Filter the incidences to include only those with state 'accepted' or 'rejected', and sort them by ID
+            this.incidences = response.filter((incidence: Incidence) => incidence.state === 'accepted' || incidence.state === 'rejected').sort((a, b) => a.id - b.id);
+            // Set cargaDatos to false after the data has been loaded
+            this.cargaDatos = false;
+        },
+        error => {
+            // Log any errors that occur while fetching reports
+            console.error('Error al obtener reportes:', error);
+        }
+    );
+}
+
+mostrarDetalle(incidence: Incidence) {
+    // Set the selected incidence to show its details
+    this.incidenceSelect = incidence;
+}
+
+cambiarEstadoReporte(idReporte: number, estado: string, event: any) {
+    if (event) {
+        const target = event.target as HTMLInputElement;
+        if (target) {
+            const isChecked = target.checked;
+
+            // Determine the new state based on whether the checkbox is checked
+            const nuevoEstado = isChecked ? 'pending' : '';
+
+            // Call the API service to change the state of the report
+            this.ApiRequestService.cambiarEstadoIncidencia(idReporte, nuevoEstado).subscribe(
+                (response: any) => {
+                    // Handle the response from the service if necessary
+                },
+                (error: any) => {
+                    // Log any errors that occur while changing the report state
+                    console.error('Error al cambiar el estado del reporte:', error);
+                    // Handle the service error if necessary
+                }
+            );
+        }
+    }
+}
+
+cerrarModal() {
+    // Clear the selected incidence and refresh the list of reports
     this.incidenceSelect = null;
     this.obtenerReportes();
-  }
+}
+
 }

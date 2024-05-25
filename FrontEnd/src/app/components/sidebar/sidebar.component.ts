@@ -16,26 +16,38 @@ export class SidebarComponent implements OnInit {
    
   constructor(private authControlService: UsuariosControlService,  private apiRequestService: ApiRequestService) {}
 
-  ngOnInit(): void {
-    this.userRole = this.authControlService.hasRole();
-    this.authControlService.getLoggedUser().subscribe(
-      (user) => {
-        this.loggedInUser = user;
-      }
-    );
-  }
-
-  logout(): void {
-    this.authControlService.logout();
-    window.location.reload();
-  }
-
-  toggleSidebar(): void {
-    const sidebar = document.getElementById('logo-sidebar');
-    if (sidebar) {
-      sidebar.classList.toggle('hidden');
+  // Initialize component
+ngOnInit(): void {
+  // Check user role using the authentication control service
+  this.userRole = this.authControlService.hasRole();
+  // Subscribe to get the logged-in user information
+  this.authControlService.getLoggedUser().subscribe(
+    // Handle successful response
+    (user) => {
+      // Set logged-in user information
+      this.loggedInUser = user;
     }
+  );
+}
+
+// Function to log out the user
+logout(): void {
+  // Call the logout method of the authentication control service
+  this.authControlService.logout();
+  // Reload the window to reflect logout changes
+  window.location.reload();
+}
+
+// Function to toggle the sidebar visibility
+toggleSidebar(): void {
+  // Get the sidebar element by its ID
+  const sidebar = document.getElementById('logo-sidebar');
+  // Toggle the 'hidden' class of the sidebar
+  if (sidebar) {
+    sidebar.classList.toggle('hidden');
   }
+}
+
 
 
 

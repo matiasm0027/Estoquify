@@ -71,19 +71,28 @@ export class IncidenceViewComponent implements OnInit {
       categoria6: [''],
     });
   }
-
   ngOnInit(): void {
+    // Get the role of the user from the authentication control service
     this.userRole = this.authControlService.hasRole();
-    this.authControlService.getLoggedUser().subscribe(
-      (user) => {
-        this.loggedInUser = user;
-      }
-    );
-    this.cargarOpciones();
-    this.obtenerNombreCategoria();
-    this.obtenerReportes()
 
-  }
+    // Get the logged-in user from the authentication control service
+    this.authControlService.getLoggedUser().subscribe(
+        (user) => {
+            // Store the logged-in user
+            this.loggedInUser = user;
+        }
+    );
+
+    // Load options for branch offices
+    this.cargarOpciones();
+
+    // Fetch category names
+    this.obtenerNombreCategoria();
+
+    // Fetch reports
+    this.obtenerReportes();
+}
+
 
   // Load options asynchronously
 cargarOpciones() {
@@ -255,314 +264,404 @@ addIncidence(): void {
   }
 
   getCategoriasSeleccionadasIds(): number[] {
+    // Initialize an empty array to store the selected category IDs
     const categoriasSeleccionadasIds: number[] = [];
+    
+    // Iterate over the keys (category IDs) in the categoriasSeleccionadas object
     for (const categoriaId in this.categoriasSeleccionadas) {
-      if (this.categoriasSeleccionadas[categoriaId]) {
-        categoriasSeleccionadasIds.push(parseInt(categoriaId));
-      }
-    }
-    return categoriasSeleccionadasIds;
-  }
-
-  getCategoriasSeleccionadas(): { id: number, name: string }[] {
-    const categoriasSeleccionadas: { id: number, name: string }[] = [];
-    for (const categoriaId in this.categoriasSeleccionadas) {
-      if (this.categoriasSeleccionadas[categoriaId]) {
-        const categoria = this.categories.find(cat => cat.id === parseInt(categoriaId));
-        if (categoria) {
-          categoriasSeleccionadas.push({ id: parseInt(categoriaId), name: categoria.name });
+        // Check if the current category ID is marked as selected
+        if (this.categoriasSeleccionadas[categoriaId]) {
+            // Convert the string category ID to an integer and add it to the array
+            categoriasSeleccionadasIds.push(parseInt(categoriaId));
         }
+    }
+    
+    // Return the array of selected category IDs
+    return categoriasSeleccionadasIds;
+}
+
+getCategoriasSeleccionadas(): { id: number, name: string }[] {
+  // Initialize an empty array to store the selected categories
+  const categoriasSeleccionadas: { id: number, name: string }[] = [];
+  
+  // Iterate over the keys (category IDs) in the categoriasSeleccionadas object
+  for (const categoriaId in this.categoriasSeleccionadas) {
+      // Check if the current category ID is marked as selected
+      if (this.categoriasSeleccionadas[categoriaId]) {
+          // Find the category object that matches the current category ID
+          const categoria = this.categories.find(cat => cat.id === parseInt(categoriaId));
+          
+          // If a matching category object is found, add it to the array with its ID and name
+          if (categoria) {
+              categoriasSeleccionadas.push({ id: parseInt(categoriaId), name: categoria.name });
+          }
       }
-    }
-    return categoriasSeleccionadas;
   }
+  
+  // Return the array of selected categories with their IDs and names
+  return categoriasSeleccionadas;
+}
 
-  onBajaEmpleado() {
-    if (this.bajaEmpleado) {
-      this.petition += 'Empleado: '; // Agrega "Empleado: " a la petición si se selecciona Baja Empleado
-    }
+onBajaEmpleado() {
+  // Check if the "bajaEmpleado" flag is set
+  if (this.bajaEmpleado) {
+      // Append "Empleado: " to the petition string if Baja Empleado is selected
+      this.petition += 'Empleado: ';
   }
+}
 
-  onBajaMaterial() {
-    if (this.bajaMaterial) {
-      this.petition += 'Material: '; // Agrega "Material: " a la petición si se selecciona Baja Material
-    }
+onBajaMaterial() {
+  // Check if the "bajaMaterial" flag is set
+  if (this.bajaMaterial) {
+      // Append "Material: " to the petition string if Baja Material is selected
+      this.petition += 'Material: ';
   }
+}
 
-  onAltaEmpleado() {
-    const datos = ['Nombre: ', 'Apellido: ', 'Email: ', 'Teléfono Móvil: ', 'Departamento: ', 'Sucursal:', 'Rol:'];
-    this.petition = datos.join('\n');
-  }
+onAltaEmpleado() {
+  // Define an array of strings representing the data fields for an employee
+  const datos = ['Nombre: ', 'Apellido: ', 'Email: ', 'Teléfono Móvil: ', 'Departamento: ', 'Sucursal:', 'Rol:'];
+  
+  // Join the elements of the array into a single string with each element on a new line
+  this.petition = datos.join('\n');
+}
 
-  onCategoriaChange() {
-    this.petition = this.formatSelectedCategories();
-  }
-
-  formatSelectedCategories() {
-    if (this.solicitudMaterial) {
+onCategoriaChange() {
+  // Set the petition string to the formatted list of selected categories
+  this.petition = this.formatSelectedCategories();
+}
+formatSelectedCategories() {
+  // Check if the "solicitudMaterial" flag is set
+  if (this.solicitudMaterial) {
+      // Get the list of selected categories
       const selectedCategories = this.getCategoriasSeleccionadas();
-      let formattedCategories = selectedCategories.map(c => c.name + ': '); // Agregar ":" después de cada nombre de categoría
-      return formattedCategories.join('\n'); // Unir las categorías con saltos de línea
-    } else {
+      
+      // Map each category to a string with the category name followed by ":"
+      let formattedCategories = selectedCategories.map(c => c.name + ': ');
+      
+      // Join the formatted category strings with newline characters
+      return formattedCategories.join('\n');
+  } else {
+      // If "solicitudMaterial" is not set, return an empty string
       return '';
-    }
   }
+}
 
-  resetForm() {
-    // Reiniciar los valores de los campos del formulario
-    this.petition = '';
-    this.altaEmpleado = false;
-    this.solicitudMaterial = false;
-    this.prioridadLow = false;
-    this.prioridadMedium = false;
-    this.prioridadHigh = false;
-    this.categoriasSeleccionadas = {};
 
-  }
+resetForm() {
+  // Reset the values of the form fields
+  this.petition = ''; // Clear the petition string
+  this.altaEmpleado = false; // Uncheck the "altaEmpleado" flag
+  this.solicitudMaterial = false; // Uncheck the "solicitudMaterial" flag
+  this.prioridadLow = false; // Uncheck the "prioridadLow" flag
+  this.prioridadMedium = false; // Uncheck the "prioridadMedium" flag
+  this.prioridadHigh = false; // Uncheck the "prioridadHigh" flag
+  this.categoriasSeleccionadas = {}; // Clear the selected categories
+}
 
-  //-------------------------------------------------FUNCIONES ROL ADMIN ----------------------------------------------------------------------------
+  //-------------------------------------------------FUNCTIONS ROLE ADMIN ----------------------------------------------------------------------------
 
   asignarMaterial() {
-    // Obtiene el valor de fullname (el ID del empleado)
+    // Get the value of fullname (the ID of the employee)
     const employeeId = this.formularioMaterial.value.fullname.id;
 
-    // Verifica si se ha seleccionado un empleado (si fullname tiene un valor)
+    // Check if an employee has been selected (if fullname has a value)
     if (!employeeId) {
-      console.error('No se ha seleccionado un empleado.');
-      return; // No hace nada más si no se ha seleccionado un empleado
+        console.error('No employee has been selected.');
+        return; // Do nothing further if no employee has been selected
     }
 
-    // Itera sobre las categorías y llama a la API si tienen un valor seleccionado
+    // Iterate over the categories and call the API if they have a selected value
     for (let i = 1; i <= 6; i++) {
-      const categoriaValue = this.formularioMaterial.value['categoria' + i];
-      if (categoriaValue) {
-        // Lógica para asignar el material al empleado con el ID proporcionado
-        const materialId = categoriaValue;
-        // Llama al servicio para asignar el material al empleado
-        this.ApiRequestService.asignarMaterial(materialId, employeeId).subscribe(
-          (response) => {
-            this.successMessage = response.message;
-            this.formularioMaterial.reset();
-            this.cerrarModal_Material()
-          },
-          (error) => {
-            console.error('Error al asignar el material:', error);
-          }
-        );
-      }
+        const categoriaValue = this.formularioMaterial.value['categoria' + i];
+        if (categoriaValue) {
+            // Logic to assign the material to the employee with the provided ID
+            const materialId = categoriaValue;
+            // Call the service to assign the material to the employee
+            this.ApiRequestService.asignarMaterial(materialId, employeeId).subscribe(
+                (response) => {
+                    // Handle successful assignment
+                    this.successMessage = response.message;
+                    // Reset the form after successful assignment
+                    this.formularioMaterial.reset();
+                    // Close the material assignment modal
+                    this.cerrarModal_Material();
+                },
+                (error) => {
+                    // Handle errors during assignment
+                    console.error('Error assigning material:', error);
+                }
+            );
+        }
     }
-  }
+}
 
-  obtenerNombreCategoria() {
-    this.ApiRequestService.categoryMaterial().subscribe(
+obtenerNombreCategoria() {
+  // Call the API to get the category material
+  this.ApiRequestService.categoryMaterial().subscribe(
       (response: any[]) => {
-        this.categories = response.map(material => ({
-          id: material.id,
-          name: material.name, // Cambiar a category_name
-        }));
+          // Map the response to an array of categories with id and name
+          this.categories = response.map(material => ({
+              id: material.id,
+              name: material.name, // Change to category_name if needed
+          }));
 
-        this.categories.forEach(categoria => {
-          this.getCategoriaDetails(categoria.id);
-        });
-        this.cargaDatos = false;
+          // Iterate over each category to get additional details
+          this.categories.forEach(categoria => {
+              this.getCategoriaDetails(categoria.id);
+          });
 
+          // Set cargaDatos to false after the data has been loaded
+          this.cargaDatos = false;
       }
-    );
-  }
+  );
+}
 
-  mostrarNotificacion(mensaje: string, duracion: number = 4000) {
-    this.envioExitoso = true;
-    this.mensajeNotificacion = mensaje;
-    setTimeout(() => {
+mostrarNotificacion(mensaje: string, duracion: number = 4000) {
+  // Set envioExitoso to true to indicate that the notification should be shown
+  this.envioExitoso = true;
+  // Set the notification message
+  this.mensajeNotificacion = mensaje;
+  // Set a timeout to hide the notification after the specified duration
+  setTimeout(() => {
       this.envioExitoso = false;
       this.mensajeNotificacion = '';
-    }, duracion);
-  }
+  }, duracion);
+}
 
-  obtenerReportes() {
-    this.ApiRequestService.listIncidences().subscribe(
-      (response:Incidence[]) => {
-        this.incidences = response;
-        this.incidencesPending = response.filter((incidence:Incidence) => incidence.state === 'pending');
-        this.cargaDatos = false;
+obtenerReportes() {
+  // Call the API to get the list of incidences
+  this.ApiRequestService.listIncidences().subscribe(
+      (response: Incidence[]) => {
+          // Store the response in the incidences array
+          this.incidences = response;
+          // Filter the incidences to get only those that are pending
+          this.incidencesPending = response.filter((incidence: Incidence) => incidence.state === 'pending');
+          // Set cargaDatos to false after the data has been loaded
+          this.cargaDatos = false;
       },
       error => {
-        console.error('Error al obtener reportes:', error);
+          // Log any errors that occur while fetching the reports
+          console.error('Error al obtener reportes:', error);
       }
-    );
-  }
+  );
+}
 
-  mostrarDetalle(incidence:Incidence) {
-    this.incidenceSelect = incidence;
-  }
+mostrarDetalle(incidence: Incidence) {
+  // Set the selected incidence to show its details
+  this.incidenceSelect = incidence;
+}
 
-  cerrarModal() {
-    this.incidenceSelect = null;
-    this.obtenerReportes();
-    this.cerrarModal_Agregar()
-  }
+cerrarModal() {
+  // Clear the selected incidence to close the details modal
+  this.incidenceSelect = null;
+  // Refresh the list of reports
+  this.obtenerReportes();
+  // Close the modal for adding a new report
+  this.cerrarModal_Agregar();
+}
 
-  cambiarEstadoReporte(idReporte: number, estado: string, event: any) {
-    if (event) {
+
+cambiarEstadoReporte(idReporte: number, estado: string, event: any) {
+  if (event) {
       const target = event.target as HTMLInputElement;
       if (target) {
-        const isChecked = target.checked;
+          const isChecked = target.checked;
 
-        // Obtener una referencia a ambos checkboxes
-        const aceptarCheckbox = document.getElementById('aceptar') as HTMLInputElement;
-        const rechazarCheckbox = document.getElementById('rechazar') as HTMLInputElement;
+          // Get references to both checkboxes
+          const aceptarCheckbox = document.getElementById('aceptar') as HTMLInputElement;
+          const rechazarCheckbox = document.getElementById('rechazar') as HTMLInputElement;
 
-        // Desmarcar el otro checkbox si el checkbox actual se selecciona
-        if (isChecked) {
-          if (target === aceptarCheckbox) {
-            rechazarCheckbox.checked = false;
-          } else if (target === rechazarCheckbox) {
-            aceptarCheckbox.checked = false;
+          // Uncheck the other checkbox if the current checkbox is selected
+          if (isChecked) {
+              if (target === aceptarCheckbox) {
+                  rechazarCheckbox.checked = false;
+              } else if (target === rechazarCheckbox) {
+                  aceptarCheckbox.checked = false;
+              }
           }
-        }
 
-        const nuevoEstado = isChecked ? (estado === 'aceptado' ? 'accepted' : 'rejected') : '';
+          // Determine the new state based on whether the checkbox is checked and the current state
+          const nuevoEstado = isChecked ? (estado === 'aceptado' ? 'accepted' : 'rejected') : '';
 
-        // Llamar al servicio API para cambiar el estado del reporte
-        this.ApiRequestService.cambiarEstadoIncidencia(idReporte, nuevoEstado).subscribe(
-          (response: any) => {
-
-          },
-          (error: any) => {
-            console.error('Error al cambiar el estado del reporte:', error);
-            // Manejar el error del servicio si es necesario
-          }
-        );
-
-        
+          // Call the API service to change the state of the report
+          this.ApiRequestService.cambiarEstadoIncidencia(idReporte, nuevoEstado).subscribe(
+              (response: any) => {
+                  // Handle the response from the service if necessary
+              },
+              (error: any) => {
+                  // Log any errors that occur while changing the report state
+                  console.error('Error al cambiar el estado del reporte:', error);
+                  // Handle the service error if necessary
+              }
+          );
       }
-    }
   }
+}
 
-  agregarEmpleado(): void {
-    this.errorMessage2 = "";
-    this.successMessage = "";
-    if (this.formularioEmpleado.valid) {
+
+agregarEmpleado(): void {
+  // Reset error and success messages
+  this.errorMessage2 = "";
+  this.successMessage = "";
+
+  // Check if the employee form is valid
+  if (this.formularioEmpleado.valid) {
+      // Extract data from the form
       const nuevoEmpleado: Employee = this.formularioEmpleado.value;
       try {
-        this.ApiRequestService.addEmployee(nuevoEmpleado).subscribe(
-          (response: any) => {
-            this.successMessage = response.message;
-            this.cerrarModal_Agregar();
-          },
-          (error: any) => {
-            this.errorMessage2 = error.error.error;
-            // No realizar ninguna acción adicional en caso de error
-          }
-        );
+          // Call the API service to add the new employee
+          this.ApiRequestService.addEmployee(nuevoEmpleado).subscribe(
+              (response: any) => {
+                  // Handle successful addition of employee
+                  this.successMessage = response.message;
+                  // Close the add employee modal
+                  this.cerrarModal_Agregar();
+              },
+              (error: any) => {
+                  // Handle errors from the API service
+                  this.errorMessage2 = error.error.error;
+                  // No further action is taken in case of error
+              }
+          );
       } catch (error) {
-        this.errorMessage2 = 'Error al agregar empleado:', error;
-        // No realizar ninguna acción adicional en caso de error
+          // Handle any exceptions that occur
+          this.errorMessage2 = 'Error al agregar empleado:', error;
+          // No further action is taken in case of error
       }
-    } else {
+  } else {
+      // Display error message if the employee form is invalid
       this.errorMessage2 = 'Formulario inválido. Por favor, complete todos los campos requeridos.';
-    }
+  }
 }
 
-  mostrarModal() {
-    this.mostrarModalAgregar = true;
-  }
+mostrarModal() {
+  // Show the add employee modal
+  this.mostrarModalAgregar = true;
+}
 
-  cerrarModal_Agregar() {
-    this.mostrarModalAgregar = false;
-    this.formularioEmpleado.reset();
-  }
+cerrarModal_Agregar() {
+  // Close the add employee modal and reset the form
+  this.mostrarModalAgregar = false;
+  this.formularioEmpleado.reset();
+}
 
-  mostrarModal_Material() {
-    this.mostrarModalMaterial = true;
-    this.obtenerNombreCategoria()
-    this.obtenerEmpleados()
-    this.placeholder = "Seleccionar empleado";
-    this.selectedEmployee = undefined;
-  }
+mostrarModal_Material() {
+  // Show the material modal
+  this.mostrarModalMaterial = true;
 
-  cerrarModal_Material() {
-    this.mostrarModalMaterial = false;
-    this.formularioMaterial.reset();
-    this.selectedEmployee = undefined;
-  }
+  // Fetch category names
+  this.obtenerNombreCategoria();
 
-  getCategoriaDetails(idCategoria: number): void {
-    this.ApiRequestService.categoryMaterialInfo(idCategoria).subscribe(
+  // Fetch employee details
+  this.obtenerEmpleados();
+
+  // Set placeholder for employee selection
+  this.placeholder = "Seleccionar empleado";
+
+  // Reset selected employee
+  this.selectedEmployee = undefined;
+}
+
+cerrarModal_Material() {
+  // Close the material modal and reset the material form
+  this.mostrarModalMaterial = false;
+  this.formularioMaterial.reset();
+
+  // Reset selected employee
+  this.selectedEmployee = undefined;
+}
+
+
+getCategoriaDetails(idCategoria: number): void {
+  // Fetch details of the category material
+  this.ApiRequestService.categoryMaterialInfo(idCategoria).subscribe(
       (categoria: any) => {
-        // Verifica que attributeCategoryMaterials existe y es un objeto
-        if (categoria.attributeCategoryMaterials) {
-          // Recoge todos los materiales disponibles
-          const materialesDisponibles = Object.values(categoria.attributeCategoryMaterials)
-            .flatMap((attrCatMat: any) => attrCatMat.material)
-            .filter((material: any) => material.state === 'available' && material.branch_office?.id === this.incidenceSelect?.employee?.branch_office?.id);
+          // Check if attributeCategoryMaterials exists and is an object
+          if (categoria.attributeCategoryMaterials) {
+              // Collect all available materials
+              const materialesDisponibles = Object.values(categoria.attributeCategoryMaterials)
+                  .flatMap((attrCatMat: any) => attrCatMat.material)
+                  .filter((material: any) => material.state === 'available' && material.branch_office?.id === this.incidenceSelect?.employee?.branch_office?.id);
 
-          // Verifica si el material ya existe en detallesMaterial antes de agregarlo
-          for (const material of materialesDisponibles) {
-            const existeMaterial = this.detallesMaterial[idCategoria]?.some((m: any) => m.id === material.id);
-            if (!existeMaterial) {
-              this.detallesMaterial[idCategoria] = [...(this.detallesMaterial[idCategoria] || []), material];
-            }
+              // Check if the material already exists in detallesMaterial before adding it
+              for (const material of materialesDisponibles) {
+                  const existeMaterial = this.detallesMaterial[idCategoria]?.some((m: any) => m.id === material.id);
+                  if (!existeMaterial) {
+                      this.detallesMaterial[idCategoria] = [...(this.detallesMaterial[idCategoria] || []), material];
+                  }
+              }
           }
-        }
       },
       (error: any) => {
-        console.error('Error al obtener los detalles de la categoría:', error);
+          // Log any errors that occur while fetching category details
+          console.error('Error al obtener los detalles de la categoría:', error);
       }
-    );
-  }
-
-  onChangeCategoria(idCategoria: number): void {
-    this.getCategoriaDetails(idCategoria);
-  }
-
-  obtenerNombreSucursal(sucursalId: number): string {
-    const sucursal = this.sucursales.find(sucursal => sucursal.id === sucursalId);
-    return sucursal ? sucursal.name : ''; // Devuelve el nombre de la sucursal si se encuentra, de lo contrario devuelve una cadena vacía
-  }
-
-  obtenerEmpleados() {
-    this.ApiRequestService.getEmployees().subscribe(
-      (data: Employee[]) => {
-        const sucursalNombre = this.incidenceSelect?.employee?.branch_office?.name;
-
-        // Filtrar empleados por nombre de sucursal
-        this.employees = data.filter(employee => employee.branch_office?.name === sucursalNombre);
-
-        // Filtrar filteredEmployees por nombre de sucursal
-        this.filteredEmployees = this.employees;
-
-        // Transformar fullname
-        this.filteredEmployees.forEach(employee => {
-          employee.fullname = employee.name + ' ' + employee.last_name;
-        });
-
-      },
-      error => {
-        console.error('Error al obtener empleados:', error);
-      }
-    );
-  }
-
-  buscarEmpleado(event: { term: string; items: any[]; }) {
-    this.selectedEmployee = undefined;
-    const searchTerm = event.term.toLowerCase();
-    this.placeholder = "Seleccionar empleado";
-    // Si hay un término de búsqueda, filtrar la lista de empleados, de lo contrario, mostrar todos los empleados
-    if (searchTerm.trim() !== '') {
-      this.filteredEmployees = this.employees.filter(employee =>
-        employee.name.toLowerCase().includes(searchTerm) ||
-        employee.last_name.toLowerCase().includes(searchTerm)
-      );
-    } else {
-      this.filteredEmployees = this.employees;
-    }
+  );
 }
 
-  seleccionarEmpleado(employee: Employee) {
-    this.selectedEmployee = employee;
-    this.placeholder = '';
-    this.filteredEmployees = this.employees;
+onChangeCategoria(idCategoria: number): void {
+  // Call the function to fetch details of the selected category
+  this.getCategoriaDetails(idCategoria);
+}
+
+obtenerNombreSucursal(sucursalId: number): string {
+  // Find the branch office with the given ID
+  const sucursal = this.sucursales.find(sucursal => sucursal.id === sucursalId);
+  // Return the name of the branch office if found, otherwise return an empty string
+  return sucursal ? sucursal.name : '';
+}
+
+
+obtenerEmpleados() {
+  // Fetch the list of employees from the API
+  this.ApiRequestService.getEmployees().subscribe(
+      (data: Employee[]) => {
+          // Get the name of the branch office from the selected incidence
+          const sucursalNombre = this.incidenceSelect?.employee?.branch_office?.name;
+
+          // Filter employees by branch office name
+          this.employees = data.filter(employee => employee.branch_office?.name === sucursalNombre);
+
+          // Initialize filteredEmployees with the filtered list of employees
+          this.filteredEmployees = this.employees;
+
+          // Transform fullname by combining name and last_name
+          this.filteredEmployees.forEach(employee => {
+              employee.fullname = employee.name + ' ' + employee.last_name;
+          });
+      },
+      error => {
+          // Log any errors that occur while fetching employees
+          console.error('Error al obtener empleados:', error);
+      }
+  );
+}
+
+buscarEmpleado(event: { term: string; items: any[]; }) {
+  // Clear the selected employee and reset the placeholder
+  this.selectedEmployee = undefined;
+  const searchTerm = event.term.toLowerCase();
+  this.placeholder = "Seleccionar empleado";
+
+  // If there is a search term, filter the list of employees; otherwise, show all employees
+  if (searchTerm.trim() !== '') {
+      this.filteredEmployees = this.employees.filter(employee =>
+          employee.name.toLowerCase().includes(searchTerm) ||
+          employee.last_name.toLowerCase().includes(searchTerm)
+      );
+  } else {
+      this.filteredEmployees = this.employees;
   }
+}
+
+seleccionarEmpleado(employee: Employee) {
+  // Set the selected employee and reset the placeholder
+  this.selectedEmployee = employee;
+  this.placeholder = '';
+  // Reset the filtered list of employees
+  this.filteredEmployees = this.employees;
+}
+
 
 }

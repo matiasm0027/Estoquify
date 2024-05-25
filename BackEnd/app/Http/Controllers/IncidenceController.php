@@ -15,7 +15,7 @@ class IncidenceController extends Controller{
 
     public function addIncidence(Request $request)
     {
-        // Define las reglas de validación
+        // Define the validation rules
         $rules = [
             'date' => 'required|date',
             'petition' => 'required|string',
@@ -23,22 +23,22 @@ class IncidenceController extends Controller{
             'type' => 'required|string',
             'employee_id' => 'required|exists:employees,id',
         ];
-
-        // Si el tipo de reporte es "Solicitud Material", requerir la presencia de categorías
-        if ($request->input('type') === 'Solicitud Material') {
+    
+        // If the report type is "Material Request", require the presence of categories
+        if ($request->input('type') === 'Material Request') {
             $rules['categories'] = 'required|array';
-            $rules['categories.*.id'] = 'required|exists:categories,id'; // Asegúrate de que cada categoría exista
+            $rules['categories.*.id'] = 'required|exists:categories,id'; // Ensure each category exists
         }
-
-        // Validar la solicitud
+    
+        // Validate the request
         $validator = Validator::make($request->all(), $rules);
-
-        // Comprobar si hay errores de validación
+    
+        // Check for validation errors
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-
-        // Datos de la incidencia
+    
+        // Incidence data
         $incidenceData = [
             'date' => $request->date,
             'petition' => $request->petition,
@@ -47,12 +47,12 @@ class IncidenceController extends Controller{
             'type' => $request->type,
             'employee_id' => $request->employee_id,
         ];
-
-        // Crear y guardar la incidencia
+    
+        // Create and save the incidence
         $incidence = Incidence::create($incidenceData);
-
-        // Si el tipo de incidencia es "Solicitud Material", asociar las categorías
-        if ($request->type === 'Solicitud Material') {
+    
+        // If the incidence type is "Material Request", associate the categories
+        if ($request->type === 'Material Request') {
             $categories = $request->input('categories');
             foreach ($categories as $category) {
                 $incidence->categoryIncidences()->create([
@@ -61,9 +61,9 @@ class IncidenceController extends Controller{
                 ]);
             }
         }
-
-        // Mensaje de que se ha generado correctamente la incidencia
-        return response()->json(['message' => 'Reporte generado correctamente'], 201);
+    
+        // Success message for generating the incidence
+        return response()->json(['message' => 'Report generated successfully'], 201);
     }
    
 
@@ -80,54 +80,54 @@ class IncidenceController extends Controller{
     }
 
     public function changeIncidenceStatus(Request $request, $id)
-{
-    try {
-        // Verifica si el usuario está autenticado
-        $user = $request->user();
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no autenticado'], 401);
+    {
+        try {
+            // Verify if the user is authenticated
+            $user = $request->user();
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no autenticado'], 401);
+            }
+    
+            // Verify if the user has the allowed role
+            $this->checkUserRole(['1']); // Change '1' with the allowed role ID
+    
+            // Find the incidence by its ID
+            $incidence = Incidence::find($id);
+    
+            // Check if the incidence was found
+            if (!$incidence) {
+                return response()->json(['message' => 'El reporte no fue encontrado'], 404);
+            }
+    
+            // Validate the state provided in the request
+            $request->validate([
+                'estado' => 'required|in:accepted,rejected,pending' // Make sure to include all possible states here
+            ]);
+    
+            // Update the state of the incidence
+            $incidence->state = $request->estado;
+            $incidence->save();
+    
+            // Return a successful response
+            return response()->json(['message' => 'Estado del reporte actualizado correctamente'], 200);
+        } catch (\Exception $e) {
+            // Catch and handle any exceptions that may occur
+            return response()->json(['error' => 'Error al cambiar el estado del reporte: ' . $e->getMessage()], 500);
         }
+    }
 
-        // Verifica si el usuario tiene el rol permitido
-        $this->checkUserRole(['1']); // Cambia '1' por el ID del rol permitido
-
-        // Encuentra el reporte por su ID
-        $incidence = Incidence::find($id);
-
-        // Verifica si se encontró el reporte
-        if (!$incidence) {
-            return response()->json(['message' => 'El reporte no fue encontrado'], 404);
+    protected function checkUserRole($allowedRoles)
+    {
+        if (!Auth::check()) {
+            // The user is not authenticated
+            abort(401, 'Unauthorized');
         }
-
-        // Valida el estado proporcionado en la solicitud
-        $request->validate([
-            'estado' => 'required|in:accepted,rejected,pending' // Asegúrate de incluir todos los posibles estados aquí
-        ]);
-
-        // Actualiza el estado del reporte
-        $incidence->state = $request->estado;
-        $incidence->save();
-
-        // Devuelve una respuesta exitosa
-        return response()->json(['message' => 'Estado del reporte actualizado correctamente'], 200);
-    } catch (\Exception $e) {
-        // Captura y maneja cualquier excepción que pueda ocurrir
-        return response()->json(['error' => 'Error al cambiar el estado del reporte: ' . $e->getMessage()], 500);
+    
+        $user = Auth::user();
+    
+        if (!in_array($user->role_id, $allowedRoles)) {
+            // The user does not have one of the allowed roles
+            abort(403, 'Access denied');
+        }
     }
-}
-
-protected function checkUserRole($allowedRoles)
-{
-    if (!Auth::check()) {
-        // El usuario no está autenticado
-        abort(401, 'Unauthorized');
-    }
-
-    $user = Auth::user();
-
-    if (!in_array($user->role_id, $allowedRoles)) {
-        // El usuario no tiene uno de los roles permitidos
-        abort(403, 'Access denied');
-    }
-}
 }

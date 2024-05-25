@@ -32,30 +32,44 @@ export class ResetPasswordComponent implements OnInit{
     });
   }
 
-  ngOnInit(): void {
-    if (!this.resetToken){
-      this.router.navigate(['/login']);
-    }
+ // Initialize component
+ngOnInit(): void {
+  // Check if there is no reset token
+  if (!this.resetToken){
+    // Redirect to the login page if there is no reset token
+    this.router.navigate(['/login']);
   }
+}
 
-  submitResetPassword(): void {
-    if (this.resetPasswordForm.valid) {
-      const email = this.resetPasswordForm.value.email;
-      const newPassword = this.resetPasswordForm.value.newPassword;
-      const confirmPassword = this.resetPasswordForm.value.confirmPassword;
+// Function to submit reset password form
+submitResetPassword(): void {
+  // Check if the reset password form is valid
+  if (this.resetPasswordForm.valid) {
+    // Extract email, new password, and confirm password from the form
+    const email = this.resetPasswordForm.value.email;
+    const newPassword = this.resetPasswordForm.value.newPassword;
+    const confirmPassword = this.resetPasswordForm.value.confirmPassword;
 
-      if (newPassword !== confirmPassword) {
-        this.passwordsMatchError = true;
-        return;
+    // Check if the new password matches the confirm password
+    if (newPassword !== confirmPassword) {
+      // Set passwords match error flag to true and exit the function
+      this.passwordsMatchError = true;
+      return;
+    }
+    // Call the API service to reset the password
+    this.apiService.resetPassword(email, newPassword, confirmPassword, this.resetToken).subscribe(
+      // Handle successful response
+      (response) => {
+        // Redirect to the login page after password reset
+        this.router.navigate(['/login']);
+      },
+      // Handle error response
+      (error) => {
+        // Set error message to display the error to the user
+        this.errorMessage = error.error.error;
       }
-      this.apiService.resetPassword(email, newPassword, confirmPassword, this.resetToken).subscribe(
-        (response) => {
-          this.router.navigate(['/login']);
-        },
-        (error) => {
-          this.errorMessage = error.error.error;
-        }
-      );
-    }
+    );
   }
+}
+
 }
