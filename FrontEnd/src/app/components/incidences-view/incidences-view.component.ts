@@ -38,13 +38,11 @@ export class IncidenceViewComponent implements OnInit {
   successMessage!: string;
   errorMessage2!:string;
   cargaDatos: boolean = true;
-
   userRole!: any;
   loggedInUser!: Employee | null;
   departamentos: { id: number; name: string; }[] = [];
   sucursales: { id: number; name: string; }[] = [];
   roles: { id: number; name: string; }[] = [];
-
   incidences!: Incidence[];
   incidencesPending!: Incidence[];
   incidenceSelect!:Incidence | null;
@@ -87,130 +85,161 @@ export class IncidenceViewComponent implements OnInit {
 
   }
 
-  cargarOpciones() {
-    forkJoin([
-      this.authControlService.cargarSucursales(),
-      this.authControlService.cargarDepartamentos(),
-      this.authControlService.cargarRoles(),
-    ]).subscribe(
-      ([sucursales, departamentos, roles]) => {
-        this.sucursales = sucursales;
-        this.departamentos = departamentos;
-        this.roles = roles;
-      },
-      (error) => {
-        console.error('Error loading options', error);
-      }
-    );
-  }
+  // Load options asynchronously
+cargarOpciones() {
+  // Combine multiple observables into one observable
+  forkJoin([
+    this.authControlService.cargarSucursales(), // Load branches
+    this.authControlService.cargarDepartamentos(), // Load departments
+    this.authControlService.cargarRoles(), // Load roles
+  ]).subscribe(
+    // Handle successful completion
+    ([sucursales, departamentos, roles]) => {
+      // Assign loaded data to respective variables
+      this.sucursales = sucursales; // Branches
+      this.departamentos = departamentos; // Departments
+      this.roles = roles; // Roles
+    },
+    // Handle errors
+    (error) => {
+      // Log error to console
+      console.error('Error loading options', error);
+    }
+  );
+}
 
 
-  //-------------------------------------------------------------FUNCIONES DE ROL MANAGER--------------------------------------------------------------------
+  //-------------------------------------------------------------FUNCTIONS ROLE MANAGER--------------------------------------------------------------------
 
   toggleCheckbox(selectedCheckbox: string) {
+    // Reset petition variable
     this.petition = '';
+  
+    // Check which checkbox is selected and perform corresponding actions
     if (selectedCheckbox === 'altaEmpleado' && this.altaEmpleado) {
-      this.solicitudMaterial = false; // Deselecciona Solicitud Material si se selecciona Alta Empleado
+      // If 'altaEmpleado' checkbox is selected and already checked
+      // Deselect other checkboxes and call function to handle 'altaEmpleado'
+      this.solicitudMaterial = false;
       this.bajaEmpleado = false;
       this.bajaMaterial = false;
       this.onAltaEmpleado();
     } else if (selectedCheckbox === 'solicitudMaterial' && this.solicitudMaterial) {
-      this.altaEmpleado = false; // Deselecciona Alta Empleado si se selecciona Solicitud Material
+      // If 'solicitudMaterial' checkbox is selected and already checked
+      // Deselect other checkboxes and call function to handle 'solicitudMaterial'
+      this.altaEmpleado = false;
       this.bajaEmpleado = false;
       this.bajaMaterial = false;
       this.onCategoriaChange();
     } else if (selectedCheckbox === 'bajaEmpleado') {
+      // If 'bajaEmpleado' checkbox is selected
+      // Deselect other checkboxes and call function to handle 'bajaEmpleado'
       this.solicitudMaterial = false;
       this.altaEmpleado = false;
       this.bajaMaterial = false;
-      this.onBajaEmpleado(); // Llama a la función para manejar Baja Empleado
+      this.onBajaEmpleado();
     } else if (selectedCheckbox === 'bajaMaterial') {
+      // If 'bajaMaterial' checkbox is selected
+      // Deselect other checkboxes and call function to handle 'bajaMaterial'
       this.solicitudMaterial = false;
       this.altaEmpleado = false;
       this.bajaEmpleado = false;
-      this.onBajaMaterial(); // Llama a la función para manejar Baja Material
+      this.onBajaMaterial();
     }
   }
 
-  togglePriority(selectedPriority: string) {
-    if (selectedPriority === 'prioridadLow' && this.prioridadLow) {
-      this.prioridadMedium = false;
-      this.prioridadHigh = false;
-    } else if (selectedPriority === 'prioridadMedium' && this.prioridadMedium) {
-      this.prioridadLow = false;
-      this.prioridadHigh = false;
-    } else if (selectedPriority === 'prioridadHigh' && this.prioridadHigh) {
-      this.prioridadLow = false;
-      this.prioridadMedium = false;
-    }
+  // Toggle priority options based on the selected priority
+togglePriority(selectedPriority: string) {
+  // Check which priority option is selected and perform corresponding actions
+  if (selectedPriority === 'prioridadLow' && this.prioridadLow) {
+    // If 'prioridadLow' is selected and already checked
+    // Deselect other priority options
+    this.prioridadMedium = false;
+    this.prioridadHigh = false;
+  } else if (selectedPriority === 'prioridadMedium' && this.prioridadMedium) {
+    // If 'prioridadMedium' is selected and already checked
+    // Deselect other priority options
+    this.prioridadLow = false;
+    this.prioridadHigh = false;
+  } else if (selectedPriority === 'prioridadHigh' && this.prioridadHigh) {
+    // If 'prioridadHigh' is selected and already checked
+    // Deselect other priority options
+    this.prioridadLow = false;
+    this.prioridadMedium = false;
+  }
+}
+
+
+// Add a new incidence report
+addIncidence(): void {
+  // Get current date in ISO string format
+  const date = new Date().toISOString().slice(0, 10);
+  let type: string = '';
+
+  // Determine the type based on user selection
+  if (this.altaEmpleado) {
+    type = 'Alta Empleado';
+  } else if (this.solicitudMaterial) {
+    type = 'Solicitud Material';
+  } else if (this.bajaEmpleado) {
+    type = 'Baja Empleado';
+  } else if (this.bajaMaterial) {
+    type = 'Baja Material';
   }
 
-  addIncidence(): void {
-    const date = new Date().toISOString().slice(0, 10);
-    let type: string = '';
-  
-    // Determinar el tipo según la selección del usuario
-    if (this.altaEmpleado) {
-      type = 'Alta Empleado';
-    } else if (this.solicitudMaterial) {
-      type = 'Solicitud Material';
-    } else if (this.bajaEmpleado) {
-      type = 'Baja Empleado';
-    } else if (this.bajaMaterial) {
-      type = 'Baja Material';
+  // Validate that a valid type of incidence has been selected
+  if (!type) {
+    console.error('Error: No valid incidence type selected');
+    return;
+  }
+
+  // Validate that petition is defined and has a value
+  if (!this.petition || this.petition.trim() === '') {
+    console.error('Error: Petition cannot be empty');
+    return;
+  }
+
+  // Validate that employeeId is defined
+  if (!this.loggedInUser?.id) {
+    console.error('Error: Unable to read employee data');
+    return;
+  }
+
+  try {
+    // Build the incidence object
+    let newIncidence = new Incidence(
+      0, // id, expected to be assigned by the database
+      date,
+      this.petition,
+      'pending',
+      this.getPriority(),
+      type,
+      this.loggedInUser?.id
+    );
+
+    // Add selected categories only if the type is 'Solicitud Material'
+    if (type === 'Solicitud Material') {
+      newIncidence.categories = this.getCategoriasSeleccionadas().map(id => new Category(id.id,id.name));
     }
-  
-    // Validar que se haya seleccionado un tipo válido
-    if (!type) {
-      console.error('Error: No se ha seleccionado un tipo válido de incidencia');
-      return;
-    }
-  
-    // Validar que petition esté definida y tenga un valor
-    if (!this.petition || this.petition.trim() === '') {
-      console.error('Error: La petición no puede estar vacía');
-      return;
-    }
-  
-    // Validar que employeeId esté definido
-    if (!this.loggedInUser?.id) {
-      console.error('Error: No se puedo leer datos del empleado');
-      return;
-    }
-  
-    try {
-      // Construir el objeto de incidencia
-      let newIncidence = new Incidence(
-        0, // id, se espera que sea asignado por la base de datos
-        date,
-        this.petition,
-        'pending',
-        this.getPriority(),
-        type,
-        this.loggedInUser?.id
-      );
-  
-      // Agregar categorías seleccionadas solo si el tipo es 'Solicitud Material'
-      if (type === 'Solicitud Material') {
-        newIncidence.categories = this.getCategoriasSeleccionadas().map(id => new Category(id.id,id.name));
+
+    // Call the API service to add the report
+    this.ApiRequestService.addIncidence(newIncidence).subscribe(
+      // Handle successful response
+      (response: any) => {
+        // Reset form fields and show notification
+        this.resetForm();
+        this.mostrarNotificacion('The report has been submitted successfully', 4000);
+      },
+      // Handle errors
+      (error: any) => {
+        console.error('Error adding report:', error);
+        // Handle error if necessary
       }
-  
-      // Llamar al servicio API para agregar el reporte
-      this.ApiRequestService.addIncidence(newIncidence).subscribe(
-        (response: any) => {
-          this.resetForm();
-          this.mostrarNotificacion('El reporte se ha enviado correctamente', 4000);
-        },
-        (error: any) => {
-          console.error('Error al agregar el reporte:', error);
-          // Manejar el error si es necesario
-        }
-      );
-    } catch (error) {
-      console.error("Error al agregar el reporte:", error);
-      // Manejar el error de acuerdo a tus necesidades, por ejemplo, mostrar un mensaje al usuario
-    }
+    );
+  } catch (error) {
+    console.error("Error adding report:", error);
+    // Handle error according to your needs, e.g., display a message to the user
   }
+}
   
 
   getPriority(): string {
