@@ -76,6 +76,12 @@ loadFaqsDetails(): void {
   );
 }
 
+mostrarModal(): void {
+  // Set mostrarModalAgregar to true to display the add modal
+  this.mostrarModalAgregar = true;
+}
+
+
 mostrarModalEditar(faq: number): void {
   // Set mostrarModalEdit to true to display the edit modal
   this.mostrarModalEdit = true;
@@ -84,10 +90,7 @@ mostrarModalEditar(faq: number): void {
   this.FaqID = faq;
 }
 
-mostrarModal(): void {
-  // Set mostrarModalAgregar to true to display the add modal
-  this.mostrarModalAgregar = true;
-}
+
 
 cerrarModal(): void {
   // Close the add modal and reload FAQ details

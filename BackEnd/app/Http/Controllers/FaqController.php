@@ -31,8 +31,8 @@ public function getFaqsDetails()
         $faqs = Faq::all()->map(function ($faq) {
             return [
                 'id' => $faq->id,
-                'title' => $faq->title,
-                'description' => $faq->description
+                'titulo' => $faq->titulo,
+                'descripcion' => $faq->descripcion
             ];
         });
 
@@ -52,8 +52,8 @@ public function createFaq(Request $request)
 {
     try {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string',
-            'description' => 'required|string',
+            'titulo' => 'required|string',
+            'descripcion' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -78,8 +78,8 @@ public function editFaq(Request $request, $id)
 {
     try {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string',
-            'description' => 'required|string',
+            'titulo' => 'required|string',
+            'descripcion' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -87,8 +87,8 @@ public function editFaq(Request $request, $id)
         }
 
         $faq = Faq::findOrFail($id);
-        $faq->title = $request->input('title');
-        $faq->description = $request->input('description');
+        $faq->title = $request->input('titulo');
+        $faq->description = $request->input('descripcion');
         $faq->save();
         
         return response()->json(['faq' => $faq], 200);
