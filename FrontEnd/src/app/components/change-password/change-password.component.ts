@@ -31,8 +31,9 @@ export class ChangePasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const firstLogin = localStorage.getItem('first_login');
     // Redirecting to home page if it's not the first login (checking local storage)
-    if (!localStorage.getItem('first_login')) {
+    if (firstLogin === '0') {
       this.router.navigate(['/home']);
     }
   }

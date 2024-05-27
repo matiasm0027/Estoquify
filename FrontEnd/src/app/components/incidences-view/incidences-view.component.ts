@@ -36,7 +36,7 @@ export class IncidenceViewComponent implements OnInit {
   placeholder: string = "Seleccionar empleado";
   formularioMaterial: FormGroup;
   successMessage!: string;
-  errorMessage2!:string;
+  errorMessage2:string ="";
   cargaDatos: boolean = true;
   userRole!: any;
   loggedInUser!: Employee | null;
@@ -123,7 +123,7 @@ cargarOpciones() {
   toggleCheckbox(selectedCheckbox: string) {
     // Reset petition variable
     this.petition = '';
-  
+
     // Check which checkbox is selected and perform corresponding actions
     if (selectedCheckbox === 'altaEmpleado' && this.altaEmpleado) {
       // If 'altaEmpleado' checkbox is selected and already checked
@@ -249,7 +249,7 @@ addIncidence(): void {
     // Handle error according to your needs, e.g., display a message to the user
   }
 }
-  
+
 
   getPriority(): string {
     if (this.prioridadLow) {
@@ -266,7 +266,7 @@ addIncidence(): void {
   getCategoriasSeleccionadasIds(): number[] {
     // Initialize an empty array to store the selected category IDs
     const categoriasSeleccionadasIds: number[] = [];
-    
+
     // Iterate over the keys (category IDs) in the categoriasSeleccionadas object
     for (const categoriaId in this.categoriasSeleccionadas) {
         // Check if the current category ID is marked as selected
@@ -275,7 +275,7 @@ addIncidence(): void {
             categoriasSeleccionadasIds.push(parseInt(categoriaId));
         }
     }
-    
+
     // Return the array of selected category IDs
     return categoriasSeleccionadasIds;
 }
@@ -283,21 +283,21 @@ addIncidence(): void {
 getCategoriasSeleccionadas(): { id: number, name: string }[] {
   // Initialize an empty array to store the selected categories
   const categoriasSeleccionadas: { id: number, name: string }[] = [];
-  
+
   // Iterate over the keys (category IDs) in the categoriasSeleccionadas object
   for (const categoriaId in this.categoriasSeleccionadas) {
       // Check if the current category ID is marked as selected
       if (this.categoriasSeleccionadas[categoriaId]) {
           // Find the category object that matches the current category ID
           const categoria = this.categories.find(cat => cat.id === parseInt(categoriaId));
-          
+
           // If a matching category object is found, add it to the array with its ID and name
           if (categoria) {
               categoriasSeleccionadas.push({ id: parseInt(categoriaId), name: categoria.name });
           }
       }
   }
-  
+
   // Return the array of selected categories with their IDs and names
   return categoriasSeleccionadas;
 }
@@ -321,7 +321,7 @@ onBajaMaterial() {
 onAltaEmpleado() {
   // Define an array of strings representing the data fields for an employee
   const datos = ['Nombre: ', 'Apellido: ', 'Email: ', 'Teléfono Móvil: ', 'Departamento: ', 'Sucursal:', 'Rol:'];
-  
+
   // Join the elements of the array into a single string with each element on a new line
   this.petition = datos.join('\n');
 }
@@ -335,10 +335,10 @@ formatSelectedCategories() {
   if (this.solicitudMaterial) {
       // Get the list of selected categories
       const selectedCategories = this.getCategoriasSeleccionadas();
-      
+
       // Map each category to a string with the category name followed by ":"
       let formattedCategories = selectedCategories.map(c => c.name + ': ');
-      
+
       // Join the formatted category strings with newline characters
       return formattedCategories.join('\n');
   } else {

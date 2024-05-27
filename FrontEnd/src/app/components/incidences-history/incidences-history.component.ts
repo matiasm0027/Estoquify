@@ -26,7 +26,7 @@ export class IncidenceHistoryComponent implements OnInit {
     ngOnInit(): void {
       // Get the role of the user from the authentication control service
       this.userRole = this.authControlService.hasRole();
-  
+
       // Get the logged-in user from the authentication control service
       this.authControlService.getLoggedUser().subscribe(
           (user) => {
@@ -34,7 +34,7 @@ export class IncidenceHistoryComponent implements OnInit {
               this.loggedInUser = user;
           }
       );
-  
+
       // Load options and fetch reports when the component initializes
       this.cargarOpciones();
       this.obtenerReportes();
@@ -60,7 +60,7 @@ obtenerReportes() {
     this.ApiRequestService.listIncidences().subscribe(
         (response: Incidence[]) => {
             // Filter the incidences to include only those with state 'accepted' or 'rejected', and sort them by ID
-            this.incidences = response.filter((incidence: Incidence) => incidence.state === 'accepted' || incidence.state === 'rejected').sort((a, b) => a.id - b.id);
+            this.incidences = response.filter((incidence: Incidence) => incidence.state === 'accepted' || incidence.state === 'rejected');
             // Set cargaDatos to false after the data has been loaded
             this.cargaDatos = false;
         },
