@@ -18,6 +18,7 @@ export class Employee {
   role?: Role; // Relación con la tabla 'role'
   first_login: boolean;
   fullname?: string;
+  Employee?:string;
   employee_materials?: EmployeeMaterial[]; // Relación con la tabla 'employee_material'
 
   constructor(

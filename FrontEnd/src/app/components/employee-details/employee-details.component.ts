@@ -209,24 +209,27 @@ desasignarMaterial(employeeId: any, materialId: any) {
 
 
  // Convert data to CSV format
-private convertToCsv(data: any): string {
-  // Check if data is valid
-  if (!data || typeof data !== 'object') {
+private convertToCsv(data: any[]): string {
+  if (!data || !Array.isArray(data) || data.length === 0) {
     console.error('Table data is not valid.');
     return '';
   }
 
-  // Extract headers
-  const headers = Object.keys(data);
+  // Extract headers from the first object, excluding 'employee_materials'
+  const headers = Object.keys(data[0]).filter(header => header !== 'employee_materials');
+  // Add a 'materials' header for the materials assigned to each employee
+  headers.push('materials');
+  
   const csvRows = [headers.join(',')];
 
-  // Convert each object into a CSV row
   const extractValues = (obj: any) => {
     const values = headers.map(header => {
-      // Check if value is an object
-      if (typeof obj[header] === 'object' && obj[header] !== null) {
-        // Assuming 'material' has a 'name' property
-        return this.escapeCsvValue(obj[header].name);
+      if (header === 'materials') {
+        // Concatenate material names assigned to the employee
+        return obj.employee_materials ? 
+          obj.employee_materials.map((em: any) => em.material.name).join('; ') : '';
+      } else if (typeof obj[header] === 'object' && obj[header] !== null) {
+        return this.escapeCsvValue(obj[header].name || obj[header].toString());
       } else {
         return this.escapeCsvValue(obj[header]);
       }
@@ -234,30 +237,30 @@ private convertToCsv(data: any): string {
     return values.join(',');
   };
 
-  csvRows.push(extractValues(data));
+  data.forEach(item => {
+    csvRows.push(extractValues(item));
+  });
 
   return csvRows.join('\n');
 }
 
 // Download CSV file
 downloadCsv() {
-  // Check if employee details are available
-  if (!this.employeeDetails) {
+  if (!this.employeeDetails || this.employeeDetails.length === 0) {
     console.error('No employee data available');
     return;
   }
-  // Convert employee details to CSV format
-  const csvContent = this.convertToCsv([this.employeeDetails]);
-  // Create blob with CSV content
+  
+  const csvContent = this.convertToCsv(this.employeeDetails);
   const blob = new Blob([csvContent], { type: 'text/csv' });
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  // Set file name
+  
   const fileName = `${this.employeeDetails[0].name}_${this.employeeDetails[0].last_name}.csv`;
   a.download = fileName;
   document.body.appendChild(a);
-  // Trigger download
+  
   a.click();
   window.URL.revokeObjectURL(url);
   document.body.removeChild(a);
@@ -268,7 +271,7 @@ private escapeCsvValue(value: any): string {
   if (typeof value === 'string') {
     return `"${value.replace(/"/g, '""')}"`;
   }
-  return value;
+  return value !== undefined ? value : '';
 }
 
 }
