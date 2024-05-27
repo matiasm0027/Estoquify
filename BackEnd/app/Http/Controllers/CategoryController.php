@@ -15,37 +15,38 @@ class CategoryController extends Controller
 {
 
     public function categoryMaterial()
-    {
-        try {
-            $categories = Category::with(['attributeCategoryMaterials.attribute', 'attributeCategoryMaterials.material.branchOffice'])
+{
+    try {
+        $categories = Category::with(['attributeCategoryMaterials.attribute', 'attributeCategoryMaterials.material.branchOffice'])
             ->get();
 
-            $result = $categories->map(function ($category) {
-                return [
-                    'id' => $category->id,
-                    'name' => $category->name,
-                    'attributeCategoryMaterials' => $category->attributeCategoryMaterials
-                    ->unique('material_id')
-                    ->map(function ($attributeCategoryMaterial) {
-                        return [
-                            'material' => [
-                                'id' => $attributeCategoryMaterial->material->id,
-                                'name' => $attributeCategoryMaterial->material->name,
-                                'low_date' => $attributeCategoryMaterial->material->low_date,
-                                'high_date' => $attributeCategoryMaterial->material->high_date,
-                                'state' => $attributeCategoryMaterial->material->state,
-                                'branch_office' => $attributeCategoryMaterial->material->branchOffice,
-                            ],
-                        ];
-                    }),
-                ];
-            });
+        $result = $categories->map(function ($category) {
+            $attributeCategoryMaterials = $category->attributeCategoryMaterials->unique('material_id');
 
-            return response()->json($result);
-        } catch (ThrottleRequestsException $e) {
-            return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
-        }
+            return [
+                'id' => $category->id,
+                'name' => $category->name,
+                'attributeCategoryMaterials' => $attributeCategoryMaterials->isEmpty() ? (object)[] : $attributeCategoryMaterials->map(function ($attributeCategoryMaterial) {
+                    return [
+                        'material' => [
+                            'id' => $attributeCategoryMaterial->material->id,
+                            'name' => $attributeCategoryMaterial->material->name,
+                            'low_date' => $attributeCategoryMaterial->material->low_date,
+                            'high_date' => $attributeCategoryMaterial->material->high_date,
+                            'state' => $attributeCategoryMaterial->material->state,
+                            'branch_office' => $attributeCategoryMaterial->material->branchOffice,
+                        ],
+                    ];
+                }),
+            ];
+        });
+
+        return response()->json($result);
+    } catch (ThrottleRequestsException $e) {
+        return response()->json(['error' => 'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.'], 429);
     }
+}
+
 
     public function addCategory(Request $request)
     {

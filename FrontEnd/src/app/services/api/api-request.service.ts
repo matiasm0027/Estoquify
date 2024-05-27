@@ -15,11 +15,11 @@ import { Incidence } from 'src/app/model/Incidence';
   providedIn: 'root'
 })
 export class ApiRequestService {
-  private apiUrl = 'http://localhost:8000/api';
+  private apiUrl = 'https://estoquify.es/api';
 
   constructor(private http: HttpClient) {}
 
-  //credenciales
+  //credentials
   login(credentials: { email: string, password: string }): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/login`, credentials);
   }
@@ -44,12 +44,12 @@ export class ApiRequestService {
   }
 
 
-  //listar a si mismo
+  //list self
   getLoggedInUser(): Observable<Employee> {
     return this.http.get<Employee>(`${this.apiUrl}/auth/getLoggedInUser`);
   }
 
-  //listar empleados
+  //employee managament
   getEmployees(): Observable<Employee[]> {
     return this.http.get<Employee[]>(`${this.apiUrl}/auth/listEmployees`);
   }
@@ -71,7 +71,7 @@ export class ApiRequestService {
   }
 
 
-  //listado de tablas genericas
+  //list data
   listDepartments(): Observable<Department[]> {
     return this.http.get<Department[]>(`${this.apiUrl}/auth/listDepartments`);
   }
@@ -89,7 +89,7 @@ export class ApiRequestService {
   }
 
 
-  //lista de categoria
+  //categories managament
   categoryMaterial(): Observable<Category[]>{
     return this.http.get<Category[]>(`${this.apiUrl}/auth/categoryMaterial`);
   }
@@ -110,7 +110,7 @@ export class ApiRequestService {
     return this.http.delete<any>(`${this.apiUrl}/auth/deleteCategory/${id}`);
   }
 
-  //listado material
+  //material managament
   getMaterial(id: number): Observable<Material> {
     return this.http.get<Material>(`${this.apiUrl}/auth/getMaterial/${id}`);
   }
@@ -141,7 +141,7 @@ export class ApiRequestService {
     return this.http.post<any>(`${this.apiUrl}/auth/asignarMaterial/${id}`, requestBody);
   }
 
-  //lista de incidencias
+  //incidence managament
   listIncidences(): Observable<Incidence[]>{
     return this.http.get<Incidence[]>(`${this.apiUrl}/auth/listIncidences`);
   }
@@ -155,6 +155,7 @@ export class ApiRequestService {
     return this.http.put<any>(`${this.apiUrl}/auth/changeIncidenceStatus/${idReporte}`, requestBody);
   }
 
+  //list employees by branch
   listEmployeesByBranchOffice(id_branch_office : number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/auth/listEmployeesByBranchOffice/${id_branch_office}`);
   }
@@ -164,6 +165,7 @@ export class ApiRequestService {
   }
 
 
+  //faq managament
   getFaqsDetails(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/auth/getFaqsDetails`);
   }
@@ -180,6 +182,7 @@ export class ApiRequestService {
     return this.http.put<any>(`${this.apiUrl}/auth/editFaq/${FaqID}`, faqData);
   }
 
+  //chat mana
   crearConexion(nuevaConexion: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/crearconexion`, nuevaConexion);
   }

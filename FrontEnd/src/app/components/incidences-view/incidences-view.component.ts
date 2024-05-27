@@ -453,6 +453,7 @@ mostrarDetalle(incidence: Incidence) {
 }
 
 cerrarModal() {
+    this.successMessage = " ";
   // Clear the selected incidence to close the details modal
   this.incidenceSelect = null;
   // Refresh the list of reports
@@ -502,8 +503,8 @@ cambiarEstadoReporte(idReporte: number, estado: string, event: any) {
 
 agregarEmpleado(): void {
   // Reset error and success messages
-  this.errorMessage2 = "";
-  this.successMessage = "";
+  this.errorMessage2 = " ";
+  this.successMessage = " ";
 
   // Check if the employee form is valid
   if (this.formularioEmpleado.valid) {
